@@ -1,0 +1,92 @@
+(function () {
+  const feed = document.getElementById("confession-feed");
+  const form = document.getElementById("confession-form");
+  const text = document.getElementById("confession-text");
+  const message = document.getElementById("confession-message");
+
+  const fallback = [
+    {
+      text: "I packed five pens for one shift and still asked someone else if I could borrow one.",
+      createdAt: "Example"
+    },
+    {
+      text: "My scrub pocket contained a snack wrapper, two pen lids, a mystery glove and absolutely no pen.",
+      createdAt: "Example"
+    }
+  ];
+
+  function escapeHtml(value) {
+    return value.replace(/[&<>"']/g, function (char) {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#039;"
+      }[char];
+    });
+  }
+
+  function render(items) {
+    if (!items.length) {
+      feed.innerHTML = '<article class="confession-card"><p>No approved confessions yet. Be the first brave pen-loser.</p></article>';
+      return;
+    }
+
+    feed.innerHTML = items.map(function (item) {
+      const date = item.createdAt && item.createdAt !== "Example"
+        ? new Date(item.createdAt).toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" })
+        : "Example";
+      return '<article class="confession-card"><p>"' + escapeHtml(item.text) + '"</p><span>' + escapeHtml(date) + '</span></article>';
+    }).join("");
+  }
+
+  async function loadConfessions() {
+    try {
+      const response = await fetch("/api/confessions");
+      if (!response.ok) throw new Error("Could not load confessions");
+      const data = await readJson(response);
+      render(data.confessions || []);
+    } catch (error) {
+      render(fallback);
+    }
+  }
+
+  async function readJson(response) {
+    const textValue = await response.text();
+    try {
+      return JSON.parse(textValue);
+    } catch (error) {
+      throw new Error("Confession backend is not deployed yet.");
+    }
+  }
+
+  if (form) {
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      message.textContent = "Submitting...";
+
+      const payload = {
+        text: text.value,
+        confirm: document.getElementById("confession-confirm").checked,
+        website: form.elements.website.value
+      };
+
+      try {
+        const response = await fetch("/api/confessions", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await readJson(response);
+        if (!response.ok) throw new Error(data.error || "Submission failed");
+        form.reset();
+        message.textContent = "Submitted. It will appear after moderation.";
+      } catch (error) {
+        message.textContent = error.message || "Something went wrong. Try again.";
+      }
+    });
+  }
+
+  loadConfessions();
+})();

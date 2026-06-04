@@ -1,0 +1,85 @@
+(function () {
+  const form = document.getElementById("admin-login");
+  const token = document.getElementById("admin-token");
+  const message = document.getElementById("admin-message");
+  const feed = document.getElementById("admin-feed");
+
+  function escapeHtml(value) {
+    return value.replace(/[&<>"']/g, function (char) {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#039;"
+      }[char];
+    });
+  }
+
+  async function loadPending() {
+    message.textContent = "Loading pending posts...";
+    const response = await fetch("/api/confessions?status=pending", {
+      headers: { authorization: "Bearer " + token.value }
+    });
+    const data = await readJson(response);
+    if (!response.ok) throw new Error(data.error || "Could not load pending posts");
+    render(data.confessions || []);
+    message.textContent = data.confessions.length ? "Pending posts loaded." : "No pending posts.";
+  }
+
+  async function readJson(response) {
+    const textValue = await response.text();
+    try {
+      return JSON.parse(textValue);
+    } catch (error) {
+      throw new Error("Confession backend is not deployed yet.");
+    }
+  }
+
+  function render(items) {
+    if (!items.length) {
+      feed.innerHTML = '<article class="confession-card"><p>No pending confessions.</p></article>';
+      return;
+    }
+
+    feed.innerHTML = items.map(function (item) {
+      return '<article class="confession-card admin-card" data-id="' + escapeHtml(item.id) + '"><p>"' + escapeHtml(item.text) + '"</p><span>' + escapeHtml(new Date(item.createdAt).toLocaleString("en-AU")) + '</span><div class="button-row"><button class="button compact" data-action="approve" type="button">Approve</button><button class="button secondary compact" data-action="reject" type="button">Reject</button></div></article>';
+    }).join("");
+  }
+
+  feed.addEventListener("click", async function (event) {
+    const button = event.target.closest("button[data-action]");
+    if (!button) return;
+    const card = button.closest("[data-id]");
+    const action = button.getAttribute("data-action");
+
+    button.disabled = true;
+    message.textContent = action === "approve" ? "Approving..." : "Rejecting...";
+
+    try {
+      const response = await fetch("/api/confessions", {
+        method: "PATCH",
+        headers: {
+          authorization: "Bearer " + token.value,
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({ id: card.getAttribute("data-id"), action: action })
+      });
+      const data = await readJson(response);
+      if (!response.ok) throw new Error(data.error || "Moderation failed");
+      await loadPending();
+    } catch (error) {
+      message.textContent = error.message || "Something went wrong.";
+      button.disabled = false;
+    }
+  });
+
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    try {
+      await loadPending();
+    } catch (error) {
+      message.textContent = error.message || "Could not load pending posts.";
+    }
+  });
+})();
