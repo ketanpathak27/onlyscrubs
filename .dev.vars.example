@@ -1,0 +1,2 @@
+# Copy to .dev.vars for local wrangler dev. Do not commit the real file.
+ADMIN_TOKEN=change-me-local-dev-token

@@ -1,58 +1,49 @@
-# OnlyScrubs Website
+# OnlyScrubs
 
-This is a static website for `onlyscrubs.org`.
+A free Australian resource site for healthcare workers and students: scrub swaps, shift and placement tips, gear notes, wellbeing signposts, and a moderated confessions feed.
 
-## Pages
+Live site: [https://onlyscrubs.org](https://onlyscrubs.org)
 
-- `index.html` - homepage
-- `confessions.html` - public confession feed and submission form
-- `admin.html` - moderation page
-- `scrub-rack.html` - scrub donation, request and swap page
-- `shift-kit.html` - practical shift tools
-- `student-bay.html` - placement prep for students
-- `gear-guide.html` - scrubs, shoes and gear guidance
-- `wellbeing.html` - Australian support links
-- `submit.html` - mailto submission templates
-- `submission-rules.html` - moderation rules
-- `privacy.html` - privacy notice
-- `disclaimer.html` - professional and medical boundary disclaimer
-- `404.html` - not found page
-- `functions/api/confessions.js` - Cloudflare Pages Function for storing and moderating confessions
-- `confessions.js` and `admin.js` - browser scripts for the feed, form and admin page
+This repository is the source for the Cloudflare Worker that serves the site and APIs.
 
-## Deploying to Cloudflare Pages
+## Stack
 
-Upload the contents of this folder, including the `assets` folder. If the hero image does not appear after deploy, check that this file exists online:
+- Static HTML, CSS and JS in `public/`
+- Cloudflare Worker in `src/worker.js` (API, security headers, caching, rate limits)
+- Cloudflare KV namespace `CONFESSIONS_KV` for submissions, comments, votes and rate-limit keys
+- `ADMIN_TOKEN` Worker secret for `/admin.html` moderation
 
-`https://onlyscrubs.org/assets/hero-scrubs-breakroom.png`
+`src/assets.js` is generated from `public/`. After editing files in `public/`, run:
 
-Important: the confession system uses Cloudflare Pages Functions. Cloudflare dashboard drag-and-drop Direct Upload does not activate a `functions` folder. Use either:
+```bash
+npm run build:assets
+```
 
-- Wrangler Direct Upload from your computer, or
-- a GitHub-connected Cloudflare Pages project.
+## Local development
 
-The static pages will still deploy by drag-and-drop, but confession storage and moderation will not work until Functions are deployed.
+```bash
+npm install
+cp .dev.vars.example .dev.vars
+# put a local-only admin token in .dev.vars
+npm run dev
+```
 
-## Confessions setup
+Wrangler uses a local KV simulation by default, so local testing does not write to production data.
 
-The confessions feature needs Cloudflare KV storage.
+## Deploy
 
-1. In Cloudflare, go to Workers & Pages.
-2. Open KV and create a namespace called `ONLYSCRUBS_CONFESSIONS`.
-3. Open your OnlyScrubs Pages project.
-4. Go to Settings, then Functions, then KV namespace bindings.
-5. Add a binding named `CONFESSIONS_KV`.
-6. Select the `ONLYSCRUBS_CONFESSIONS` namespace.
-7. Go to Environment variables.
-8. Add `ADMIN_TOKEN` with a long private password/token.
-9. Redeploy the site.
-10. Visit `/confessions.html` to submit and view approved confessions.
-11. Visit `/admin.html` to approve or reject pending confessions.
+```bash
+npx wrangler deploy
+```
 
-New confessions do not appear publicly until approved in `/admin.html`.
+The Worker is bound to `onlyscrubs.org`. Keep the existing `ADMIN_TOKEN` secret; deployments should not replace it unless you intend to rotate it.
 
-## Compliance posture
+## Confessions
 
-The site is written to avoid regulated-health-service advertising. It does not provide medical advice, diagnosis, treatment, clinical recommendations, patient stories or testimonials about regulated health services.
+Public submissions go to `/api/confessions` and stay pending until approved at `/admin.html`. Comments, ratings and reports have additional endpoints under `/api/`. Keyword checks and honeypot fields catch obvious risky or spam submissions; human moderation is still required.
 
-This is not legal advice. Review before adding payments, donations, accounts, public forms or public listing boards.
+Posts older than one year are archived automatically.
+
+## Compliance
+
+OnlyScrubs is not a clinic and does not provide medical advice, diagnosis or treatment. It is written to avoid regulated-health-service advertising. Review this before adding payments, accounts or public listing boards.

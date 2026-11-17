@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "onlyscrubs",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-06-04",
+  "workers_dev": false,
+  "kv_namespaces": [
+    {
+      "binding": "CONFESSIONS_KV",
+      "id": "3ca3a6fd6dce4a83a02f133fac5048a2"
+    }
+  ],
+  "routes": [
+    {
+      "pattern": "onlyscrubs.org/*",
+      "zone_name": "onlyscrubs.org"
+    }
+  ]
+}
