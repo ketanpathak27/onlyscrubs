@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="OnlyScrubs">
+  <rect width="64" height="64" rx="14" fill="#0c6b68"/>
+  <path fill="#f4f7f5" d="M18 24h10l4 6 4-6h10v22H18z"/>
+  <path d="M28 24c2 6 6 6 8 0" fill="none" stroke="#0c6b68" stroke-width="2"/>
+  <text x="32" y="44" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" font-weight="700" fill="#084e4c">OS</text>
+</svg>

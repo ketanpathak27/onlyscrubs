@@ -1,0 +1,80 @@
+[
+  {
+    "id": "shoes",
+    "category": "shoes",
+    "title": "Shoes for long shifts",
+    "summary": "Closed, wipeable, and boring enough to pass a uniform check. Comfort shows up at hour ten, not in the shop mirror.",
+    "advice": [
+      "Follow the shoe rule you were actually given: closed toe, closed heel, and a sole that meets the slip-resistance note in your uniform guide. A nice sneaker that cannot be wiped clean is a common expensive mistake.",
+      "Try shoes on later in the day, when your feet are closer to shift size. Walk on a hard floor in the shop if they will let you. A shoe that needs weeks of break-in is a rough choice for a first placement week.",
+      "Replace them when the tread is smooth, the heel collapses inward, or the lining has worn through. Rotating two pairs, if you can afford it, lets each pair dry out between shifts."
+    ],
+    "lookFor": ["Wipeable upper", "Room for swelling", "A sole you can replace or resole is a bonus, not a requirement", "Laces or a fastening you can tighten mid-shift"],
+    "thinkTwice": ["Mesh that soaks up spills", "Fashion trainers with no tread", "Buying your size from a chart without trying them, if a shop is available"]
+  },
+  {
+    "id": "compression-socks",
+    "category": "socks",
+    "title": "Compression socks",
+    "summary": "Some people wear graduated compression socks for long standing shifts. That is a product choice, not a treatment plan.",
+    "advice": [
+      "If you have arterial disease, diabetes with foot changes, sudden swelling, or you are pregnant, ask your own clinician before using compression. This page cannot tell you a pressure grade.",
+      "Use the maker's size chart, measuring where they tell you to measure. A tighter size is not 'more support'. Put them on before your feet have swollen, and take them off to sleep unless you have been told otherwise.",
+      "They lose stretch. When they slide down or feel loose, they are finished. Wash them the way the label says so the elastic lasts."
+    ],
+    "lookFor": ["A published size chart", "A pressure you can read on the packet", "A heel that sits on your heel", "Fabric you can tolerate in warm clinical areas"],
+    "thinkTwice": ["Buying the strongest pair because it sounds more serious", "Using them to hide swelling you have not had checked", "Knee-highs that cut in behind the knee"]
+  },
+  {
+    "id": "fob-watch",
+    "category": "watches",
+    "title": "Fob watches",
+    "summary": "Many clinical areas do not allow wristwatches. A fob pinned to the uniform is the usual workaround.",
+    "advice": [
+      "Look for a clear second hand or a digital second count, because timing a pulse or a breathing rate needs seconds, not just the hour. Check it against a known clock now and then. Cheap movements drift.",
+      "The pin should hold fabric without tearing it. A silicone cover is easier to wipe than a fabric strap. Infection-control rules differ by workplace: follow the local one, including whether a watch is allowed at all.",
+      "Do not wear it on your wrist if the rule says not to, and do not clip it where it dangles into a sterile field or a cot."
+    ],
+    "lookFor": ["Readable seconds", "A quiet tick if noise bothers you", "A brooch pin with a cover", "Water resistance enough for handwashing splash"],
+    "thinkTwice": ["A heavy decorative watch that pulls the neckline", "No second hand", "Assuming a phone clock is allowed. Often it is not."]
+  },
+  {
+    "id": "bags",
+    "category": "bags",
+    "title": "Bags",
+    "summary": "A bag you can wipe, that keeps lunch away from your notebook, and that does not live on the floor of a corridor.",
+    "advice": [
+      "A backpack shares the weight of a placement day better than a single-shoulder tote. If the clinical area bans backpacks, plan a locker or a smaller bag for the floor and leave the rest outside.",
+      "Separate a wet pocket or a sleeve for your drink. One leak onto notes is a bad shift. Do not store paperwork that identifies a patient or a workplace in a bag that goes home.",
+      "Choose a fabric or shell you can wipe. Pale canvas looks fresh for one commute."
+    ],
+    "lookFor": ["Wipeable lining", "A sleeve for a water bottle", "Two shoulder straps", "A pocket you can reach without unpacking everything"],
+    "thinkTwice": ["Open totes in the rain", "Bags so large they block a doorway", "Using the same pocket for lunch and ID documents"]
+  },
+  {
+    "id": "stethoscopes",
+    "category": "stethoscopes",
+    "title": "Stethoscopes",
+    "summary": "Your unit outline is the source of truth for whether you need one on day one. Some placements provide them.",
+    "advice": [
+      "If you do need one, a tunable diaphragm and soft earpieces are the features students usually notice. An expensive chest piece does not interpret sounds for you. A mid-range model is enough while you are learning.",
+      "Try the earpieces. They should angle slightly forward, into the ear canal, and not hurt after ten minutes. Learn which way your unit wants the tubing to face, and clean the whole piece between people the way you are taught.",
+      "Engrave or mark it in a way that is allowed. They walk off. Do not lend it and then forget who has it at the end of a shift."
+    ],
+    "lookFor": ["Comfortable earpieces", "A diaphragm you can clean", "Tubing that is not so long it drags", "A name method that survives alcohol wipes"],
+    "thinkTwice": ["The most expensive model as a first purchase", "Fabric tubing covers that cannot be cleaned", "Buying before you have read the equipment list"]
+  },
+  {
+    "id": "pens-torches",
+    "category": "pens",
+    "title": "Pens and penlights",
+    "summary": "Take more pens than you think you need. Take the torch your course actually asked for.",
+    "advice": [
+      "Black ink is the usual expectation for records. Confirm the local documentation rule before you arrive with a pack of blue. Click pens lose fewer caps in a pocket than capped pens, though both vanish.",
+      "A small penlight is often on student lists for neurological observations. Use the style your university described, with fresh batteries. Do not use a phone torch if phones are banned in that area.",
+      "Keep pens and the torch in a pocket you check before you leave. Borrowing all shift is a confession, not a system."
+    ],
+    "lookFor": ["Black ink that does not blob", "A clip that stays on scrub fabric", "A penlight with a pupil gauge only if your list asks for one", "Spare batteries in the bag, not loose in the pocket"],
+    "thinkTwice": ["Gel pens that smear on clinical forms", "A huge torch that looks tactical and blinds people", "Leaving your only pen on a desk"]
+  }
+]
