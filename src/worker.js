@@ -1,10 +1,10 @@
 import { CANONICAL, SCRIPT_HASHES } from "./generated/meta.js";
-import { siteConfig } from "./config.js";
+import { siteConfig, supportLink } from "./config.js";
 import { applySecurityHeaders, json } from "./lib/http.js";
 import { turnstileSiteKey } from "./lib/turnstile.js";
 import { apiComments, apiConfessions, apiNewsletter, apiRate, apiReact, apiReport, apiUnsubscribe } from "./routes/community.js";
 import { apiListings, apiMessages } from "./routes/rack.js";
-import { apiAdmin, apiAdminBulk, apiAdminLogin, apiAdminLogout, apiAdminSession, apiNewsletterExport, apiStats } from "./routes/admin.js";
+import { apiAdmin, apiAdminBulk, apiAdminIndexNow, apiAdminLogin, apiAdminLogout, apiAdminSession, apiNewsletterExport, apiStats } from "./routes/admin.js";
 
 const SITE_HOST = "onlyscrubs.org";
 
@@ -27,10 +27,21 @@ function redirect(location, status = 301) {
   });
 }
 
+function indexNowKeyFile() {
+  return new Response(siteConfig.indexNowKey, {
+    status: 200,
+    headers: {
+      "content-type": "text/plain; charset=utf-8",
+      "cache-control": "public, max-age=3600",
+      "x-content-type-options": "nosniff"
+    }
+  });
+}
+
 function apiConfig(env) {
   const supportFromEnv = env.SUPPORT_URL;
-  const supportUrl =
-    supportFromEnv == null || supportFromEnv === "" ? siteConfig.supportUrl || "" : String(supportFromEnv);
+  const configured = supportFromEnv == null || supportFromEnv === "" ? siteConfig.supportUrl : supportFromEnv;
+  const supportUrl = supportLink(configured);
   let adsEnabled = Boolean(siteConfig.adsEnabled);
   if (env.ADS_ENABLED === "true" || env.ADS_ENABLED === "1") adsEnabled = true;
   if (env.ADS_ENABLED === "false" || env.ADS_ENABLED === "0") adsEnabled = false;
@@ -81,7 +92,8 @@ export default {
     if (path === "/api/messages") return apiMessages(request, env);
     if (path === "/api/config") return apiConfig(env);
     if (path === "/api/admin/login") return apiAdminLogin(request, env);
-    if (path === "/api/admin/logout") return apiAdminLogout();
+    if (path === "/api/admin/logout") return apiAdminLogout(request);
+    if (path === "/api/admin/indexnow") return apiAdminIndexNow(request, env);
     if (path === "/api/admin/session") return apiAdminSession(request, env);
     if (path === "/api/admin/stats") return apiStats(request, env);
     if (path === "/api/admin/bulk") return apiAdminBulk(request, env);
@@ -92,6 +104,8 @@ export default {
     if (request.method !== "GET" && request.method !== "HEAD") {
       return json({ error: "Method not allowed" }, 405);
     }
+
+    if (path === `/${siteConfig.indexNowKey}.txt`) return indexNowKeyFile();
 
     if (CANONICAL[path]) {
       return redirect(CANONICAL[path] + url.search);

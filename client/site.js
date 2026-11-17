@@ -73,16 +73,33 @@
     return field ? field.value : "";
   };
 
+  function showSignedIn(on) {
+    document.querySelectorAll("[data-admin-lock], [data-admin-logout]").forEach(function (el) { el.hidden = !on; });
+  }
   fetch("/api/admin/session").then(function (res) { return res.json(); }).then(function (data) {
-    if (!data || !data.signedIn) return;
-    document.querySelectorAll("[data-admin-lock]").forEach(function (link) { link.hidden = false; });
+    showSignedIn(Boolean(data && data.signedIn));
   }).catch(function () {});
 
+  function usableSupportUrl(value) {
+    try {
+      const url = new URL(String(value || "").trim());
+      if (url.protocol !== "https:" && url.protocol !== "http:") return "";
+      const host = url.hostname.toLowerCase();
+      if (!host || host === "example.com" || host.endsWith(".example") || host === "localhost") return "";
+      return url.href;
+    } catch (error) {
+      return "";
+    }
+  }
   loadConfig().then(function (cfg) {
+    const href = usableSupportUrl(cfg.supportUrl);
     document.querySelectorAll("[data-support-link]").forEach(function (link) {
-      if (cfg.supportUrl) {
-        link.href = cfg.supportUrl;
+      if (href) {
+        link.href = href;
         link.hidden = false;
+      } else {
+        link.removeAttribute("href");
+        link.hidden = true;
       }
     });
     if (cfg.adsEnabled) {
@@ -178,19 +195,104 @@
     draw();
   }
 
+  function runningStandalone() {
+    const standalone = window.matchMedia("(display-mode: standalone)").matches || window.matchMedia("(display-mode: fullscreen)").matches;
+    return standalone || window.navigator.standalone === true;
+  }
+  function installCopy() {
+    const ua = navigator.userAgent || "";
+    const iOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    if (iOS) {
+      return {
+        intro: "Safari on iPhone and iPad does not show an install prompt. Add OnlyScrubs from the share menu instead.",
+        steps: [
+          "Tap the Share button in the toolbar. It is a square with an arrow pointing up.",
+          "Scroll the share sheet and tap Add to Home Screen.",
+          "Tap Add. OnlyScrubs then opens from the home screen."
+        ]
+      };
+    }
+    if (/Android/i.test(ua)) {
+      return {
+        intro: "If this browser did not ask to install OnlyScrubs, use the menu.",
+        steps: [
+          "Open the browser menu, usually the three dots.",
+          "Tap Install app or Add to Home screen.",
+          "Confirm. The icon is added to your home screen."
+        ]
+      };
+    }
+    return {
+      intro: "If you do not see an install prompt, use the browser menu.",
+      steps: [
+        "Open the browser menu.",
+        "Choose Install OnlyScrubs, or use the install icon in the address bar.",
+        "Confirm. The site then opens in its own window."
+      ]
+    };
+  }
+  function esc(value) {
+    return String(value).replace(/[&<>]/g, function (char) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[char];
+    });
+  }
   const installButton = document.querySelector("[data-install]");
-  let deferredPrompt;
+  const installSheet = document.querySelector("[data-install-sheet]");
+  if (runningStandalone() && installButton) installButton.hidden = true;
+  let deferredPrompt = null;
   window.addEventListener("beforeinstallprompt", function (event) {
     event.preventDefault();
     deferredPrompt = event;
-    if (installButton) installButton.hidden = false;
+    if (installButton && !runningStandalone()) installButton.hidden = false;
   });
-  installButton?.addEventListener("click", async function () {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
+  window.addEventListener("appinstalled", function () {
     deferredPrompt = null;
-    installButton.hidden = true;
+    if (installButton) installButton.hidden = true;
+    if (installSheet && installSheet.open && installSheet.close) installSheet.close();
+  });
+  function openInstallSheet() {
+    if (!installSheet) return;
+    const copy = installCopy();
+    const intro = installSheet.querySelector("[data-install-intro]");
+    const list = installSheet.querySelector("[data-install-steps]");
+    if (intro) intro.textContent = copy.intro;
+    if (list) list.innerHTML = copy.steps.map(function (step) { return "<li>" + esc(step) + "</li>"; }).join("");
+    if (typeof installSheet.showModal === "function") installSheet.showModal();
+    else installSheet.hidden = false;
+  }
+  installButton?.addEventListener("click", async function () {
+    if (deferredPrompt) {
+      try {
+        deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        if (choice && choice.outcome === "accepted") installButton.hidden = true;
+        return;
+      } catch (error) {
+        deferredPrompt = null;
+      }
+    }
+    openInstallSheet();
+  });
+  installSheet?.querySelector("[data-install-close]")?.addEventListener("click", function () {
+    if (installSheet.close) installSheet.close();
+    else installSheet.hidden = true;
+  });
+  installSheet?.addEventListener("click", function (event) {
+    if (event.target === installSheet && installSheet.close) installSheet.close();
+  });
+  document.addEventListener("click", async function (event) {
+    const button = event.target.closest("[data-admin-logout]");
+    if (!button) return;
+    button.disabled = true;
+    try {
+      const res = await fetch("/api/admin/logout", { method: "POST" });
+      if (!res.ok) throw new Error("Could not log out.");
+      location.assign("/");
+    } catch (error) {
+      button.disabled = false;
+      button.textContent = "Could not log out";
+    }
   });
 
   if ("serviceWorker" in navigator) {

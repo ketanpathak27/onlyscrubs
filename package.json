@@ -9,7 +9,8 @@
     "deploy": "wrangler deploy",
     "check": "wrangler deploy --dry-run",
     "test": "node --test test/*.mjs",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "indexnow": "node scripts/indexnow.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.164.0"

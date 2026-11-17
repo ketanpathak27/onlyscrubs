@@ -3,9 +3,32 @@ export const siteConfig = {
   siteName: "OnlyScrubs",
   siteUrl: "https://onlyscrubs.org",
   contactEmail: "hello@onlyscrubs.org",
-  /** Buy-me-a-coffee style URL. Leave empty to hide the link. Override with SUPPORT_URL. */
+  /**
+   * The only place the coffee link is configured in this repo.
+   * Leave this empty until the owner supplies a real Buy Me a Coffee or Ko-fi URL.
+   * A Worker var named SUPPORT_URL overrides it. Empty, or anything that is not
+   * an http(s) URL, hides the button.
+   */
   supportUrl: "",
   /** Reserved ad slots on guides and gear pages. Override with ADS_ENABLED=true. */
   adsEnabled: false,
-  locale: "en-AU"
+  locale: "en-AU",
+  /** Public IndexNow key. Served at /<key>.txt. Not a secret. */
+  indexNowKey: "8f686a4ed0d24a66820ce232f9e73175"
 };
+
+/** Return a usable support URL, or "" when the button should stay hidden. */
+export function supportLink(value) {
+  const raw = String(value ?? "").trim();
+  if (!raw) return "";
+  let url;
+  try {
+    url = new URL(raw);
+  } catch {
+    return "";
+  }
+  if (url.protocol !== "https:" && url.protocol !== "http:") return "";
+  const host = url.hostname.toLowerCase();
+  if (!host || host === "example.com" || host.endsWith(".example") || host === "localhost") return "";
+  return url.toString();
+}

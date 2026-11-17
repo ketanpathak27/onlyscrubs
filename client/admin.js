@@ -22,12 +22,12 @@
     app.hidden = true;
     gate.hidden = false;
     if (text) signInMessage.textContent = text;
-    document.querySelectorAll("[data-admin-lock]").forEach(function (link) { link.hidden = true; });
+    document.querySelectorAll("[data-admin-lock], [data-admin-logout]").forEach(function (link) { link.hidden = true; });
   }
   function showApp() {
     gate.hidden = true;
     app.hidden = false;
-    document.querySelectorAll("[data-admin-lock]").forEach(function (link) { link.hidden = false; });
+    document.querySelectorAll("[data-admin-lock], [data-admin-logout]").forEach(function (link) { link.hidden = false; });
   }
   async function read(res) {
     const type = res.headers.get("content-type") || "";
@@ -122,12 +122,12 @@
     if (kind.value === "relay") kind.value = "confession";
     load().catch(function (error) { message.textContent = error.message; });
   });
-  document.getElementById("admin-logout")?.addEventListener("click", async function () {
-    await fetch("/api/admin/logout", { method: "POST" });
-    feed.innerHTML = "";
-    stats.innerHTML = "";
-    headlines.innerHTML = "";
-    showGate("Signed out.");
+  document.getElementById("submit-indexnow")?.addEventListener("click", async function () {
+    message.textContent = "Submitting pages to IndexNow…";
+    try {
+      const data = await read(await fetch("/api/admin/indexnow", { method: "POST" }));
+      message.textContent = "Submitted " + data.count + " pages to IndexNow.";
+    } catch (error) { message.textContent = error.message; }
   });
   document.getElementById("archive-old")?.addEventListener("click", async function () {
     message.textContent = "Archiving…";
