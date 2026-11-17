@@ -1,0 +1,17 @@
+{
+  "name": "onlyscrubs",
+  "private": true,
+  "description": "OnlyScrubs website and Cloudflare Worker",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "build:assets": "python3 scripts/build-assets.py"
+  },
+  "devDependencies": {
+    "wrangler": "^4.164.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "workerd@1.20261117.1": true
+  }
+}
