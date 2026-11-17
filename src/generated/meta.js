@@ -9,6 +9,7 @@ export const CANONICAL = {
   "/guides/first-graduate-year": "/guides/first-graduate-year.html",
   "/guides/feet-and-back": "/guides/feet-and-back.html",
   "/guides/budgeting": "/guides/budgeting.html",
+  "/guides/rental-bond-back": "/guides/rental-bond-back.html",
   "/guides/asking-for-help": "/guides/asking-for-help.html",
   "/guides/ahpra-registration-new-grad": "/guides/ahpra-registration-new-grad.html",
   "/guides/nmba-standards-for-practice": "/guides/nmba-standards-for-practice.html",
@@ -20,6 +21,11 @@ export const CANONICAL = {
   "/guides/social-media-and-professionalism": "/guides/social-media-and-professionalism.html",
   "/guides/fatigue-and-night-shift-sleep": "/guides/fatigue-and-night-shift-sleep.html",
   "/guides/speaking-up-about-safety": "/guides/speaking-up-about-safety.html",
+  "/guides/recording-your-cpd": "/guides/recording-your-cpd.html",
+  "/guides/renewal-and-recency": "/guides/renewal-and-recency.html",
+  "/guides/nurse-midwife-tax": "/guides/nurse-midwife-tax.html",
+  "/guides/placement-costs": "/guides/placement-costs.html",
+  "/guides/graduate-program-hub": "/guides/graduate-program-hub.html",
   "/scrub-rack": "/scrub-rack.html",
   "/shift-kit": "/shift-kit.html",
   "/student-bay": "/student-bay.html",
@@ -27,6 +33,7 @@ export const CANONICAL = {
   "/confessions": "/confessions.html",
   "/submit": "/submit.html",
   "/wellbeing": "/wellbeing.html",
+  "/advertise": "/advertise.html",
   "/submission-rules": "/submission-rules.html",
   "/about": "/about.html",
   "/moderation": "/moderation.html",
@@ -64,7 +71,7 @@ export const GUIDES = [
   },
   {
     "title": "Handover tips using ISBAR",
-    "description": "How Australian students and new clinicians can structure a handover with ISBAR, including a blank template and the limits of what to write down.",
+    "description": "How Australian nursing students can use ISBAR, what the NSQHS Communicating for Safety Standard requires, and how to keep handover notes private. Not clinical advice.",
     "path": "/guides/isbar-handover.html",
     "date": "2026-11-17",
     "updated": "2026-11-17",
@@ -110,6 +117,17 @@ export const GUIDES = [
     "title": "Budgeting as a student nurse or midwife",
     "description": "A plain-language look at the costs Australian nursing and midwifery students actually meet, and where to check current payments. Not personal financial advice.",
     "path": "/guides/budgeting.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "students",
+      "money"
+    ]
+  },
+  {
+    "title": "Getting your rental bond back in Australia",
+    "description": "A state-by-state guide to official condition-report deadlines and bond-claim processes in Australia, with links to each tenancy body. General information, not legal advice.",
+    "path": "/guides/rental-bond-back.html",
     "date": "2026-11-17",
     "updated": "2026-11-17",
     "tags": [
@@ -237,6 +255,61 @@ export const GUIDES = [
       "safety",
       "grads"
     ]
+  },
+  {
+    "title": "Recording your NMBA CPD",
+    "description": "How to keep a CPD record that matches the NMBA standard, plus a tally that stays on your device.",
+    "path": "/guides/recording-your-cpd.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "cpd",
+      "grads"
+    ]
+  },
+  {
+    "title": "Registration renewal and recency of practice",
+    "description": "When NMBA renewal is due, what the current fee schedule says, and the 450-hour recency rule. General information, with the sources dated.",
+    "path": "/guides/renewal-and-recency.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "registration",
+      "grads"
+    ]
+  },
+  {
+    "title": "Tax deductions for nurses and midwives",
+    "description": "What the ATO occupation guide is for, and the expenses it is careful about. Not tax advice.",
+    "path": "/guides/nurse-midwife-tax.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "pay",
+      "grads"
+    ]
+  },
+  {
+    "title": "What a placement actually costs",
+    "description": "A plain budget for nursing and midwifery placements, and how it compares with the 2026 Commonwealth Prac Payment. Not a grant assessment.",
+    "path": "/guides/placement-costs.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "placements",
+      "students"
+    ]
+  },
+  {
+    "title": "Graduate program dates, by state",
+    "description": "An evergreen pointer to NSW GradStart, the Victorian GNMP match, and Queensland Health's graduate program. Dates live on their pages.",
+    "path": "/guides/graduate-program-hub.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "grads",
+      "students"
+    ]
   }
 ];
 export const SCRIPT_HASHES = [
@@ -245,11 +318,12 @@ export const SCRIPT_HASHES = [
   "sha256-03rnRsqe7GKgo/mRpzOlQNqiVVP2c4QiPKnZpxZgNjI=",
   "sha256-FGKzG5vidY7FmNpVW/6Sfwyb4hXuDGpGVUyhBAHW+vY=",
   "sha256-0OHeDsvc8qG6U6PrOBEh5nTu4bueDAoL0TNWxMmAQJc=",
-  "sha256-S6yyfAYzPL/J2dBhlBJeqHDbKHvRkP5o4pUAVJLGpqU=",
+  "sha256-6WLtetwXJZL0I4RItpGFh7MEdDU7M0NnEEgm5+j/GlI=",
   "sha256-OpwwnKfy4WjboJXWzcip/9Ld+2/siCR+4Z5xuL8f0XI=",
   "sha256-TUoXe/9Q6QiwJxTip3OdYHpF6b8/OPdg/5q1QtRbKSw=",
   "sha256-snEwDl5JNxuUgwWRGsBzNm7kActcV4pZSSLJVfCnhDY=",
   "sha256-3wFHb36IMqqiSFLScys1NOrF75/dFBgCGjX5IcL65xk=",
+  "sha256-Kc+nSClNlLDlT5KnfgDiJPGZCz9y8dAed1OjqDy7BfU=",
   "sha256-ZjfA8Tb6L6rho+WHRRQmxjN//ZMbS6IwMXQdkzhO2aI=",
   "sha256-6uKStIQxRoHleJz/c1Sbpf1WDVesFX5BcWjqP6vb054=",
   "sha256-z8WzN6LK8dpEnG5HSoXQRXaYW+2yBIzWHyFcwy7+XjQ=",
@@ -261,7 +335,13 @@ export const SCRIPT_HASHES = [
   "sha256-XJiHuIPFl5Uy3wk5ucy7YdYG8Zj9VGdhc51s0rKSAx4=",
   "sha256-mKoXgSumqY0ac1ZOuxmeCmHQgeMNu5T+KvCmpBn3pSU=",
   "sha256-rkz/enKqaf0jrbKkqnfmyA6ZeRAuN+wi+7KW/j73Q44=",
+  "sha256-GhnK68SFc7sUKo0qW+vEc/ZbPVtGNq00Iqlb6+psrx0=",
+  "sha256-WePPQuOL+xDvALZMPPprQhOh2I8wfpQlbSsWEB8qnOI=",
+  "sha256-fqIZJXQ7BejzcRaiZikjK3VjG3M/hYfWLXYrYFT9rYM=",
+  "sha256-5CQ/8k6EI20ElNN0qFFgRKDQPg2gw4ELE1vTbbBPBcM=",
+  "sha256-Z6OM7Oubyi5f2dSh/YrN7tXJb6NsUae/UnPZSIbJ38k=",
   "sha256-wQk8mEAWqYA0r2n2QkKuatylTcFdf8N9nFtGoNOT0MY=",
+  "sha256-VEFahPjlfjonpzC7puGSvHGvc89sej9NCdW/1l6N2HE=",
   "sha256-lg7Dbab44hlpIpTiQTngBgsbexKPkdFFYx2dFa+qVqg=",
   "sha256-Pdv9VAKMkNX00smSl1OWH6RbmWi+u/bT0g6Mxr66PXM=",
   "sha256-Sl0jETEZiCgGmwJEB72mHwEbY1rbaFNy07Fs4kVja+w=",

@@ -551,6 +551,10 @@ fieldset.group legend { font-family: var(--font-display); padding: 0 6px; }
 .shop-card img { width: 100%; height: auto; border-radius: 12px; display: block; margin-bottom: 12px; }
 .price { font-family: var(--font-display); font-size: 1.8rem; margin: 0 0 8px; }
 .shop-note { margin-top: 18px; }
+.table-wrap { overflow-x: auto; margin: var(--space-5) 0; }
+.table-wrap table { width: 100%; border-collapse: collapse; }
+.table-wrap th, .table-wrap td { text-align: left; padding: var(--space-3); border-bottom: 1px solid var(--line); vertical-align: top; }
+[data-cpd-list] button, [data-placement-calc] button, [data-cpd-tally] button { min-height: 44px; }
 .shop-callout { margin-top: 16px; }
 .flag-note { margin: 0 0 8px; padding: 10px 12px; background: var(--mist); border-left: 6px solid var(--coral-fill); border-radius: 10px; }
 .shift-card { border-left: 8px solid var(--gold-fill); }

@@ -14,7 +14,17 @@ export const siteConfig = {
   adsEnabled: false,
   locale: "en-AU",
   /** Public IndexNow key. Served at /<key>.txt. Not a secret. */
-  indexNowKey: "8f686a4ed0d24a66820ce232f9e73175"
+  indexNowKey: "8f686a4ed0d24a66820ce232f9e73175",
+  /**
+   * Future creator products. An empty url hides the callout.
+   * Do not mention these on the site until a real Gumroad URL is set here.
+   */
+  upcomingProducts: {
+    cpdOrganiser: { label: "NMBA CPD & Registration Renewal Organiser", url: "" },
+    gradWorkbook: { label: "New Grad Nurse Program Application & Interview Workbook", url: "" },
+    placementKit: { label: "Clinical Placement Survival Kit", url: "" },
+    expenseLog: { label: "Nurse & Midwife Work Expense Log", url: "" }
+  }
 };
 
 /** Return a usable support URL, or "" when the button should stay hidden. */

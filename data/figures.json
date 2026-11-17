@@ -1,0 +1,66 @@
+{
+  "checked": "2026-11-17",
+  "cpd": {
+    "minimumHours": 20,
+    "asOf": "2026-11-17",
+    "source": "https://www.nursingmidwiferyboard.gov.au/Registration-Standards/Understanding-CPD-for-nurses-and-midwives",
+    "renewalNoteSource": "https://www.nursingmidwiferyboard.gov.au/News/2026-04-07-Registration-renewal-opens"
+  },
+  "renewal": {
+    "dueMonth": 5,
+    "dueDay": 31,
+    "generalFeeAud": 201,
+    "nswGeneralFeeAud": 193,
+    "nswRebateAud": 8,
+    "lateFeeAud": 50,
+    "graduateApplicationFeeAud": 101,
+    "feeScheduleAsOf": "2026-10-09",
+    "feeSource": "https://www.nursingmidwiferyboard.gov.au/Registration-and-Endorsement/Fees.aspx",
+    "renewalNewsSource": "https://www.nursingmidwiferyboard.gov.au/News/2026-04-07-Registration-renewal-opens"
+  },
+  "recency": {
+    "hours": 450,
+    "years": 5,
+    "evidenceYears": 5,
+    "asOf": "2026-11-17",
+    "source": "https://www.nursingmidwiferyboard.gov.au/Codes-Guidelines-Statements/FAQ/recency-of-practice.aspx"
+  },
+  "pracPayment": {
+    "weeklyAud": 338.6,
+    "year": 2026,
+    "previousWeeklyAud": 331.65,
+    "previousYear": 2025,
+    "minimumPlacementHoursPerWeek": 30,
+    "workTestHoursPerWeek": 15,
+    "incomeTestWeeklyAud": 1500,
+    "asOf": "2026-11-17",
+    "source": "https://www.education.gov.au/commonwealth-prac-payment-cpp/frequently-asked-questions-cpp",
+    "studyAssist": "https://www.studyassist.gov.au/financial-and-study-support/student-income-support"
+  },
+  "gradRounds": [
+    {
+      "state": "NSW",
+      "program": "GradStart",
+      "url": "https://www.health.nsw.gov.au/nursing/employment/Pages/gradstart-recruitment-handbook.aspx",
+      "extraUrl": "https://www.health.nsw.gov.au/nursing/employment/gradstart/Pages/eligibility.aspx",
+      "datesNote": "For a 2027 start, the eligibility page asks if you finish between 1 June 2026 and 31 May 2027. Opening and closing dates are in the current handbook.",
+      "asOf": "2026-11-17"
+    },
+    {
+      "state": "VIC",
+      "program": "GNMP Match (with PMCV)",
+      "url": "https://www.health.vic.gov.au/nursing-and-midwifery/nursing-and-midwifery-graduates",
+      "extraUrl": "https://www.pmcv.com.au/",
+      "datesNote": "Public services use the graduate nursing and midwifery program match. Dates are published on the Department of Health and PMCV pages for that round.",
+      "asOf": "2026-11-17"
+    },
+    {
+      "state": "QLD",
+      "program": "Queensland Health graduate program",
+      "url": "https://www.careers.health.qld.gov.au/nursing-and-midwifery-careers/nurse-and-midwife-graduate-program",
+      "extraUrl": "",
+      "datesNote": "When this page was checked in November 2026, the careers site said the 2027 round had closed. The next opening date is whatever that page shows now.",
+      "asOf": "2026-11-17"
+    }
+  ]
+}

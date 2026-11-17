@@ -1,4 +1,6 @@
 import shopData from "../data/shop.json" with { type: "json" };
+import figures from "../data/figures.json" with { type: "json" };
+import { siteConfig } from "../src/config.js";
 import { TAGS } from "../src/lib/moderation.js";
 import { adSlot, heroArt, layout, newsletterForm } from "./layout.mjs";
 import { esc } from "./markdown.mjs";
@@ -19,6 +21,59 @@ function tags(field = "tag") {
 
 function toolkitCallout() {
   return `<aside class="callout shop-callout"><p><strong>From the OnlyScrubs creator.</strong> Fillable templates and study notes for students and new grads are on the <a href="/shop.html">shop</a>. They are independent templates, not clinical advice, and not an NMBA or Ahpra product.</p></aside>`;
+}
+
+export function productCallout(key) {
+  const product = siteConfig.upcomingProducts[key];
+  const url = String(product?.url || "").trim();
+  if (!url) return "";
+  return `<aside class="callout shop-callout"><p><strong>From the OnlyScrubs creator.</strong> <a href="${esc(url)}" rel="noopener noreferrer">${esc(product.label)}</a>. Independent templates, not an official NMBA or Ahpra product.</p></aside>`;
+}
+
+function money(value) {
+  return "A$" + Number(value).toFixed(2).replace(/\.00$/, "");
+}
+
+function toolBlock(guide) {
+  if (guide.tool === "cpd") {
+    return `<section class="panel" data-cpd-tally data-target="${figures.cpd.minimumHours}">
+      <h2>Hours on this device</h2>
+      <p>General information only. This tally stays in this browser. It is not sent to Ahpra, the NMBA, or OnlyScrubs. The ${figures.cpd.minimumHours}-hour line is the minimum in the NMBA material checked on ${esc(figures.cpd.asOf)}.</p>
+      <form class="form">
+        <label>What you did<input name="label" maxlength="80" required placeholder="Handover workshop"></label>
+        <label>Hours<input name="hours" type="number" min="0.5" max="40" step="0.5" required></label>
+        <button class="button secondary" type="submit">Add hours</button>
+      </form>
+      <p data-cpd-total aria-live="polite"></p>
+      <ul data-cpd-list></ul>
+    </section>`;
+  }
+  if (guide.tool === "renewal") {
+    const fee = figures.renewal;
+    return `<section class="panel" data-renewal data-due-month="${fee.dueMonth}" data-due-day="${fee.dueDay}">
+      <h2>Next 31 May</h2>
+      <p data-renewal-count aria-live="polite">Counting…</p>
+      <p>General information only. The fee schedule effective ${esc(fee.feeScheduleAsOf)} lists general registration at ${money(fee.generalFeeAud)} nationally and ${money(fee.nswGeneralFeeAud)} if your principal place of practice is NSW. Late renewal is ${money(fee.lateFeeAud)}. Check the <a href="${esc(fee.feeSource)}" rel="noopener noreferrer">NMBA fees page</a> before you pay.</p>
+    </section>`;
+  }
+  if (guide.tool === "placement") {
+    const pay = figures.pracPayment;
+    return `<section class="panel" data-placement-calc data-weekly="${pay.weeklyAud}" data-year="${pay.year}">
+      <h2>Placement budget sketch</h2>
+      <p>General information only. The ${pay.year} Commonwealth Prac Payment rate used here is ${money(pay.weeklyAud)} a week, from the Department of Education FAQ checked on ${esc(pay.asOf)}. It is taxable, and you only get it if you are eligible.</p>
+      <form class="form">
+        <label>Placement weeks<input name="weeks" type="number" min="1" max="20" value="4" required></label>
+        <label>Your extra costs for those weeks, in dollars<input name="costs" type="number" min="0" step="1" value="800" required></label>
+        <button class="button secondary" type="submit">Compare</button>
+      </form>
+      <p data-placement-result aria-live="polite"></p>
+    </section>`;
+  }
+  if (guide.tool === "grad-dates") {
+    const rows = figures.gradRounds.map((round) => `<tr><th scope="row">${esc(round.state)}</th><td>${esc(round.program)}</td><td>${esc(round.datesNote)}</td><td><a href="${esc(round.url)}" rel="noopener noreferrer">Official page</a></td></tr>`).join("");
+    return `<div class="table-wrap"><table><caption>State rounds, checked ${esc(figures.checked)}. Dates change. The official page wins.</caption><thead><tr><th>State</th><th>Program</th><th>What we could verify</th><th>Link</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }
+  return "";
 }
 
 const postingTerms = `<p class="disclosure">By posting you agree to the <a href="/terms.html">Terms</a>.</p>`;
@@ -168,6 +223,7 @@ export function guideArticle(assets, guide, related) {
     active: "/guides.html",
     assets,
     tearoom: true,
+    scripts: guide.tool && guide.tool !== "grad-dates" ? [assets.tools] : [],
     jsonLd: [{
       "@context": "https://schema.org",
       "@type": "Article",
@@ -189,6 +245,8 @@ export function guideArticle(assets, guide, related) {
       <div class="button-row no-print"><button class="button secondary compact" type="button" data-share data-share-title="${esc(guide.title)}">Share</button></div>
       <blockquote class="callout"><p><strong>Not clinical advice.</strong> General information for healthcare workers and students in Australia. It does not replace your university, employer, facilitator, or professional standards.</p></blockquote>
       ${guide.toolkit === "yes" ? toolkitCallout() : ""}
+      ${productCallout(guide.product)}
+      ${toolBlock(guide)}
       ${adSlot("guide-top")}
       ${guide.html}
       ${adSlot("guide-end")}
@@ -256,7 +314,8 @@ export function shiftKit(assets) {
     assets,
     tearoom: true,
     scripts: [assets.planner],
-    main: `<section class="wrap page-hero"><p class="eyebrow">Shift tools</p><h1>Shift Kit</h1><p class="lede">Sketch sleep around a roster that has never met a circadian rhythm. Nothing here is uploaded. It is a sketch, not a medical plan. If you are drowsy, do not drive.</p></section>
+    main: `<section class="wrap page-hero"><p class="eyebrow">Shift tools</p><h1>Shift Kit</h1><p class="lede">Sketch sleep around a roster that has never met a circadian rhythm. Nothing here is uploaded. It is a sketch, not a medical plan. If you are drowsy, do not drive.</p>
+    ${toolkitCallout()}</section>
     <section class="wrap section page-split">
       <form class="panel form" data-planner>
         <h2>Rest and caffeine sketch</h2>
@@ -294,7 +353,8 @@ export function studentBay(assets) {
     assets,
     tearoom: true,
     scripts: [assets.checklist],
-    main: `<section class="wrap page-hero"><p class="eyebrow">Placement prep</p><h1>Student Bay</h1><p class="lede">Pack the boring things before the shift invents new paperwork. Ticks stay in this browser. They do not join the roster.</p></section>
+    main: `<section class="wrap page-hero"><p class="eyebrow">Placement prep</p><h1>Student Bay</h1><p class="lede">Pack the boring things before the shift invents new paperwork. Ticks stay in this browser. They do not join the roster.</p>
+    ${toolkitCallout()}</section>
     <section class="wrap section">
       <form id="placement-checklist">
         <p class="progress" id="check-progress" aria-live="polite">0 packed</p>
@@ -855,8 +915,8 @@ export function shop(assets) {
       <a class="button primary" href="${esc(product.url)}" target="_blank" rel="noopener noreferrer">Buy on Gumroad</a>
     </article>`).join("");
   return page({
-    title: "Shop",
-    description: "Digital templates from the OnlyScrubs creator: a nursing student toolkit, a renter's bond kit, a household budget planner and a sole trader starter kit. Checkout is on Gumroad.",
+    title: "Shop | Australian templates for nurses, renters and sole traders",
+    description: "Printable Australian templates from OnlyScrubs: nursing study sheets, a rental bond record kit, a household budget planner and a sole trader starter kit.",
     path: "/shop.html",
     active: "/shop.html",
     assets,
@@ -876,10 +936,51 @@ export function shop(assets) {
         availability: "https://schema.org/InStock"
       }
     })),
-    main: `<section class="wrap page-hero"><p class="eyebrow">From the OnlyScrubs creator</p><h1>Shop</h1><p class="lede">Templates from the person who runs this site, for the paperwork the job keeps inventing. Not third-party ads. Checkout and delivery happen on Gumroad.</p>
+    main: `<section class="wrap page-hero"><p class="eyebrow">From the OnlyScrubs creator</p><h1>Australian templates we made</h1><p class="lede">Digital downloads for Australian nurses, students, renters and sole traders. They are organising tools and general information, sold on Gumroad. They are not official forms, and they are not legal, financial, tax or clinical advice. Not third-party ads.</p>
       <p>Digital downloads delivered via Gumroad. Your rights under the Australian Consumer Law apply.</p></section>
       <section class="wrap section"><div class="grid shop-grid">${cards}</div>
       <p class="affiliation shop-note">Independent templates. Not affiliated with or endorsed by any government agency, NMBA or Ahpra. General information only, not legal, financial, tax or clinical advice.</p></section>`
+  });
+}
+
+export function advertise(assets) {
+  return page({
+    title: "Advertise with OnlyScrubs",
+    description: "How to advertise on OnlyScrubs: who the audience is, what ad types we will run, and the rules that keep health advertising honest.",
+    path: "/advertise.html",
+    active: "",
+    assets,
+    jsonLd: [{
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "Advertise with OnlyScrubs",
+      url: `${SITE}/advertise.html`,
+      description: "Advertising rules and contact for OnlyScrubs.",
+      inLanguage: "en-AU"
+    }],
+    main: `<section class="wrap page-hero prose"><p class="eyebrow">A small site, labelled ads</p><h1>Advertise with us</h1>
+      <p>OnlyScrubs is a free Australian site for nurses, midwives, students and other healthcare workers. People come for practical guides, a moderated scrub swap, shift tools and a confessions feed that is not allowed to name patients or workplaces. General information only. This page is not a rate card.</p>
+      <h2>Who is here</h2>
+      <p>The audience is people who work or study in nursing and midwifery in Australia, plus students getting ready for placement and a graduate year. We do not publish traffic numbers. If you need a count, ask, and we will only share a figure we can actually measure.</p>
+      <h2>What we will run</h2>
+      <ul>
+        <li>A labelled <strong>Ad</strong> slot on guide and gear pages. The slot stays empty until an ad is switched on. It never appears in the confessions feed.</li>
+        <li>A <strong>Sponsored</strong> link on a gear note, marked as such, if we ever add one. Ordinary notes are not ads.</li>
+        <li>The creator's own templates on the <a href="/shop.html">shop</a>. Those are not third-party ads. They are labelled as from the OnlyScrubs creator.</li>
+      </ul>
+      <h2>What we will not run</h2>
+      <p>Ahpra's <a href="https://www.ahpra.gov.au/Resources/Advertising-hub.aspx" rel="noopener noreferrer">advertising guidelines</a> apply when an ad is about a regulated health service. We will not accept:</p>
+      <ul>
+        <li>Testimonials about clinical care, or quotes that read like one.</li>
+        <li>Claims about treatment outcomes, cure rates, or that a service is better than another without evidence the guidelines allow.</li>
+        <li>Anything that pressures someone into unnecessary care.</li>
+        <li>Ads that look like they come from AHPRA, the NMBA, a health service, or this site's editorial guides.</li>
+        <li>Patient stories, even de-identified ones.</li>
+      </ul>
+      <p>OnlyScrubs is not affiliated with AHPRA, the NMBA, any union, health service or employer. An ad on the site does not change that.</p>
+      <h2>Ask</h2>
+      <p>Email <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> with what you want to run and where. We will say yes or no. There is no price list on this page, because we have not published one.</p>
+    </section>`
   });
 }
 

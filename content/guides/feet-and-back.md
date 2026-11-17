@@ -4,6 +4,7 @@ description: General habits for healthcare workers who stand, walk, and move loa
 date: 2026-11-17
 updated: 2026-11-17
 tags: feet, wellbeing
+toolkit: yes
 ---
 
 Feet and backs take the hours that rosters do not count. This page is about habits and buying sense. It is not physiotherapy, not a diagnosis, and not permission to ignore a workplace manual-handling policy.

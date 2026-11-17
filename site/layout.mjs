@@ -155,6 +155,7 @@ export function layout(options) {
         <a href="/about.html">About</a>
         <a href="/moderation.html">How we moderate</a>
         <a href="/shop.html">Shop</a>
+        <a href="/advertise.html">Advertise</a>
         <a href="/wellbeing.html">Wellbeing</a>
         <a href="/submission-rules.html">Rules</a>
         <a href="/complaints.html">Complaints</a>

@@ -4,6 +4,7 @@ description: A practical, non-clinical guide for Australian nursing and midwifer
 date: 2026-11-17
 updated: 2026-11-17
 tags: placements, students
+toolkit: yes
 ---
 
 Your first placement is a change of pace, not a test of whether you were born for the work. Universities describe it in learning outcomes. The shift itself is louder, earlier, and more full of names than the handbook suggests. You can prepare the boring parts so the new parts have room.
