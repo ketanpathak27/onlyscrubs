@@ -18,6 +18,7 @@ const guideOrder = [
   "first-graduate-year",
   "feet-and-back",
   "budgeting",
+  "rental-bond-back",
   "asking-for-help",
   "ahpra-registration-new-grad",
   "nmba-standards-for-practice",
@@ -28,7 +29,12 @@ const guideOrder = [
   "cpd-for-new-grads",
   "social-media-and-professionalism",
   "fatigue-and-night-shift-sleep",
-  "speaking-up-about-safety"
+  "speaking-up-about-safety",
+  "recording-your-cpd",
+  "renewal-and-recency",
+  "nurse-midwife-tax",
+  "placement-costs",
+  "graduate-program-hub"
 ];
 
 function hash(content) {
@@ -116,7 +122,8 @@ const assets = {
   planner: writeHashed("planner", "js", `${plannerLib}\n${fs.readFileSync(path.join(root, "client", "planner.js"), "utf8")}`),
   checklist: writeHashed("checklist", "js", fs.readFileSync(path.join(root, "client", "checklist.js"))),
   breathe: writeHashed("breathe", "js", fs.readFileSync(path.join(root, "client", "breathe.js"))),
-  admin: writeHashed("admin", "js", fs.readFileSync(path.join(root, "client", "admin.js")))
+  admin: writeHashed("admin", "js", fs.readFileSync(path.join(root, "client", "admin.js"))),
+  tools: writeHashed("tools", "js", fs.readFileSync(path.join(root, "client", "tools.js")))
 };
 
 const guides = loadGuides();
@@ -131,6 +138,7 @@ rendered.set("/gear-guide.html", pages.gearGuide(assets, gear));
 rendered.set("/confessions.html", pages.confessions(assets));
 rendered.set("/submit.html", pages.submitPage(assets));
 rendered.set("/wellbeing.html", pages.wellbeing(assets));
+rendered.set("/advertise.html", pages.advertise(assets));
 rendered.set("/submission-rules.html", pages.rules(assets));
 rendered.set("/about.html", pages.about(assets));
 rendered.set("/moderation.html", pages.moderation(assets));

@@ -207,7 +207,7 @@ test("new guides stay in range and point at official sources", () => {
     assert.doesNotMatch(raw, /best seller|\$\d/);
   }
   const names = readdirSync(new URL("../content/guides/", import.meta.url));
-  assert.equal(names.length, 18);
+  assert.equal(names.length, 24);
 });
 
 test("shop page keeps plain prices and the consumer-law lines", () => {

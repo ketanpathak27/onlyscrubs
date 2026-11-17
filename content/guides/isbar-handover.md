@@ -1,59 +1,69 @@
 ---
 title: Handover tips using ISBAR
-description: How Australian students and new clinicians can structure a handover with ISBAR, including a blank template and the limits of what to write down.
+description: How Australian nursing students can use ISBAR, what the NSQHS Communicating for Safety Standard requires, and how to keep handover notes private. Not clinical advice.
 date: 2026-11-17
 updated: 2026-11-17
 tags: handover, students
+toolkit: yes
 ---
 
-Handover is a communication habit. ISBAR is one structure taught across Australian health services and universities. The letters are sometimes taught as Introduction, Situation, Background, Assessment, Recommendation, and sometimes Identify replaces Introduction. Use the version your university or workplace uses. The point is the same: the listener should know who you are, what is going on, what matters from before, what you have noticed, and what you need.
+Handover is the moment responsibility moves. The Australian Commission on Safety and Quality in Health Care describes clinical handover as the transfer of professional responsibility and accountability for some or all aspects of a patient's care, to another person or professional group, on a temporary or permanent basis. That definition sits in the Commission's work on the [Communicating for Safety Standard](https://www.safetyandquality.gov.au/national-standards/nsqhs-standards/communicating-safety-standard) and in the [OSSIE Guide to Clinical Handover Improvement](https://www.safetyandquality.gov.au/sites/default/files/resources/attachments/ossie_guide_to_clinical_handover_improvement.pdf).
 
-This page explains the shape of the conversation. It is not a clinical script, and it is not a substitute for local handover policy. Do not practise with real people in your care. Use scenarios your educator provides.
+This page is general information for students and new clinicians in Australia. It is not clinical advice. It does not replace your university, your facilitator, or the handover tool your facility actually uses. Do not practise the structure with real details from a shift. Use a scenario your educator gives you.
 
-## What each step is for
+## What the national standard asks for
 
-**Identify or Introduction.** Your name, your role, and where you are calling or speaking from. On a ward this can be one sentence. On the phone it stops the other person guessing.
+The Communicating for Safety Standard is part of the National Safety and Quality Health Service Standards. Two actions are the ones to know when you are watching or giving handover. Checked on the Commission's standard page on 17 November 2026:
 
-**Situation.** The reason you are speaking, and how urgent it is, in one or two sentences. Lead with the need, not the life story.
+**Action 6.07.** The health service, with its clinicians, defines the minimum information to communicate at handover, the risks that matter in that service, and which clinicians are involved.
 
-**Background.** The relevant context the other person does not already share: why this person is here, what has already been done, allergies or risks your policy says must be included. Relevant is the word. A handover is not a reading of the entire file.
+**Action 6.08.** Clinicians use a structured handover. That includes preparing for it, having the relevant information ready, getting the right people there, knowing the patient's goals and preferences, supporting patients and carers to take part if the patient wants that, and making sure responsibility and accountability actually transfer.
 
-**Assessment.** What you have observed or been told to report, in the order your workplace expects. Students should be clear about what they saw themselves and what they were told. Do not upgrade a guess into a finding.
+A structured tool is how services try to make that complete and repeatable. The Commission's [implementation toolkit for clinical handover improvement](https://www.safetyandquality.gov.au/sites/default/files/resources/attachments/ImplementationToolkitforClinicalHandoverImprovement.pdf) says several mnemonics are used in Australia, including SBAR, ISBAR and ISOBAR, and that there is no evidence one mnemonic is safer than another. The local policy picks the tool. Many universities teach ISBAR. Follow that version, not a mnemonic you preferred in a textbook.
 
-**Recommendation.** What you are asking for. A review, a task to be done by a certain time, or confirmation that you should continue the current plan. If you do not know what you are asking, say that: "I am not sure what the next step should be. Can you help me work it out?"
+## What the letters usually stand for
+
+ISBAR is commonly **Identify** or **Introduction**, **Situation**, **Background**, **Assessment** and **Recommendation**. The listener should know who you are, why you are speaking, what context they do not already share, what you observed, and what you are asking for.
+
+**Identify or Introduction.** Your name, your role, and that you are a student if you are one. On the phone, say where you are speaking from. Nights are full of unfamiliar voices.
+
+**Situation.** The reason for the call, and how urgent it is, in one or two sentences. Lead with the need. People who start with the whole background leave the listener waiting.
+
+**Background.** Only the context the other person does not already have, including whatever your local policy says must be in there. A handover is not a reading of the whole file.
+
+**Assessment.** What you observed, or what you were told to report, in the order the workplace expects. Be clear about what you saw yourself. Do not turn a guess into a finding, and do not offer a diagnosis you are not qualified to make.
+
+**Recommendation.** The specific ask: a review, a task by a time, or help to work out the next step. If you do not know, say so. "I am worried, and I want someone to review this with me" is clearer than a pile of maybes.
+
+On a bad phone line, say the recommendation twice: once when you reach it, once at the end. If you are escalated to someone more senior, repeat ISBAR. They were not in the room for the first version.
+
+If you are receiving handover, you can ask the speaker to pause on the recommendation. "What do you need from me in the next hour?" is a fair question.
 
 ## A blank you can practise out loud
 
 Use square brackets. Do not fill them with a real case in a notebook that leaves the workplace.
 
-1. "My name is [name]. I am a [year and course, or role] on [shift type]."
-2. "I am calling about [the need], and I think it is [urgent / can wait until / needs a time]."
+1. "My name is [name]. I am a [role] on [shift type]."
+2. "I am speaking about [the need], and it is [urgent / can wait / needs a time]."
 3. "The background you need is [only the points your educator says belong here]."
-4. "What I have observed is [facts, not a diagnosis you are not qualified to make]."
+4. "What I have observed is [facts]."
 5. "I am asking for [the specific thing]."
 
-Say it once to a classmate using a scenario from class. Then shorten it. Long handovers get interrupted, and the recommendation falls off the end. If you are a student, your buddy should know you are about to hand over so they can correct the content before it travels.
+Say it once with a classmate and a classroom scenario, then shorten it. Long handovers lose the recommendation off the end. On placement, agree a cue with your buddy: you speak, they add or correct, and you are not left holding a decision that is not yours.
 
-## Common ways it falls apart
+## Notes that stay at work
 
-People start with background because that is the part they revised. The listener is still waiting to hear why you are there. Situation first, even if it feels blunt.
+Record only what the facility allows on a handover sheet. Do not take identifiable information home: no names, record numbers, dates of birth, bed lists, or photos in a bag, a phone, or a message. If you want to remember the structure later, write the five headings only. Put used sheets in confidential waste before you leave.
 
-People pad uncertainty with extra words. "I think maybe it might be a bit concerning" is harder to hear than "I am worried, and I want someone to review this with me." Worry is allowed. Inventing confidence is not.
+The [Nursing and Midwifery Board of Australia](https://www.nursingmidwiferyboard.gov.au/) sets the professional standards registered nurses and midwives work to. Students practise inside their course rules. After a messy handover, ask for one concrete tip and use it on the next one. [How to ask for help](/guides/asking-for-help.html) and the [first clinical placement guide](/guides/first-clinical-placement.html) are the companion notes.
 
-People write the handover in a personal note with bed numbers, names, and dates, then take the note home to study. That is how confidentiality incidents start. If you need to remember the *structure*, write the five headings only. If your workplace bans any personal notes, follow that.
+You do not need a paid template. A blank page with five headings, used on site and left there, is enough. If you want fillable ISBAR sheets and a shift organiser as a study aid, they are in the creator's nursing toolkit on the [shop](/shop.html). That pack is not clinical advice, and it is not affiliated with or endorsed by the Commission, the NMBA or Ahpra.
 
-## Phone calls and the night desk
+## Sources
 
-On the phone, start with your name and role even if you think they know you. Nights are full of unfamiliar voices. Say the recommendation twice if the line is bad: once in the middle, once at the end.
+Checked 17 November 2026.
 
-If you are escalated to someone more senior, do not restart from the beginning of the shift. Repeat ISBAR. They were not in the room for the first version.
-
-If you are receiving handover, you are allowed to ask the speaker to pause on the recommendation. "What do you need from me in the next hour?" saves both of you.
-
-## Students specifically
-
-You may be asked to give a short handover before you are comfortable. That is practice, and it should be supervised. Agree a cue with your buddy: you speak, they add or correct, you do not get left holding a clinical decision.
-
-Read your university's documentation and communication learning outcomes. The [Nursing and Midwifery Board of Australia](https://www.nursingmidwiferyboard.gov.au/) sets professional standards for registered nurses and midwives. Students are expected to work towards those standards inside their course rules, not to freelance.
-
-After a handover that felt messy, ask for one tip, not a performance review. Then use it on the next one. The [first placement guide](/guides/first-clinical-placement.html) has more on feedback that does not spiral. If you are not sure you should be the person making the call, start with [how to ask for help](/guides/asking-for-help.html).
+- Australian Commission on Safety and Quality in Health Care, [Communicating for Safety Standard](https://www.safetyandquality.gov.au/national-standards/nsqhs-standards/communicating-safety-standard), Actions 6.07 and 6.08.
+- Australian Commission on Safety and Quality in Health Care, [OSSIE Guide to Clinical Handover Improvement](https://www.safetyandquality.gov.au/sites/default/files/resources/attachments/ossie_guide_to_clinical_handover_improvement.pdf).
+- Australian Commission on Safety and Quality in Health Care, [implementation toolkit for clinical handover improvement](https://www.safetyandquality.gov.au/sites/default/files/resources/attachments/ImplementationToolkitforClinicalHandoverImprovement.pdf), on the choice of mnemonic.
+- Nursing and Midwifery Board of Australia, [professional standards](https://www.nursingmidwiferyboard.gov.au/).

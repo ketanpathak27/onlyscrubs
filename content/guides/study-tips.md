@@ -4,6 +4,7 @@ description: Practical study habits for Australian nursing and midwifery degrees
 date: 2026-11-17
 updated: 2026-11-17
 tags: students, study
+toolkit: yes
 ---
 
 Nursing and midwifery degrees in Australia are heavy on both theory and placement. The students who cope are not always the ones who highlight the most pages. They are usually the ones who practise remembering, and who protect sleep during assessment weeks.

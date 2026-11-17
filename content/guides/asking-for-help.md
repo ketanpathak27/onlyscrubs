@@ -4,6 +4,7 @@ description: Practical ways for Australian nurses, midwives and students to ask 
 date: 2026-11-17
 updated: 2026-11-17
 tags: wellbeing, students
+toolkit: yes
 ---
 
 Asking for help is part of the job. Teams that treat it as a personal flaw create unsafe shifts. You can get better at the ask, and you can debrief afterwards without turning a real person into a story.

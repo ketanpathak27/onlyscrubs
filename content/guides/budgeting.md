@@ -4,6 +4,7 @@ description: A plain-language look at the costs Australian nursing and midwifery
 date: 2026-11-17
 updated: 2026-11-17
 tags: students, money
+toolkit: yes
 ---
 
 Most pre-registration nursing and midwifery placements in Australia are unpaid. The degree can still be full-time while the income stops, and the costs go up: travel, parking, shoes, uniforms, and sometimes a second rent closer to the placement. This page names those costs in general terms. It is not personal financial advice, tax advice, or a list of dollar amounts, because payments and grants change.
@@ -55,3 +56,5 @@ Talk to the university financial counselling service, and to anyone you owe mone
 You can be a careful student and still be broke. The placement model is expensive. Using a grant, a payment you are eligible for, or a donated pair of scrubs is practical. It is not a failure to budget.
 
 If money stress is tangled up with not coping, Nurse & Midwife Support ([1800 667 877](https://www.nmsupport.org.au/)) can help you think about the next conversation, and your GP or the university counselling service can help with the health side.
+
+If you want a household planner in Australian dollars, the creator's budget spreadsheet is on the [shop](/shop.html). It is an organising tool, not financial advice. Renters who want the bond steps, rather than a spreadsheet, can read [getting your rental bond back](/guides/rental-bond-back.html).
