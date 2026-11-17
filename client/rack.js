@@ -64,7 +64,7 @@
       const box = document.createElement("form");
       box.className = "form";
       box.dataset.reportForm = "1";
-      box.innerHTML = '<label>What should moderation look at?<input name="reason" maxlength="220" required></label><button class="button compact" type="submit">Send report</button><p class="form-message"></p>';
+      box.innerHTML = '<label>Category<select name="category"><option value="other">Something else</option><option value="spam">Spam</option><option value="harassment">Harassment</option><option value="patient-info">Patient information</option><option value="threats">Threat</option><option value="self-harm">Self-harm or someone at risk</option></select></label><label>What should moderation look at?<input name="reason" maxlength="220" required></label><button class="button compact" type="submit">Send report</button><p class="form-message"></p>';
       card.appendChild(box);
       return;
     }
@@ -73,7 +73,7 @@
     const card = button.closest("[data-id]");
     const slot = card.querySelector("[data-contact-slot]");
     if (slot.childElementCount) return;
-    slot.innerHTML = '<form class="form" data-relay><p>Your email is sent to moderation, not published on the listing.</p><label>Your name<input name="name" required maxlength="60"></label><label>Your email<input name="email" type="email" required></label><label>Message<textarea name="message" required minlength="12" maxlength="800" placeholder="Size you need, pickup suburb, and whether you can collect this week."></textarea></label><label class="check"><input name="confirm" type="checkbox" required><span>This message does not name a workplace, patient or clinical matter.</span></label><p class="disclosure">By posting you agree to the <a href="/terms.html">Terms</a>.</p><input class="honeypot" name="website" tabindex="-1" autocomplete="off"><div data-turnstile></div><button class="button primary" type="submit">Send via OnlyScrubs</button><p class="form-message"></p></form>';
+    slot.innerHTML = '<form class="form" data-relay><p>Your email is sent to moderation, not published on the listing.</p><label>Your name<input name="name" required maxlength="60"></label><label>Your email<input name="email" type="email" required></label><label>Message<textarea name="message" required minlength="12" maxlength="800" placeholder="Size you need, pickup suburb, and whether you can collect this week."></textarea></label><label class="check"><input name="confirm" type="checkbox" required><span>This message does not name a workplace, patient or clinical matter.</span></label><p class="disclosure">By posting you agree to the <a href="/terms.html">Terms</a>.</p><input class="honeypot" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" aria-label="Leave this empty"><div data-turnstile></div><button class="button primary" type="submit">Send via OnlyScrubs</button><p class="form-message"></p></form>';
     const cfg = await window.OnlyScrubs.config();
     const widget = slot.querySelector("[data-turnstile]");
     if (widget && cfg.turnstileSiteKey && window.turnstile) window.turnstile.render(widget, { sitekey: cfg.turnstileSiteKey });
@@ -87,12 +87,13 @@
       const message = reportForm.querySelector(".form-message");
       message.textContent = "Sending…";
       try {
-        await read(await fetch("/api/report", {
+        const result = await read(await fetch("/api/report", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ id: card.dataset.id, kind: "listing", reason: reportForm.reason.value })
+          body: JSON.stringify({ id: card.dataset.id, kind: "listing", reason: reportForm.reason.value, category: reportForm.category.value })
         }));
-        card.innerHTML = "<p>Reported. This listing is hidden while moderation reviews it.</p>";
+        if (result.hidden) card.innerHTML = "<p>Reported. This listing is hidden while moderation reviews it.</p>";
+        else message.textContent = "Reported. Thanks. A person will review it, and it is hidden if more people report it.";
       } catch (error) {
         message.textContent = error.message;
       }

@@ -95,7 +95,8 @@ export function layout(options) {
   const tearoomBlock = tearoom
     ? `<p class="tearoom" data-tearoom><span data-tearoom-line>Cold coffee is still coffee. This is the science.</span></p><p class="night-note">Night shift. The printer is haunted and the coffee is a rumour. Don't say the Q word.</p>`
     : "";
-  const support = `<a class="button secondary compact" data-support-link hidden rel="noopener noreferrer">Buy the next round of coffee</a>`;
+  // No <a> without a real URL. site.js adds the link here only when /api/config returns one.
+  const support = `<span class="support-slot" data-support-slot hidden></span>`;
   return `<!doctype html>
 <html lang="en-AU">
 <head>
@@ -152,18 +153,9 @@ export function layout(options) {
     ${footerNews}
     <div>
       <nav class="footer-nav" aria-label="Footer">
-        <a href="/about.html">About</a>
-        <a href="/moderation.html">How we moderate</a>
-        <a href="/shop.html">Shop</a>
-        <a href="/advertise.html">Advertise</a>
-        <a href="/wellbeing.html">Wellbeing</a>
-        <a href="/submission-rules.html">Rules</a>
-        <a href="/complaints.html">Complaints</a>
-        <a href="/privacy.html">Privacy</a>
-        <a href="/terms.html">Terms</a>
-        <a href="/disclaimer.html">Disclaimer</a>
-        <a href="/submit.html">Submit</a>
-        <a href="/guides.html">Guides</a>
+        <div class="footer-col"><p class="footer-head">Explore</p><a href="/guides.html">Guides</a><a href="/shop.html">Shop</a><a href="/wellbeing.html">Wellbeing</a><a href="/about.html">About</a></div>
+        <div class="footer-col"><p class="footer-head">Community</p><a href="/submit.html">Submit</a><a href="/submission-rules.html">Rules</a><a href="/moderation.html">How we moderate</a><a href="/advertise.html">Advertise</a></div>
+        <div class="footer-col"><p class="footer-head">Legal</p><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/disclaimer.html">Disclaimer</a><a href="/complaints.html">Complaints</a></div>
       </nav>
       <p class="affiliation">OnlyScrubs is not affiliated with AHPRA, the Nursing and Midwifery Board of Australia (NMBA), any union, health service or employer.</p>
       <p class="fine">General information only. Not a clinic and not medical advice. <a href="/terms.html">Terms</a> · <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> <a class="admin-entry" href="/admin.html">Admin</a></p>

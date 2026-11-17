@@ -190,18 +190,20 @@
       const box = document.createElement("form");
       box.className = "form";
       box.dataset.reportForm = "1";
-      box.innerHTML = '<label>Category<select name="category"><option value="other">Something else</option><option value="spam">Spam</option><option value="harassment">Harassment</option><option value="patient-info">Patient information</option><option value="threats">Threat</option></select></label><label>What should moderation look at?<input name="reason" maxlength="220" required></label><button class="button compact" type="submit">Send report</button><p class="form-message"></p>';
+      box.innerHTML = '<label>Category<select name="category"><option value="other">Something else</option><option value="spam">Spam</option><option value="harassment">Harassment</option><option value="patient-info">Patient information</option><option value="threats">Threat</option><option value="self-harm">Self-harm or someone at risk</option></select></label><label>What should moderation look at?<input name="reason" maxlength="220" required></label><button class="button compact" type="submit">Send report</button><p class="form-message"></p>';
       card.appendChild(box);
       box.addEventListener("submit", async function (submitEvent) {
         submitEvent.preventDefault();
         const message = box.querySelector(".form-message");
         try {
-          await read(await fetch("/api/report", {
+          const result = await read(await fetch("/api/report", {
             method: "POST",
             headers: { "content-type": "application/json" },
             body: JSON.stringify({ id: id, reason: box.reason.value, category: box.category.value })
           }));
-          message.textContent = "Reported. It is hidden while a person reviews it.";
+          message.textContent = result.hidden
+            ? "Reported. It is hidden while a person reviews it."
+            : "Reported. Thanks. A person will review it, and it is hidden if more people report it.";
           box.reason.disabled = true;
         } catch (error) {
           message.textContent = error.message;
@@ -210,9 +212,22 @@
     }
     if (comments) {
       const thread = card.querySelector("[data-thread]");
-      const open = thread.hidden;
-      thread.hidden = !open;
+      const open = thread.hidden || thread.classList.contains("is-closing");
       comments.setAttribute("aria-expanded", open ? "true" : "false");
+      if (open) {
+        thread.classList.remove("is-closing");
+        thread.hidden = false;
+      } else if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        thread.hidden = true;
+      } else {
+        thread.classList.add("is-closing");
+        window.setTimeout(function () {
+          if (thread.classList.contains("is-closing")) {
+            thread.classList.remove("is-closing");
+            thread.hidden = true;
+          }
+        }, 220);
+      }
       if (open && !thread.dataset.loaded) {
         thread.innerHTML = '<p class="meta-row">Fetching the comments…</p>';
         try {
