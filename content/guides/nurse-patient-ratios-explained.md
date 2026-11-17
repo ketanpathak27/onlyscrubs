@@ -6,9 +6,9 @@ updated: 2026-11-18
 tags: staffing, safety
 ---
 
-The roster was finalised, then finalised again. "We're in ratio" is not a spell. It is a staffing rule, and the rule is the document that covers your ward. Checked on 18 November 2026, the official pages do not match.
+The roster was finalised, then finalised again, then "just one more tweak". "We're in ratio" is not a spell you chant at handover. It is a staffing rule, and the rule is whatever document actually covers your ward. Spoiler: every state wrote a different one. Checked against official sources on 18 November 2026.
 
-General information only, not clinical, legal or financial advice. It is not clinical advice and not industrial advice, and it recommends no party. OnlyScrubs is not a union, a health department, or a political party.
+General information only, not clinical, legal or financial advice. It is not clinical advice and not industrial advice. OnlyScrubs is not a union or a health department.
 
 ## A minimum, not a ceiling
 
@@ -24,7 +24,7 @@ A nurse-to-patient ratio is the minimum number of nurses or midwives for the pat
 
 **South Australia.** The [Nurse and Midwife to Patient Ratios Act 2025](https://www.legislation.sa.gov.au/lz?path=%2Fc%2Fa%2Fnurse+and+midwife+to+patient+ratios+act+2025) is in force. The ward ratios are in its schedules. Section 7, linked above, is the counting rule.
 
-**Western Australia.** A [government statement on 16 November 2026](https://www.wa.gov.au/government/media-statements/Cook%20Labor%20Government/Nurse-to-patient-ratios-expanded-across-more-WA-public-hospitals-20261116) said the public rollout covers 91 metropolitan wards and all metropolitan emergency departments, with the final 33 wards starting that day. It names the hospitals in the phase, plans maternity and mental health for 2027, and calls the rollout a commitment of the Cook Labor Government. It does not point to an Act. Use the local policy and any agreement.
+**Western Australia.** A [government statement on 16 November 2026](https://www.wa.gov.au/government/media-statements/Cook%20Labor%20Government/Nurse-to-patient-ratios-expanded-across-more-WA-public-hospitals-20261116) said the public rollout covers 91 metropolitan wards and all metropolitan emergency departments, with the final 33 wards starting that day. It names the hospitals in the phase, plans maternity and mental health for 2027, and describes the rollout as a government commitment. It does not point to an Act. Use the local policy and any agreement.
 
 **New South Wales public hospitals.** [NSW Health](https://www.health.nsw.gov.au/workforce/Pages/safe-staffing-levels.aspx) is phasing in Safe Staffing Levels with the NSWNMA. Several inpatient areas are published at 1:4 in the morning, 1:4 in the afternoon and 1:7 at night, on occupied beds, with in-charge hours separate. Emergency rows include 1:1 for generally occupied resuscitation beds and 1:3 for generally occupied treatment spaces. This page did not find a Victorian-style statute on that page. Maternity was still being discussed.
 
@@ -37,14 +37,6 @@ A nurse-to-patient ratio is the minimum number of nurses or midwives for the pat
 Victoria, Queensland and South Australia, above, are public-sector laws. Western Australia's statement and the NSW Health page are public systems. A private hospital is usually an agreement or a policy, and that agreement may contain no ratio at all.
 
 On 17 November 2026, [Coast Community News](https://coastcommunitynews.com.au/central-coast/news/2026/11/nurses-strike-in-face-of-healthe-care-offer/) reported an NSWNMA stop-work on 11 November at three Central Coast Healthe Care private hospitals, described as protected industrial action, with pay and ratios among the issues. It reported a vote from 9am on 19 November to 4pm on 23 November 2026 across 13 Healthe Care hospitals, and that members said the offer had no ratios. Healthe Care had not responded in the article. How a vote works is in [stop-works, strikes and EBA votes](/guides/enterprise-bargaining-and-industrial-action.html).
-
-## The Victorian election, stated flatly
-
-The [Parliament of Victoria](https://www.parliament.vic.gov.au/election) says the election is on Saturday 28 November 2026, and that early voting opens on Wednesday 18 November 2026. That is a calendar fact.
-
-On 5 November 2026, [Victorian Labor](https://www.viclabor.org.au/news/labor-will-deliver-better-mental-health-care-with-nurse-to-patient-ratios) said a re-elected Carroll Labor government would legislate mental health ratios: acute adult, and acute child and youth, at 1:4 morning and evening and 1:8 at night; secure extended care the same; high dependency at 1:2. It described 102 million dollars, almost 160 more mental health nurses, and 30 new graduate places. The ANMF (Victorian Branch) described the acute, child and adolescent, and secure extended care figures as including a supernumerary in-charge nurse. Labor's post does not say "in charge". A promise is not the Act.
-
-The Liberal and Nationals' [letter to Tandem](https://tandemcarers.org.au/common/Uploaded%20files/2026Election/261023_LNP-response-to-scorecard-questionsv2.pdf), dated 23 October 2026, promises a Mental Health Workforce Strategy within 100 days and a 50 million dollar Targeted Mental Health Workforce Fund, plus further commitments before election day. It does not mention ratios. It is a reply to a carers' group, not a whole health policy. This page prefers neither statement.
 
 ## When the board and the people do not match
 
