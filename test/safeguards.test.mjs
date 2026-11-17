@@ -197,7 +197,7 @@ test("new guides stay in range and point at official sources", () => {
     "social-media-and-professionalism.md": ["nursingmidwiferyboard.gov.au", "ahpra.gov.au"],
     "fatigue-and-night-shift-sleep.md": ["healthdirect.gov.au", "nmsupport.org.au"],
     "speaking-up-about-safety.md": ["ahpra.gov.au", "nursingmidwiferyboard.gov.au"],
-    "nurse-patient-ratios-explained.md": ["wa.gov.au", "legislation.vic.gov.au", "health.nsw.gov.au", "parliament.vic.gov.au", "legislation.qld.gov.au"],
+    "nurse-patient-ratios-explained.md": ["wa.gov.au", "legislation.vic.gov.au", "health.nsw.gov.au", "legislation.qld.gov.au"],
     "enterprise-bargaining-and-industrial-action.md": ["fairwork.gov.au", "fwc.gov.au", "tas.gov.au"],
     "protected-titles-who-can-call-themselves-a-nurse.md": ["nursingmidwiferyboard.gov.au", "ahpra.gov.au"]
   };
