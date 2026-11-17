@@ -5,6 +5,7 @@ date: 2026-11-17
 updated: 2026-11-17
 tags: nights, wellbeing
 toolkit: yes
+product: payTracker
 ---
 
 Night shift asks your body to be alert while everyone else is asleep, then to sleep while the day is happening outside the blinds. You will not hack that perfectly. You can make it less brutal, and you can refuse to drive when you are not safe.

@@ -5,6 +5,7 @@ date: 2026-11-17
 updated: 2026-11-17
 tags: registration, grads
 toolkit: yes
+product: iqnmPlanner
 ---
 
 Registration is the legal permission to practise as a nurse or a midwife in Australia. A graduate program, a contract, and a name badge do not replace it. This page walks through the public steps in plain language. It is not clinical advice, not a decision from the Nursing and Midwifery Board of Australia, and not a promise that an application will be granted.

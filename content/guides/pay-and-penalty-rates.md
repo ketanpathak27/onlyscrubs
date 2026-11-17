@@ -5,6 +5,7 @@ date: 2026-11-17
 updated: 2026-11-17
 tags: pay, grads
 toolkit: yes
+product: payTracker
 ---
 
 Pay questions travel faster than pay answers. Someone in a group chat will quote a Saturday rate from a different state, a different year, and a different kind of employer, and it will sound confident. This page will not do that. It is not industrial advice, not financial advice, and not clinical advice. It is a map to the documents that actually set rates.

@@ -5,7 +5,7 @@ date: 2026-11-17
 updated: 2026-11-17
 tags: registration, grads
 tool: renewal
-product: cpdOrganiser
+product: iqnmPlanner
 ---
 
 Renewal is the annual declaration that you still meet the registration standards. Recency of practice is one of those standards: have you actually practised recently enough? This page is general information only, checked on 17 November 2026. It is not a renewal, not a fee invoice, and not clinical advice. If the NMBA page and this page disagree, use theirs.

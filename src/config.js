@@ -23,7 +23,17 @@ export const siteConfig = {
     cpdOrganiser: { label: "NMBA CPD & Registration Renewal Organiser", url: "" },
     gradWorkbook: { label: "New Grad Nurse Program Application & Interview Workbook", url: "" },
     placementKit: { label: "Clinical Placement Survival Kit", url: "" },
-    expenseLog: { label: "Nurse & Midwife Work Expense Log", url: "" }
+    expenseLog: { label: "Nurse & Midwife Work Expense Log", url: "" },
+    payTracker: {
+      label: "Australian Nurse Roster & Pay Tracker",
+      url: "https://lofiluffyy.gumroad.com/l/gnacj",
+      note: "Pay estimates only. You enter your own award or enterprise agreement rates. No award rates are stated."
+    },
+    iqnmPlanner: {
+      label: "IQNM Registration Planner",
+      url: "https://lofiluffyy.gumroad.com/l/nlvlrt",
+      note: "Not migration advice, and not an official NMBA or Ahpra product."
+    }
   }
 };
 
