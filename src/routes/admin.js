@@ -1,7 +1,9 @@
 import { json, readJson, auth, clientKey, rateLimit, rateLimitState, limited, timingSafeEqual } from "../lib/http.js";
-import { buildDigest, EMAIL_SENDING_REASON, unsubscribeLink } from "../lib/digest.js";
+import { buildDigest, EMAIL_SENDING_REASON } from "../lib/digest.js";
 import { GUIDES } from "../generated/meta.js";
+import { sitemapUrls, submitIndexNow } from "../lib/indexnow.js";
 import { clean } from "../lib/moderation.js";
+import { unsubscribeToken, unsubscribeUrl } from "../lib/newsletter.js";
 import { sessionCookie, signSession } from "../lib/session.js";
 import { archiveOld, findById, listByPrefix, publicShift, read, strip } from "../lib/store.js";
 
@@ -27,6 +29,7 @@ function applyAction(item, kind, action) {
   if (action === "approve" && kind !== "relay") {
     item.status = "approved";
     item.approvedAt = now;
+    delete item.hiddenAt;
     return { item };
   }
   if (action === "reject" && kind !== "relay") {
@@ -86,8 +89,35 @@ export async function apiAdminLogin(request, env) {
   return withCookie(json({ ok: true }), cookie);
 }
 
-export async function apiAdminLogout() {
+export async function apiAdminLogout(request) {
+  if (request && request.method !== "POST") return json({ error: "Method not allowed" }, 405);
   return withCookie(json({ ok: true }), sessionCookie("", 0));
+}
+
+export async function apiAdminIndexNow(request, env) {
+  const gate = await requireAdmin(request, env);
+  if (gate.error) return gate.error;
+  if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
+  if (!env.ASSETS) return json({ error: "Sitemap is not available." }, 500);
+  const sitemapUrl = new URL("/sitemap.xml", request.url);
+  const sitemapRes = await env.ASSETS.fetch(new Request(sitemapUrl));
+  if (!sitemapRes.ok) return json({ error: "Sitemap could not be read." }, 500);
+  const urls = sitemapUrls(await sitemapRes.text());
+  if (!urls.length) return json({ error: "Sitemap was empty." }, 500);
+  try {
+    const result = await submitIndexNow(urls);
+    if (!result.ok) {
+      return json({
+        ok: false,
+        status: result.status,
+        count: result.count,
+        error: "IndexNow returned " + result.status + ". The key file must be live on onlyscrubs.org before a submission is accepted."
+      }, 502);
+    }
+    return json({ ok: true, status: result.status, count: result.count });
+  } catch {
+    return json({ error: "IndexNow could not be reached." }, 502);
+  }
 }
 
 export async function apiAdmin(request, env) {
@@ -237,30 +267,24 @@ function csvCell(value) {
   return cell;
 }
 
-async function subscriberRows(kv) {
+async function subscriberRows(kv, secret) {
   const listed = await kv.list({ prefix: "newsletter:" });
   const rows = [];
   for (const key of listed.keys) {
     const raw = await kv.get(key.name);
     let email = key.name.slice("newsletter:".length);
     let createdAt = "";
-    let token = "";
+    let consentAt = "";
     try {
       const parsed = JSON.parse(raw) || {};
       email = parsed.email || email;
       createdAt = parsed.createdAt || "";
-      token = parsed.token || "";
-      if (!token) {
-        token = crypto.randomUUID();
-        parsed.email = email;
-        parsed.token = token;
-        await kv.put(key.name, JSON.stringify(parsed));
-      }
-      if (token) await kv.put("unsub:" + token, email);
+      consentAt = parsed.consentAt || "";
     } catch {
-      token = "";
+      consentAt = "";
     }
-    rows.push({ email, createdAt, token, unsubscribeUrl: token ? unsubscribeLink(token) : "" });
+    const link = secret ? unsubscribeUrl(await unsubscribeToken(secret, email)) : "";
+    rows.push({ email, createdAt, consentAt, unsubscribeUrl: link });
   }
   return rows;
 }
@@ -270,7 +294,7 @@ export async function composeDigest(env) {
   const confessions = await listByPrefix(kv, "confession:", "approved");
   const shift = await publicShift(kv);
   const digest = buildDigest({ confessions, guides: GUIDES, shift });
-  const subscribers = await subscriberRows(kv);
+  const subscribers = await subscriberRows(kv, env.ADMIN_TOKEN || "");
   return {
     subject: digest.subject,
     html: digest.html,
@@ -316,8 +340,8 @@ export async function apiDigestHtml(request, env) {
 export async function apiNewsletterExport(request, env) {
   const gate = await requireAdmin(request, env);
   if (gate.error) return gate.error;
-  const people = await subscriberRows(gate.kv);
-  const rows = [["email", "createdAt", "unsubscribeUrl"], ...people.map((person) => [person.email, person.createdAt, person.unsubscribeUrl])];
+  const people = await subscriberRows(gate.kv, env.ADMIN_TOKEN || "");
+  const rows = [["email", "createdAt", "consentAt", "unsubscribeUrl"], ...people.map((person) => [person.email, person.createdAt, person.consentAt, person.unsubscribeUrl])];
   const csv = rows.map((row) => row.map(csvCell).join(",")).join("\n") + "\n";
   return new Response(csv, {
     status: 200,

@@ -21,6 +21,24 @@ function toolkitCallout() {
   return `<aside class="callout shop-callout"><p><strong>From the OnlyScrubs creator.</strong> Fillable templates and study notes for students and new grads are on the <a href="/shop.html">shop</a>. They are independent templates, not clinical advice, and not an NMBA or Ahpra product.</p></aside>`;
 }
 
+const postingTerms = `<p class="disclosure">By posting you agree to the <a href="/terms.html">Terms</a>.</p>`;
+
+function faqPage(pairs) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: pairs.map(([name, text]) => ({
+      "@type": "Question",
+      name,
+      acceptedAnswer: { "@type": "Answer", text }
+    }))
+  };
+}
+
+function faqHtml(pairs) {
+  return `<h2>Common questions</h2>\n${pairs.map(([question, answer]) => `<h3>${esc(question)}</h3>\n<p>${answer}</p>`).join("\n")}`;
+}
+
 function guideCards(guides) {
   return guides.map((guide) => `<a class="guide-card link-card" href="${guide.path}" data-guide-card data-tags="${esc(guide.tags.join(","))}">
     <p class="kicker">${esc(guide.tags.join(" · "))}</p>
@@ -42,11 +60,26 @@ export function home(assets, guides) {
     newsletter: "band",
     jsonLd: [{
       "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "OnlyScrubs",
+      url: `${SITE}/`,
+      email: "hello@onlyscrubs.org",
+      logo: `${SITE}/icons/icon-512.png`,
+      areaServed: { "@type": "Country", name: "Australia" },
+      description: "Anonymous practical resources for Australian nurses, midwives, students and healthcare workers."
+    }, {
+      "@context": "https://schema.org",
       "@type": "WebSite",
       name: "OnlyScrubs",
       url: `${SITE}/`,
       description: "Practical, anonymous resources for Australian nurses, midwives, students and healthcare workers.",
-      inLanguage: "en-AU"
+      inLanguage: "en-AU",
+      publisher: { "@type": "Organization", name: "OnlyScrubs", url: `${SITE}/`, email: "hello@onlyscrubs.org" },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: { "@type": "EntryPoint", urlTemplate: `${SITE}/confessions.html?q={search_term_string}` },
+        "query-input": "required name=search_term_string"
+      }
     }],
     main: `<section class="wrap hero">
       <div class="hero-copy">
@@ -98,7 +131,7 @@ export function home(assets, guides) {
         <div>
           <p class="kicker">Newsletter</p>
           <h2>Occasional notes. We will not page you at 3am.</h2>
-          <p>Guides and site news only. Stored so we can email you. Unsubscribe any time, or ask and we delete the address.</p>
+          <p>Guides and site news from OnlyScrubs, hello@onlyscrubs.org. Each email has an unsubscribe link that removes you straight away.</p>
         </div>
         ${newsletterForm()}
       </div>
@@ -189,6 +222,7 @@ export function scrubRack(assets) {
       <div class="panel" id="list-form">
         <h2>List a set</h2>
         <p>No employer names, no clinical supplies, no patient stories. Suburb and state are enough.</p>
+        <p class="banner"><strong>Before you post.</strong> The title, description, size, colour, suburb and state are public. Your contact email is not. People write through OnlyScrubs, and a moderator passes on a suitable message. That is the safer contact option. Do not type an email address or phone number into the public fields.</p>
         <form class="form" id="listing-form">
           <label>I want to<select name="type" required><option value="donate">Donate</option><option value="request">Request</option><option value="swap">Swap</option></select></label>
           <label>Title<input name="title" required minlength="4" maxlength="80" placeholder="Navy scrub top, size 12"></label>
@@ -200,8 +234,9 @@ export function scrubRack(assets) {
           <label>State<select name="state" required><option value="">Choose</option>${states}</select></label>
           <label>Condition<select name="condition" required><option value="new">New</option><option value="as-new">As new</option><option value="good" selected>Good</option><option value="fair">Fair</option></select></label>
           <label>Your name<input name="contactName" maxlength="60" autocomplete="name"></label>
-          <label>Email, kept private<input name="contactEmail" type="email" required autocomplete="email"></label>
-          <label class="check"><input name="confirm" type="checkbox" required><span>I confirm this does not name a workplace, patient, or clinical matter.</span></label>
+          <label>Email, kept off the public listing<input name="contactEmail" type="email" required autocomplete="email"></label>
+          <label class="check"><input name="confirm" type="checkbox" required><span>I confirm this does not name a workplace, patient, or clinical matter, and that my email is only for OnlyScrubs to pass messages on.</span></label>
+          ${postingTerms}
           <input class="honeypot" name="website" tabindex="-1" autocomplete="off">
           <div data-turnstile></div>
           <button class="button primary" type="submit">List it for review</button>
@@ -305,7 +340,7 @@ export function gearGuide(assets, gear) {
   const cats = [...new Map(gear.map((item) => [item.category, item.category])).keys()];
   const cards = gear.map((item) => {
     const affiliate = item.affiliateUrl
-      ? `<p><a href="${esc(item.affiliateUrl)}" rel="sponsored nofollow noopener noreferrer">Partner link</a></p>`
+      ? `<p class="sponsored-placement"><span class="ad-label">Sponsored</span> <a href="${esc(item.affiliateUrl)}" rel="sponsored nofollow noopener noreferrer">Sponsored partner link</a></p>`
       : "";
     const blob = [item.title, item.summary, item.category, ...(item.advice || []), ...(item.lookFor || [])].join(" ");
     return `<article class="card gear-card" data-gear="${esc(blob)}" data-category="${esc(item.category)}">
@@ -329,7 +364,7 @@ export function gearGuide(assets, gear) {
     tearoom: true,
     scripts: [assets.gear],
     main: `<section class="wrap page-hero"><p class="eyebrow">Comfort is not a personality flaw</p><h1>Gear guide</h1><p class="lede">What to look for before your pay cycle files a complaint. No star ratings, no made-up prices, no pretend reviews.</p>
-      <p class="disclosure">If a link is ever marked as a partner link, OnlyScrubs may earn a commission at no extra cost to you. There are no partner links on this page today. Ordinary links are not ads.</p></section>
+      <p class="disclosure">Anything marked <strong>Sponsored</strong> is a paid or affiliate placement. OnlyScrubs may earn a commission at no extra cost to you. There are no sponsored links on this page unless a card says Sponsored. Slots marked <strong>Ad</strong> are advertisements. Ordinary notes are not ads.</p></section>
     <section class="wrap section">
       ${adSlot("gear-top")}
       <div class="filters">
@@ -380,6 +415,7 @@ export function confessions(assets) {
           <label for="confession-text">Your confession<textarea id="confession-text" maxlength="700" minlength="20" required placeholder="Example: I came home with three pens, none of them mine, and the coffee was already cold."></textarea></label>
           <fieldset class="tag-picker"><legend>Tags, if they fit</legend>${tags()}</fieldset>
           <label class="check"><input type="checkbox" id="confession-confirm" required><span>I confirm this does not identify a patient, colleague, hospital, employer, date, incident or clinical detail.</span></label>
+          ${postingTerms}
           <input class="honeypot" name="website" tabindex="-1" autocomplete="off">
           <div data-turnstile></div>
           <button class="button primary" type="submit">Chart it for review</button>
@@ -398,7 +434,7 @@ export function submitPage(assets) {
     active: "/submit.html",
     assets,
     tearoom: true,
-    main: `<section class="wrap page-hero"><p class="eyebrow">Send it in</p><h1>Submit</h1><p class="lede">A scrub listing, a guide idea, or a confession that could survive a full moon and a regulator with Wi-Fi.</p></section>
+    main: `<section class="wrap page-hero"><p class="eyebrow">Send it in</p><h1>Submit</h1><p class="lede">A scrub listing, a guide idea, or a confession that could survive a full moon and a regulator with Wi-Fi.</p>${postingTerms}</section>
     <section class="wrap section"><div class="grid cards">
       <a class="card link-card" href="/scrub-rack.html#list-form"><h3>Scrub Rack</h3><p>Donate, request or swap. Your email stays off the public card.</p></a>
       <a class="card link-card" href="/confessions.html"><h3>Confession</h3><p>Write it on the site. It waits for moderation.</p></a>
@@ -406,6 +442,12 @@ export function submitPage(assets) {
     </div></section>`
   });
 }
+
+const wellbeingFaq = [
+  ["What should I do in an emergency in Australia?", "Call 000 for police, fire or ambulance. This page is not an emergency service."],
+  ["Who can nurses, midwives and students call?", "Nurse & Midwife Support on 1800 667 877, any time. Lifeline, Beyond Blue and 13YARN are listed on this page."],
+  ["Is the breathing exercise treatment?", "No. It is a short pause. Stop if you feel unwell, and contact a health service if you need care."]
+];
 
 export function wellbeing(assets) {
   return page({
@@ -415,6 +457,7 @@ export function wellbeing(assets) {
     active: "/wellbeing.html",
     assets,
     scripts: [assets.breathe],
+    jsonLd: [faqPage(wellbeingFaq)],
     main: `<section class="wrap page-hero"><p class="eyebrow">Support signposts</p><h1>Wellbeing</h1><p class="lede">Not therapy and not medical advice. Real services, with the numbers checked on their own sites on 17 November 2026.</p></section>
     <section class="wrap section">
       <h2>If there is immediate danger</h2>
@@ -437,9 +480,16 @@ export function wellbeing(assets) {
         </div>
       </div>
       <p><a href="/guides/asking-for-help.html">How to ask for help and debrief</a> without turning a shift into a public story.</p>
+      ${faqHtml(wellbeingFaq)}
     </section>`
   });
 }
+
+const rulesFaq = [
+  ["Can I post a patient story if I remove the name?", "No. Patient stories are not allowed, even when you think they are de-identified."],
+  ["Can I name a colleague or a workplace?", "No. Do not name or describe a colleague, hospital, ward, clinic or employer in a way that identifies them."],
+  ["How do I report a post or a scrub listing?", "Use the Report button on the item, or the complaints page. A report hides that confession or listing from the public page while it is reviewed."]
+];
 
 export function rules(assets) {
   return page({
@@ -448,6 +498,7 @@ export function rules(assets) {
     path: "/submission-rules.html",
     active: "",
     assets,
+    jsonLd: [faqPage(rulesFaq)],
     main: `<section class="wrap page-hero prose"><p class="eyebrow">Keep it kind, keep it safe</p><h1>Submission rules</h1>
       <p>Submissions may be edited, held, rejected, archived or deleted. Nothing is public until a person approves it. A filter can hold a post for that review and record why. It does not publish the post. Read <a href="/moderation.html">how we moderate</a>.</p>
       <h2>Allowed</h2>
@@ -465,8 +516,9 @@ export function rules(assets) {
         <li>Bullying, harassment, discrimination, sexual content, hate, or workplace call-outs.</li>
         <li>Testimonials or claims about regulated health services.</li>
       </ul>
-      <p>Upvotes, Same and Hug reactions are for approved posts only. One of each per person. Reports go to the moderation queue. The same person cannot report the same post twice, and there is a daily limit. A post leaves the public feed after three different reports, or straight away when the report is about patient information or a threat. A person still reviews it.</p>
+      <p>Upvotes, Same and Hug reactions are for approved posts only. One of each per person. A report hides the confession or listing from the public page and sends it to the moderation queue. The same connection cannot report the same post twice, and there is a daily limit. Read the <a href="/terms.html">Terms</a> before you post. To raise a concern, use the <a href="/complaints.html">complaints page</a>.</p>
       <p>If a post looks like you are in crisis, we will show Australian support lines and hold the post. We are not a crisis service. Call 000 if you are in immediate danger.</p>
+      ${faqHtml(rulesFaq)}
     </section>`
   });
 }
@@ -474,29 +526,135 @@ export function rules(assets) {
 export function privacy(assets) {
   return page({
     title: "Privacy",
-    description: "What OnlyScrubs stores: confessions, scrub listings, relay messages, newsletter addresses, and hashed IP keys for rate limits.",
+    description: "How OnlyScrubs handles personal information under the Australian Privacy Principles, including IP hashes, the admin cookie, Scrub Rack emails, and overseas hosting.",
     path: "/privacy.html",
     active: "",
     assets,
-    main: `<section class="wrap page-hero prose"><p class="eyebrow">Privacy first</p><h1>Privacy</h1>
-      <p>OnlyScrubs is a small community site. We store what we need to moderate it and to run the features on the page. We do not sell data. Email <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> to ask for a removal.</p>
-      <h2>Confessions and comments</h2>
-      <p>We store the text you submit, the time, optional tags, and later the public counts for ratings, Same and Hug. Submissions stay pending until approved. Posts older than a year move to an archive. Do not include patient, colleague or workplace details. There is nowhere to put your name, and you should not add one.</p>
-      <h2>Scrub Rack and messages</h2>
-      <p>A listing stores the public details you typed, plus the email and optional name in fields that are not shown on the public card. A relay message stores the sender's name, email and message so a moderator can pass it on. We do not run a paid email service. Passing a message on is a manual step.</p>
-      <h2>Newsletter</h2>
-      <p>If you join the list, we store the email address, the date, and a random unsubscribe token so each note can carry your own unsubscribe link. We use it to send occasional OnlyScrubs notes. We do not give it to advertisers. Ask us and we will delete it, or use the unsubscribe link in a note. The site can prepare a digest for a person to send. It does not send that mail itself.</p>
+    main: `<section class="wrap page-hero prose"><p class="eyebrow">Australian Privacy Principles</p><h1>Privacy</h1>
+      <p>This page explains how OnlyScrubs handles personal information. It is general information about this website, not legal advice. It was last updated on 17 November 2026.</p>
+      <h2>Who we are</h2>
+      <p>OnlyScrubs is an independent community website at onlyscrubs.org, run from Victoria, Australia, for healthcare workers and students. It is not a hospital, clinic, union, university, regulator, or government agency. For privacy questions, access requests, corrections, or complaints, email <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a>.</p>
+      <h2>What we collect</h2>
+      <ul>
+        <li><strong>Confessions and comments.</strong> The text, the time, optional tags, moderation status, and later the public counts for ratings, Same and Hug. There is no name field. Do not add your name, or anyone else's.</li>
+        <li><strong>Scrub Rack listings.</strong> The public card shows the type, title, description, size, brand, colour, condition, suburb and state. The contact email, and the name if you typed one, are stored separately and are not shown on the card. See <a href="#scrub-rack-email">email on Scrub Rack listings</a> below.</li>
+        <li><strong>Relay messages.</strong> The sender's name, email and message, plus which listing it is about, so a moderator can pass a suitable note on. We do not run a paid email service. Passing a message on is a manual step.</li>
+        <li><strong>Newsletter.</strong> The email address, the date you agreed, and the fact that you consented to occasional emails from OnlyScrubs, hello@onlyscrubs.org. We do not add you without that tick.</li>
+        <li><strong>Reports.</strong> The reason you type, and a count on the item, so we can hide and review it.</li>
+        <li><strong>Connection address, for limits only.</strong> To slow spam and to stop repeat votes and reactions, the site hashes the IP address your connection presents (SHA-256, then a shortened hex string) and stores that hash with a counter or a vote marker. We do not write the raw IP address into our content store, and we do not build a profile from the hash.</li>
+        <li><strong>Admin cookie.</strong> <code>os_admin</code> is set only after a successful moderator sign-in. It is HttpOnly, Secure, and SameSite=Strict, lasts 12 hours, and holds a signed expiry, not the admin password. It is not used for analytics or advertising. Visitors who are not signed in as a moderator do not get this cookie.</li>
+        <li><strong>On your device only.</strong> The colour theme, the placement checklist ticks, and pages saved by the installable app stay in this browser. They are not uploaded.</li>
+      </ul>
+      <h2>Why we collect it</h2>
+      <p>We use this information to publish and moderate the community, pass Scrub Rack messages to the right person, send the newsletter you asked for, limit abuse, and keep the site available. We do not sell personal information, and we do not use it for advertising profiles.</p>
+      <h2>Cookies</h2>
+      <p>The only cookie this site sets itself is <code>os_admin</code>, and only for a signed-in moderator. We do not set analytics or advertising cookies, and we do not ask you to accept a tracking banner. If the optional spam check is switched on, Cloudflare Turnstile may process technical data, including on Cloudflare's own domain, to decide whether a form is automated. If Cloudflare Web Analytics is enabled for the domain, it is aggregated and does not add a separate tracker of ours.</p>
+      <h2 id="scrub-rack-email">Email on Scrub Rack listings</h2>
+      <p>Your contact email is <strong>not</strong> published on the listing. People who are interested send a message through OnlyScrubs. A moderator can then pass that message to the address you gave us. Do not put an email address or phone number in the title, description, suburb, or any other public field. Those fields are visible to anyone. The optional name on the form is also kept off the public card. If you would rather not share an email with us at all, do not list an item. You can still read the rack.</p>
+      <h2>Disclosure</h2>
+      <p>We do not give the newsletter list or private listing emails to advertisers or other sites. Moderators can see pending and approved records, including private emails, so they can run the queue. We may disclose information if the law requires it, or if it is reasonably necessary to lessen a serious threat to someone's life, health, or safety. Public text you submit can be read by anyone once it is approved.</p>
+      <h2>Overseas processing</h2>
+      <p>The site is hosted on Cloudflare. Content is stored in Cloudflare KV, which is a global service, and Cloudflare processes requests on a network that is not limited to Australia. That means personal information may be processed and stored overseas, including outside Australia. We do not promise that a particular record stays in Australia. Cloudflare acts as our infrastructure provider. We remain responsible for the handling we ask them to do. Their own privacy notice describes their processing.</p>
+      <h2>Retention</h2>
+      <ul>
+        <li>Confessions stay pending until moderated. Approved posts move to an archive after a year. Rejected or deleted posts are removed from the public site. An archived post is no longer on the public feed.</li>
+        <li>Comments follow the same moderation path and are removed if we delete them.</li>
+        <li>Scrub Rack listings and relay messages are kept while the listing is live and while a moderator still needs the message. Ask us and we will delete a listing or a message we can find.</li>
+        <li>A reported confession or listing is hidden from the public page as soon as the report is lodged. We keep the record in the moderation queue until it is restored or deleted.</li>
+        <li>Newsletter addresses are kept until you unsubscribe or ask us to delete them. Unsubscribe takes effect immediately.</li>
+        <li>Rate-limit counters expire with the limit window, from minutes up to about an hour. Vote and reaction markers expire after a year. The admin cookie expires after 12 hours, or sooner if the moderator logs out.</li>
+      </ul>
+      <h2>Access and correction</h2>
+      <p>Email <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> to ask for a copy of personal information we hold about you, or to correct it. Tell us the address you used, and enough detail to find the record, such as the listing title or the approximate date. Confessions do not store a name. If you did not include an email, we may not be able to tell which anonymous post is yours. We will not hand over someone else's information to prove a point. We aim to answer access and correction requests within 30 days.</p>
+      <h2>Anonymity</h2>
+      <p>You can read the site without identifying yourself. Confessions do not ask for a name. The newsletter and a Scrub Rack listing need an email, because those features do not work without one. Anonymity is not a promise that a story cannot be recognised. Do not post details that identify a patient, a colleague, or a workplace. Do not send us government identifiers such as a Medicare number. We do not ask for them, and we will delete content that contains them.</p>
+      <h2>Complaints</h2>
+      <p>Email <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> with the words "privacy complaint", what happened, and how we can reach you. We will acknowledge the complaint and aim to respond within 30 days. If you are not satisfied with our response, you can complain to the Office of the Australian Information Commissioner at <a href="https://www.oaic.gov.au/" rel="noopener noreferrer">oaic.gov.au</a>. Content complaints and defamation concern notices are handled on the <a href="/complaints.html">complaints page</a>. The rules for using the site are in the <a href="/terms.html">Terms of Use</a>.</p>
       <h2>Shop</h2>
       <p>The shop lists digital templates from the OnlyScrubs creator. Choosing Buy on Gumroad takes you to Gumroad, which handles the checkout, the download and the payment. We do not receive your card number. Purchases are handled by Gumroad under <a href="https://gumroad.com/privacy" rel="noopener noreferrer">their privacy policy</a>.</p>
-      <h2>Rate limits, reactions and reports</h2>
-      <p>To slow spam, to stop repeat votes, and to ignore a second report from the same person, we store a shortened hash of the connection address, not the address itself, next to a counter, a vote marker or a report marker. We do not build a profile from it. If a filter holds a post, we store a short reason so a moderator can see why.</p>
-      <h2>Spam check and analytics</h2>
-      <p>If Turnstile keys are configured, forms ask Cloudflare Turnstile to check the submission. The site works without those keys. If Cloudflare Web Analytics is turned on for the domain, Cloudflare may collect aggregated visit metrics. We do not add a separate advertising tracker. Reserved ad slots on guides and the gear guide stay empty unless ads are explicitly switched on, and they never appear in the confessions feed.</p>
-      <h2>Where it sits</h2>
-      <p>Text is stored in Cloudflare KV, which is a global service. We do not promise that data stays in Australia. The contact for privacy requests is hello@onlyscrubs.org.</p>
     </section>`
   });
 }
+
+export function terms(assets) {
+  return page({
+    title: "Terms of Use",
+    description: "Terms for using OnlyScrubs: who it is for, what you may post, anonymity limits, moderation, the content licence, and liability under the Australian Consumer Law.",
+    path: "/terms.html",
+    active: "",
+    assets,
+    main: `<section class="wrap page-hero prose"><p class="eyebrow">The rules of the site</p><h1>Terms of Use</h1>
+      <p>These terms apply when you use onlyscrubs.org. They are the site's house rules. They are general information about how OnlyScrubs operates, not legal advice. If you need advice about your own situation, ask a lawyer. Last updated 17 November 2026.</p>
+      <h2>Who may use OnlyScrubs</h2>
+      <p>You must be 18 or older. The site is aimed at healthcare workers and students in Australia, including nurses, midwives, and people training for that work. If you are under 18, do not use the site. If you do not agree to these terms, do not post, list, or subscribe.</p>
+      <h2>Acceptable use</h2>
+      <p>You may read the guides, use the shift tools, and send harmless, non-identifying community posts. You must not post or send:</p>
+      <ul>
+        <li>Patient-identifying information, including a story you believe is de-identified, an image, a date of birth, a record number, or a clinical incident.</li>
+        <li>Anything that names or identifies a colleague, student, supervisor, or workplace, including a hospital, ward, clinic, employer, or a description that would let a reader work out who you mean.</li>
+        <li>Defamatory material, harassment, bullying, hate, sexual content, or threats.</li>
+        <li>Illegal content, or content that asks someone else to break the law or a professional obligation.</li>
+        <li>Clinical instructions framed as professional advice, treatment claims, or testimonials about a regulated health service.</li>
+        <li>Impersonation of another person, a health service, a regulator, a university, or OnlyScrubs.</li>
+      </ul>
+      <p>The shorter list on the <a href="/submission-rules.html">submission rules</a> page is part of these terms. A keyword filter blocks some risky wording. It does not replace your judgement.</p>
+      <h2>Anonymity has limits</h2>
+      <p>Confessions do not ask for your name, but anonymity is not absolute. We store a shortened hash of your connection address to limit spam and repeat votes. Moderators can see the private email on a Scrub Rack listing and on a newsletter signup. A post that describes a real shift too closely can identify you even with the name left off. We may disclose information if the law requires it. Do not post anything you would be unwilling to explain to your employer or your university.</p>
+      <h2>Moderation</h2>
+      <p>We may refuse, edit, hide, archive, or delete any content, and we may stop accepting posts, without notice. Reported confessions and listings are hidden from the public page when the report arrives. We aim to resolve a report or a complaint within 7 days. How to raise one is on the <a href="/complaints.html">complaints page</a>. Our moderation decision is about what stays on this website. It is not a finding about you, your workplace, or the law.</p>
+      <h2>Your content</h2>
+      <p>You keep ownership of what you submit. You grant OnlyScrubs a non-exclusive, worldwide, royalty-free licence to host, moderate, display, archive, and remove that content on this site for as long as we operate the relevant page. You confirm you have the right to submit it, and that it does not breach these terms or anyone else's rights. You can ask us to delete a post you can identify. Public copies and archives may already have been seen.</p>
+      <h2>Not advice</h2>
+      <p>Guides, checklists, gear notes, the shift planner, the breathing pause, confessions, and listings are general information or community material. They are not medical, mental health, legal, employment, financial, or other professional advice, and they are not a consultation. You are responsible for your own clinical, professional, and privacy obligations. Read the <a href="/disclaimer.html">disclaimer</a>.</p>
+      <h2>Liability and the Australian Consumer Law</h2>
+      <p>OnlyScrubs is a free community site. Nothing in these terms excludes, restricts, or modifies any consumer guarantee, right, or remedy under the Australian Consumer Law, or any other law, that cannot lawfully be excluded. Where the law allows a guarantee to be limited, and it is fair and reasonable to do so, our liability for a failure to comply with that guarantee is limited to resupplying the service or paying the cost of resupplying it. To the extent the law allows, we are not liable for loss or damage arising from your use of the site, from relying on general information as if it were professional advice, or from content posted by other people. You use other people's posts and listings at your own judgement.</p>
+      <h2>Governing law</h2>
+      <p>These terms are governed by the laws of Victoria, Australia. The courts of Victoria have jurisdiction, subject to any right you have to raise a dispute in another forum that the law does not let us exclude.</p>
+      <h2>Shop and third-party checkout</h2>
+      <p>Digital templates on the <a href="/shop.html">shop</a> are the creator's own products. When you choose Buy on Gumroad, you leave OnlyScrubs. The checkout is a third-party checkout on Gumroad. OnlyScrubs does not process the payment, store your card, or deliver the file. Digital downloads are delivered via Gumroad. Your rights under the Australian Consumer Law apply. The products are general information. They are not legal, financial, tax or clinical advice, and they are not endorsed by a government agency, the NMBA or Ahpra.</p>
+      <h2>Contact</h2>
+      <p>OnlyScrubs, <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a>. Privacy handling is on the <a href="/privacy.html">privacy page</a>. Concerns about a post are on the <a href="/complaints.html">complaints page</a>.</p>
+    </section>`
+  });
+}
+
+export function complaints(assets) {
+  return page({
+    title: "Complaints and takedown",
+    description: "How to report an OnlyScrubs post or send a defamation concern notice, what to include, and how quickly we hide and review it.",
+    path: "/complaints.html",
+    active: "",
+    assets,
+    main: `<section class="wrap page-hero prose"><p class="eyebrow">Tell us</p><h1>Complaints and takedown</h1>
+      <p>Use this page to report content on OnlyScrubs, including a defamation concern. This is general information about our process, not legal advice, and it is not itself a concerns notice under defamation law. Last updated 17 November 2026.</p>
+      <h2>Report a confession or a listing</h2>
+      <p>Open the item and use <strong>Report</strong>. Say what we should look at. The confession or listing is hidden from the public page as soon as the report is lodged, and it appears in the moderation queue. You can also email <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> if the item is already gone, or if the problem is not a single post.</p>
+      <h2>Defamation and other concern notices</h2>
+      <p>If you say something on the site is defamatory, or otherwise unlawful, email <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> with the subject "Concern notice". Include:</p>
+      <ul>
+        <li>Your name and a contact email or phone number.</li>
+        <li>The page address, or enough of the wording and the date for us to find it.</li>
+        <li>The words you are concerned about, quoted.</li>
+        <li>Why you say they are a problem, including who you say is identified.</li>
+        <li>What you want us to do: hide the item, delete it, or correct it.</li>
+        <li>A statement that your notice is made in good faith.</li>
+      </ul>
+      <p>If you are unsure whether a formal concerns notice has to follow a set form, get your own advice. We will still treat an email with the details above as a request to review the content.</p>
+      <h2>What we do, and when</h2>
+      <p>We hide reported confessions and listings promptly. The Report button does that immediately. If you email us, we hide the item as soon as we have read the email and can find it. We aim to resolve the report within 7 days: leave it hidden, edit it, delete it, or put it back. If you left a contact, we will tell you what we did. Seven days is our target for a decision on the website. It is not a promise about court deadlines.</p>
+      <h2>Privacy complaints</h2>
+      <p>Privacy complaints, access, and correction are on the <a href="/privacy.html">privacy page</a>. If we cannot resolve a privacy complaint, you can go to the Office of the Australian Information Commissioner at <a href="https://www.oaic.gov.au/" rel="noopener noreferrer">oaic.gov.au</a>.</p>
+      <h2>Contact</h2>
+      <p>OnlyScrubs, <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a>. The rules for posting are in the <a href="/terms.html">Terms of Use</a> and the <a href="/submission-rules.html">submission rules</a>.</p>
+    </section>`
+  });
+}
+
+const disclaimerFaq = [
+  ["Is OnlyScrubs medical advice?", "No. It is general information, humour and practical notes for healthcare workers and students. It does not diagnose, treat, or replace a clinician."],
+  ["What if I need urgent help?", "In Australia, call 000. Support lines are on the wellbeing page."],
+  ["Does OnlyScrubs give legal or employment advice?", "No. It is not legal advice, employment advice, financial advice, or professional supervision."]
+];
 
 export function disclaimer(assets) {
   return page({
@@ -505,6 +663,7 @@ export function disclaimer(assets) {
     path: "/disclaimer.html",
     active: "",
     assets,
+    jsonLd: [faqPage(disclaimerFaq)],
     main: `<section class="wrap page-hero prose"><p class="eyebrow">Important boundary</p><h1>Disclaimer</h1>
       <p>OnlyScrubs provides general information, practical resources, humour and community support for healthcare workers and students. It does not provide medical advice, mental health treatment, diagnosis, clinical services, legal advice, employment advice, financial advice, or professional supervision.</p>
       <p class="affiliation">OnlyScrubs is not affiliated with AHPRA, the Nursing and Midwifery Board of Australia (NMBA), any union, health service or employer.</p>
@@ -515,7 +674,8 @@ export function disclaimer(assets) {
       <h2>Regulated health services</h2>
       <p>OnlyScrubs is not intended to advertise regulated health services. Do not submit testimonials, treatment claims, clinical advice, or content that encourages unnecessary use of health services.</p>
       <h2>Tools on this site</h2>
-      <p>The shift planner, breathing exercise, checklists and gear notes are general education. They are not personalised care. Gear pages do not invent prices or reviews. Partner links, if they are added later, will be marked.</p>
+      <p>The shift planner, breathing exercise, checklists and gear notes are general education. They are not personalised care. Gear pages do not invent prices or reviews. Paid or affiliate placements are marked Ad or Sponsored.</p>
+      ${faqHtml(disclaimerFaq)}
     </section>`
   });
 }
@@ -543,8 +703,9 @@ export function admin(assets) {
     <section class="wrap section" id="admin-app" hidden>
       <div class="page-hero">
         <p class="eyebrow">Signed in</p>
-        <h1>Moderation</h1>
-        <p>Approve, reject or delete pending confessions and listings. Reports stay on the item.</p>
+        <h2>Moderation</h2>
+        <p>Approve, reject or delete pending confessions and listings. A report hides the item from the public page. Approve it again to show it. Newsletter CSV rows include an unsubscribe link. Every email must name OnlyScrubs, hello@onlyscrubs.org, and include that link.</p>
+        <div class="button-row"><button class="button" id="admin-logout" type="button" data-admin-logout>Log out</button></div>
       </div>
       <div class="metrics" id="admin-headlines"></div>
       <form class="form" id="admin-tools">
@@ -556,7 +717,7 @@ export function admin(assets) {
           <button class="button secondary" id="show-flagged" type="button">Flagged</button>
           <button class="button secondary" id="archive-old" type="button">Archive posts over 1 year</button>
           <button class="button secondary" id="unpin-shift" type="button">Unpin shift of the week</button>
-          <button class="button" id="admin-logout" type="button">Log out</button>
+          <button class="button secondary" id="submit-indexnow" type="button">Submit pages to IndexNow</button>
         </div>
         <div class="admin-bar">
           <label>Bulk action<select id="bulk-action"><option value="approve">Approve</option><option value="reject">Reject</option><option value="read">Mark read</option><option value="delete">Delete</option></select></label>
@@ -622,6 +783,7 @@ export function about(assets) {
         <li>Shift tools and a wellbeing page that points to real Australian services.</li>
         <li>A moderated confessions feed for harmless shift-life humour.</li>
         <li>A <a href="/shop.html">shop</a> of the creator's own digital templates. Checkout happens on Gumroad.</li>
+        <li>A <a href="/complaints.html">complaints page</a> if something on the site should come down. We aim to resolve those within 7 days.</li>
       </ul>
       <h2>What it is not</h2>
       <ul>
@@ -670,8 +832,8 @@ export function moderation(assets) {
       </ul>
       <p>Removed or rejected posts do not stay on the public pages. We may delete them. We do not promise to store a copy for you.</p>
       <h2>Reports</h2>
-      <p>Anyone can report a public confession or listing. Tell us the category, especially if it is patient information or a threat. We aim to look at reports within 7 days.</p>
-      <p>A second report of the same post from the same connection is ignored. There is a daily limit so a pile-on cannot flood the queue. A post is hidden from the public feed after 3 different people report it. Patient information and threats are hidden straight away. Hiding is not the final decision. A person still approves, rejects or deletes it.</p>
+      <p>Anyone can report a public confession or listing. The item is hidden from the public page when the report is lodged, and a person still reviews it. We aim to resolve reports within 7 days. The full takedown process, including defamation concern notices, is on the <a href="/complaints.html">complaints page</a>.</p>
+      <p>A second report of the same post from the same connection is ignored. There is a daily limit so a pile-on cannot flood the queue. Hiding is not the final decision. A person can put the item back, reject it, or delete it.</p>
       <h2>How to appeal</h2>
       <p>If your post was rejected, hidden or edited and you think that was wrong, email <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> with the rough time of the post and a short reason. Do not include patient information, a clinical story, or a workplace name in the appeal. A person reads appeals. We aim to reply within 7 days. The reply is an email. It is not a review by AHPRA, a union or an employer.</p>
       <p>This is not the place to complain about a health service. For a notification about a registered practitioner, start with <a href="https://www.ahpra.gov.au/Notifications/mandatorynotifications.aspx" rel="noopener noreferrer">Ahpra's mandatory notifications guidance</a>. For an immediate safety emergency, call 000.</p>
@@ -718,45 +880,6 @@ export function shop(assets) {
       <p>Digital downloads delivered via Gumroad. Your rights under the Australian Consumer Law apply.</p></section>
       <section class="wrap section"><div class="grid shop-grid">${cards}</div>
       <p class="affiliation shop-note">Independent templates. Not affiliated with or endorsed by any government agency, NMBA or Ahpra. General information only, not legal, financial, tax or clinical advice.</p></section>`
-  });
-}
-
-export function terms(assets) {
-  return page({
-    title: "Terms",
-    description: "Terms for using OnlyScrubs, including the shop. Checkout for digital templates is handled by Gumroad.",
-    path: "/terms.html",
-    active: "",
-    assets,
-    main: `<section class="wrap page-hero prose"><p class="eyebrow">The short version</p><h1>Terms</h1>
-      <p>OnlyScrubs is a free community and resource site. Using it means you will not post patient information, identifiers, or anything the <a href="/submission-rules.html">submission rules</a> disallow. The <a href="/disclaimer.html">disclaimer</a> explains what the site is not. The <a href="/privacy.html">privacy page</a> explains what is stored.</p>
-      <p class="affiliation">${AFFILIATION}</p>
-      <h2>Shop and third-party checkout</h2>
-      <p>Digital templates on the <a href="/shop.html">shop</a> are the creator's own products. When you choose Buy on Gumroad, you leave OnlyScrubs. The checkout is a third-party checkout on Gumroad. OnlyScrubs does not process the payment, store your card, or deliver the file. Digital downloads are delivered via Gumroad. Your rights under the Australian Consumer Law apply.</p>
-      <p>Product pages on this site show a plain price. They are general information and templates. They are not legal, financial, tax or clinical advice, and they are not endorsed by a government agency, the NMBA or Ahpra.</p>
-      <h2>Contact</h2>
-      <p>Questions about the site or a purchase notice can go to <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a>. Appeals about moderation are described on <a href="/moderation.html">how we moderate</a>.</p>
-    </section>`
-  });
-}
-
-export function unsubscribe(assets) {
-  return page({
-    title: "Unsubscribe",
-    description: "Stop OnlyScrubs notes.",
-    path: "/unsubscribe.html",
-    active: "",
-    assets,
-    robots: "noindex, nofollow",
-    newsletter: "none",
-    main: `<section class="wrap page-hero"><p class="eyebrow">Notes</p><h1>Unsubscribe</h1>
-      <p class="lede">This stops occasional OnlyScrubs notes. It does not delete a confession or a listing, because those are not tied to your email.</p>
-      <form class="form panel" data-unsubscribe>
-        <label>Unsubscribe token<input name="token" required autocomplete="off"></label>
-        <button class="button primary" type="submit">Unsubscribe</button>
-        <p class="form-message" data-form-message role="status"></p>
-      </form>
-    </section>`
   });
 }
 

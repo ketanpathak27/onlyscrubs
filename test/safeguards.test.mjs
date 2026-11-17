@@ -127,7 +127,7 @@ test("three distinct reports hide a post and a duplicate does not count", async 
   const third = await apiReport(request("/api/report", { method: "POST", ip: "203.0.113.3", body: { id: "post-1", category: "harassment", reason: "third" } }), env);
   assert.equal((await third.json()).hidden, true);
   const stored = JSON.parse(await kv.get("confession:2026-11-17T00:00:00.000Z:post-1"));
-  assert.equal(stored.status, "hidden");
+  assert.ok(stored.hiddenAt);
   assert.equal(stored.reportsCount, 3);
 });
 
@@ -149,7 +149,7 @@ test("a patient-information report hides immediately", async () => {
   assert.equal((await res.json()).hidden, true);
   const stored = JSON.parse(await kv.get("confession:2026-11-17T00:00:00.000Z:post-2"));
   assert.equal(stored.reportsCount, 1);
-  assert.equal(stored.status, "hidden");
+  assert.ok(stored.hiddenAt);
 });
 
 test("digest names the sender and keeps a per-subscriber unsubscribe slot", () => {

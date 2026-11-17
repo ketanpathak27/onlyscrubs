@@ -3,6 +3,9 @@
   const form = document.getElementById("confession-form");
   if (!feed) return;
   const status = document.getElementById("feed-status");
+  const search = document.getElementById("feed-search");
+  const initialQuery = new URLSearchParams(location.search).get("q") || "";
+  if (search && initialQuery) search.value = initialQuery;
   let all = [];
   let topWeek = [];
   let shift = null;
@@ -51,7 +54,7 @@
     return Array.from(form.querySelectorAll('input[name="tag"]:checked')).map(function (input) { return input.value; });
   }
   function render() {
-    const query = (document.getElementById("feed-search")?.value || "").toLowerCase();
+    const query = (search?.value || "").toLowerCase();
     const sort = document.getElementById("feed-sort")?.value || "new";
     let items = all.filter(function (item) {
       const tags = item.tags || [];
@@ -127,7 +130,7 @@
     }
   }
 
-  document.getElementById("feed-search")?.addEventListener("input", render);
+  search?.addEventListener("input", render);
   document.getElementById("feed-sort")?.addEventListener("change", render);
   document.getElementById("feed-tags")?.addEventListener("click", function (event) {
     const button = event.target.closest("[data-feed-tag]");
@@ -198,7 +201,7 @@
             headers: { "content-type": "application/json" },
             body: JSON.stringify({ id: id, reason: box.reason.value, category: box.category.value })
           }));
-          message.textContent = "Report received. A person will look at it.";
+          message.textContent = "Reported. It is hidden while a person reviews it.";
           box.reason.disabled = true;
         } catch (error) {
           message.textContent = error.message;
@@ -217,7 +220,7 @@
           const list = (data.comments || []).map(function (comment) {
             return '<div class="comment"><p>' + esc(comment.text) + '</p><span class="meta-row">' + esc(new Date(comment.createdAt).toLocaleDateString("en-AU")) + '</span></div>';
           }).join("") || '<p class="meta-row">No comments yet.</p>';
-          thread.innerHTML = list + (example ? "" : '<form class="form" data-comment-form><label>Comment<textarea minlength="8" maxlength="500" required placeholder="Kind, harmless, and not about a real shift you could be identified from."></textarea></label><div data-turnstile></div><button class="button secondary" type="submit">Add a note</button><p class="form-message"></p></form>');
+          thread.innerHTML = list + (example ? "" : '<form class="form" data-comment-form><label>Comment<textarea minlength="8" maxlength="500" required placeholder="Kind, harmless, and not about a real shift you could be identified from."></textarea></label><p class="disclosure">By posting you agree to the <a href="/terms.html">Terms</a>.</p><div data-turnstile></div><button class="button secondary" type="submit">Add a note</button><p class="form-message"></p></form>');
           thread.dataset.loaded = "1";
           const widget = thread.querySelector("[data-turnstile]");
           const cfg = await window.OnlyScrubs.config();

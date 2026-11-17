@@ -1,4 +1,13 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { CONSENT_TEXT } from "../src/lib/newsletter.js";
 import { esc } from "./markdown.mjs";
+
+const themeBoot = fs.readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "../client/theme-init.js"),
+  "utf8"
+).trim();
 
 const NAV = [
   ["/guides.html", "Guides"],
@@ -13,8 +22,8 @@ const NAV = [
 ];
 
 export function heroArt() {
-  return `<div class="hero-art" aria-hidden="true">
-    <svg viewBox="0 0 640 560" xmlns="http://www.w3.org/2000/svg">
+  return `<div class="hero-art" role="img" aria-label="Illustration of folded scrubs and a fob watch">
+    <svg viewBox="0 0 640 560" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <rect width="640" height="560" fill="var(--mist)"/>
       <circle cx="520" cy="96" r="72" fill="var(--coral-fill)" opacity="0.9"/>
       <circle cx="78" cy="470" r="86" fill="var(--gold-fill)" opacity="0.85"/>
@@ -30,8 +39,8 @@ export function heroArt() {
 }
 
 export function adSlot(id) {
-  return `<aside class="ad-slot no-print" data-ad-slot="${esc(id)}" hidden>
-    <p class="ad-label">Advertisement</p>
+  return `<aside class="ad-slot no-print" data-ad-slot="${esc(id)}" hidden aria-label="Ad">
+    <p class="ad-label">Ad</p>
     <div class="ad-frame" id="${esc(id)}">Ad slot. No ad network is connected.</div>
   </aside>`;
 }
@@ -39,11 +48,12 @@ export function adSlot(id) {
 export function newsletterForm() {
   return `<form class="form" data-newsletter>
     <label>Email address<input name="email" type="email" autocomplete="email" required placeholder="you@example.com"></label>
+    <label class="check"><input name="consent" type="checkbox" required><span>${esc(CONSENT_TEXT)}</span></label>
     <input class="honeypot" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
     <div data-turnstile></div>
     <button class="button primary" type="submit">Send the notes, not a 3am page</button>
     <p class="form-message" data-form-message role="status"></p>
-    <p class="disclosure">No spam and no patient stories. You can unsubscribe from any note, or ask us to delete the address. Read the <a href="/privacy.html">privacy page</a>.</p>
+    <p class="disclosure">Sender: OnlyScrubs, <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a>. Guides and site news only. Every email includes an unsubscribe link. Read the <a href="/privacy.html">privacy page</a>.</p>
   </form>`;
 }
 
@@ -91,6 +101,7 @@ export function layout(options) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>${themeBoot}</script>
   <title>${esc(fullTitle)}</title>
   <meta name="description" content="${esc(description)}">
   ${robots ? `<meta name="robots" content="${esc(robots)}">` : ""}
@@ -100,6 +111,10 @@ export function layout(options) {
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <meta name="theme-color" content="#f3f6f4">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="OnlyScrubs">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta property="og:title" content="${esc(fullTitle)}">
   <meta property="og:description" content="${esc(description)}">
   <meta property="og:url" content="${canonical}">
@@ -107,13 +122,16 @@ export function layout(options) {
   <meta property="og:site_name" content="OnlyScrubs">
   <meta property="og:locale" content="en_AU">
   <meta property="og:image" content="https://onlyscrubs.org/og.png">
+  <meta property="og:image:alt" content="OnlyScrubs, practical notes for Australian healthcare workers">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${esc(fullTitle)}">
   <meta name="twitter:description" content="${esc(description)}">
   <meta name="twitter:image" content="https://onlyscrubs.org/og.png">
+  <meta name="twitter:image:alt" content="OnlyScrubs, practical notes for Australian healthcare workers">
   <link rel="preload" href="/assets/fonts/source-sans-3-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="${assets.styles}">
-  <script src="${assets.theme}"></script>
   ${jsonScripts.join("\n  ")}
 </head>
 <body>
@@ -121,11 +139,12 @@ export function layout(options) {
   <header class="site-header">
     <a class="brand" href="/"><span class="brand-mark">OS</span><span>OnlyScrubs</span></a>
     <div class="header-tools">
+      <button class="nav-logout header-logout" type="button" data-admin-logout hidden>Log out</button>
       <a class="icon-button nav-lock" href="/admin.html" data-admin-lock hidden aria-label="Admin"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></a>
       <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch colour theme">${icon("sun")}${icon("moon")}</button>
       <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav">Menu</button>
     </div>
-    <nav class="site-nav" id="site-nav" data-nav aria-label="Primary">${nav}</nav>
+    <nav class="site-nav" id="site-nav" data-nav aria-label="Primary">${nav}<button class="nav-logout" type="button" data-admin-logout hidden>Log out</button></nav>
     ${tearoomBlock}
   </header>
   <main id="main">${main}</main>
@@ -138,6 +157,7 @@ export function layout(options) {
         <a href="/shop.html">Shop</a>
         <a href="/wellbeing.html">Wellbeing</a>
         <a href="/submission-rules.html">Rules</a>
+        <a href="/complaints.html">Complaints</a>
         <a href="/privacy.html">Privacy</a>
         <a href="/terms.html">Terms</a>
         <a href="/disclaimer.html">Disclaimer</a>
@@ -145,10 +165,18 @@ export function layout(options) {
         <a href="/guides.html">Guides</a>
       </nav>
       <p class="affiliation">OnlyScrubs is not affiliated with AHPRA, the Nursing and Midwifery Board of Australia (NMBA), any union, health service or employer.</p>
-      <p class="fine">General information only. Not a clinic and not medical advice. <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> <a class="admin-entry" href="/admin.html">Admin</a></p>
-      <div class="button-row no-print">${support}<button class="button compact" type="button" data-install hidden>Install app</button></div>
+      <p class="fine">General information only. Not a clinic and not medical advice. <a href="/terms.html">Terms</a> · <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> <a class="admin-entry" href="/admin.html">Admin</a></p>
+      <div class="button-row no-print">${support}<button class="button compact" type="button" data-install>Install app</button></div>
     </div>
   </footer>
+  <dialog class="sheet" id="install-sheet" data-install-sheet aria-labelledby="install-sheet-title">
+    <div class="sheet-card">
+      <h2 id="install-sheet-title">Add OnlyScrubs to your home screen</h2>
+      <p data-install-intro>You can keep OnlyScrubs on this device and open it like an app.</p>
+      <ol data-install-steps></ol>
+      <button class="button primary" type="button" data-install-close>Close</button>
+    </div>
+  </dialog>
   <script src="${assets.site}" defer></script>
   ${scripts.map((src) => `<script src="${src}" defer></script>`).join("\n  ")}
 </body>

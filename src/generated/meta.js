@@ -32,9 +32,9 @@ export const CANONICAL = {
   "/moderation": "/moderation.html",
   "/shop": "/shop.html",
   "/terms": "/terms.html",
+  "/complaints": "/complaints.html",
   "/privacy": "/privacy.html",
   "/disclaimer": "/disclaimer.html",
-  "/unsubscribe": "/unsubscribe.html",
   "/admin": "/admin.html",
   "/404": "/404.html",
   "/offline": "/offline.html"
@@ -240,7 +240,9 @@ export const GUIDES = [
   }
 ];
 export const SCRIPT_HASHES = [
-  "sha256-H97NhiljHwovpTK6sV3WLtYOuADCllkQBSF6vMLjj+o=",
+  "sha256-gcjtwTPQOZXLIrMoiaKsNnlt9MiwBNoONUs7FnTTr4E=",
+  "sha256-DZ76L1DlOWNwudjspNR0qrTMETxUvskbU74DbEAJPIk=",
+  "sha256-03rnRsqe7GKgo/mRpzOlQNqiVVP2c4QiPKnZpxZgNjI=",
   "sha256-FGKzG5vidY7FmNpVW/6Sfwyb4hXuDGpGVUyhBAHW+vY=",
   "sha256-0OHeDsvc8qG6U6PrOBEh5nTu4bueDAoL0TNWxMmAQJc=",
   "sha256-S6yyfAYzPL/J2dBhlBJeqHDbKHvRkP5o4pUAVJLGpqU=",
@@ -259,10 +261,13 @@ export const SCRIPT_HASHES = [
   "sha256-XJiHuIPFl5Uy3wk5ucy7YdYG8Zj9VGdhc51s0rKSAx4=",
   "sha256-mKoXgSumqY0ac1ZOuxmeCmHQgeMNu5T+KvCmpBn3pSU=",
   "sha256-rkz/enKqaf0jrbKkqnfmyA6ZeRAuN+wi+7KW/j73Q44=",
+  "sha256-wQk8mEAWqYA0r2n2QkKuatylTcFdf8N9nFtGoNOT0MY=",
+  "sha256-lg7Dbab44hlpIpTiQTngBgsbexKPkdFFYx2dFa+qVqg=",
   "sha256-Pdv9VAKMkNX00smSl1OWH6RbmWi+u/bT0g6Mxr66PXM=",
   "sha256-Sl0jETEZiCgGmwJEB72mHwEbY1rbaFNy07Fs4kVja+w=",
   "sha256-0hTF3kDVm0lHuM3bPlfVYvt+XlK7UHrgh7py4km4iWE=",
   "sha256-mZqMXZJ9a1a/qZyLaVl/bAV77FeDJCDgaevtC12c/4c=",
   "sha256-x66MVCyc5IC+3HpD9G80pryPHM0hcV8DJuh9jw/Coww=",
-  "sha256-9W5ZBquyMtjiH/bB90xjbXk6yAqhPeqZWSCD6aubMC0="
+  "sha256-9W5ZBquyMtjiH/bB90xjbXk6yAqhPeqZWSCD6aubMC0=",
+  "sha256-9GmtW/L4DdssR9Vic2rfj1OVJZN6Aahc0RJ3bOXcqx0="
 ];

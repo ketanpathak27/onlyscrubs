@@ -16,7 +16,7 @@ Read the placement letter twice. Note the start time, the meeting point, the uni
 
 Sort transport for the earliest shift, not the average one. If you are driving, look at parking rules and cost. If you are on public transport, check the first service of the day, then a backup. Tell someone at home what time you expect to be back, without describing the workplace.
 
-Pack from the list your university gave you. Typical items include an approved uniform, closed shoes, your student ID, and any compliance documents they told you to carry or to have uploaded. Do not invent extra clinical kit to look prepared. If the brief says the service supplies a particular item, believe the brief.
+Pack from the list your university gave you. Typical items include an approved uniform, closed shoes, your student ID, and any compliance documents they told you to carry or to have uploaded. The tick list on [Student Bay](/student-bay.html) is the same idea in a form you can print. Do not invent extra clinical kit to look prepared. If the brief says the service supplies a particular item, believe the brief. What it costs to get there is covered, without invented prices, in the [budgeting guide](/guides/budgeting.html).
 
 Wash a new uniform before day one. Fabric shrinks, and a too-small set is a distraction you do not need while you are trying to remember where the staff room is.
 

@@ -22,12 +22,12 @@
     app.hidden = true;
     gate.hidden = false;
     if (text) signInMessage.textContent = text;
-    document.querySelectorAll("[data-admin-lock]").forEach(function (link) { link.hidden = true; });
+    document.querySelectorAll("[data-admin-lock], [data-admin-logout]").forEach(function (link) { link.hidden = true; });
   }
   function showApp() {
     gate.hidden = true;
     app.hidden = false;
-    document.querySelectorAll("[data-admin-lock]").forEach(function (link) { link.hidden = false; });
+    document.querySelectorAll("[data-admin-lock], [data-admin-logout]").forEach(function (link) { link.hidden = false; });
   }
   async function read(res) {
     const type = res.headers.get("content-type") || "";
@@ -43,11 +43,14 @@
   function summary(item) {
     return item.text || item.title || item.message || item.email || item.listingTitle || "";
   }
-  function actions(itemKind, itemStatus) {
+  function actions(itemKind, item) {
+    const itemStatus = item.status || "";
     if (itemKind === "relay") return '<button class="button compact" data-action="read" type="button">Mark read</button><button class="button danger compact" data-action="delete" type="button">Delete</button>';
     let html = "";
-    if (itemStatus === "pending" || itemStatus === "hidden") html += '<button class="button compact" data-action="approve" type="button">Approve</button><button class="button compact" data-action="reject" type="button">Reject</button>';
-    if (itemKind === "confession" && itemStatus === "approved") html += '<button class="button secondary compact" data-action="pin-shift" type="button">Pin as shift of the week</button><button class="button secondary compact" data-action="archive" type="button">Archive</button>';
+    if (itemStatus === "pending") html += '<button class="button compact" data-action="approve" type="button">Approve</button><button class="button compact" data-action="reject" type="button">Reject</button>';
+    if (item.hiddenAt) html += '<button class="button compact" data-action="approve" type="button">Show again</button>';
+    if (itemKind === "confession" && itemStatus === "approved" && !item.hiddenAt) html += '<button class="button secondary compact" data-action="pin-shift" type="button">Pin as shift of the week</button>';
+    if (itemKind === "confession" && itemStatus === "approved") html += '<button class="button secondary compact" data-action="archive" type="button">Archive</button>';
     if (itemKind === "confession" && itemStatus === "archived") html += '<button class="button compact" data-action="restore" type="button">Restore</button>';
     html += '<button class="button danger compact" data-action="delete" type="button">Delete</button>';
     return html;
@@ -61,7 +64,7 @@
     feed.innerHTML = '<label class="check"><input id="select-all" type="checkbox"><span>Select all</span></label>' + items.map(function (item) {
       const privateBits = [item.contactEmail, item.email, item.toEmail].filter(Boolean).join(" · ");
       const flag = item.flagReason ? '<p class="flag-note"><strong>Flagged for review.</strong> ' + esc(item.flagReason) + "</p>" : "";
-      return '<article class="confession admin-card" data-id="' + esc(item.id) + '"><header><input type="checkbox" data-select value="' + esc(item.id) + '" aria-label="Select item"></header>' + flag + '<p>' + esc(summary(item)) + '</p><p class="meta-row">' + esc(item.status || "") + " · " + esc(item.createdAt ? new Date(item.createdAt).toLocaleString("en-AU") : "") + (item.score != null ? " · score " + esc(item.score) : "") + " · reports " + esc(item.reportsCount || 0) + (item.lastReportCategory ? " · " + esc(item.lastReportCategory) : "") + (item.lastReportReason ? " · " + esc(item.lastReportReason) : "") + (item.hiddenReason ? " · " + esc(item.hiddenReason) : "") + (privateBits ? " · " + esc(privateBits) : "") + '</p><div class="button-row">' + actions(itemKind, item.status) + "</div></article>";
+      return '<article class="confession admin-card" data-id="' + esc(item.id) + '"><header><input type="checkbox" data-select value="' + esc(item.id) + '" aria-label="Select item"></header>' + flag + '<p>' + esc(summary(item)) + '</p><p class="meta-row">' + esc(item.status || "") + " · " + esc(item.createdAt ? new Date(item.createdAt).toLocaleString("en-AU") : "") + (item.score != null ? " · score " + esc(item.score) : "") + " · reports " + esc(item.reportsCount || 0) + (item.lastReportCategory ? " · " + esc(item.lastReportCategory) : "") + (item.hiddenAt ? " · hidden from public" : "") + (item.lastReportReason ? " · " + esc(item.lastReportReason) : "") + (privateBits ? " · " + esc(privateBits) : "") + '</p><div class="button-row">' + actions(itemKind, item) + "</div></article>";
     }).join("");
   }
   function metric(value, label) {
@@ -163,12 +166,12 @@
       message.textContent = "Digest HTML downloaded. Replace {{unsubscribe_url}} with each subscriber's link from the CSV.";
     } catch (error) { message.textContent = error.message; }
   });
-  document.getElementById("admin-logout")?.addEventListener("click", async function () {
-    await fetch("/api/admin/logout", { method: "POST" });
-    feed.innerHTML = "";
-    stats.innerHTML = "";
-    headlines.innerHTML = "";
-    showGate("Signed out.");
+  document.getElementById("submit-indexnow")?.addEventListener("click", async function () {
+    message.textContent = "Submitting pages to IndexNow…";
+    try {
+      const data = await read(await fetch("/api/admin/indexnow", { method: "POST" }));
+      message.textContent = "Submitted " + data.count + " pages to IndexNow.";
+    } catch (error) { message.textContent = error.message; }
   });
   document.getElementById("archive-old")?.addEventListener("click", async function () {
     message.textContent = "Archiving…";

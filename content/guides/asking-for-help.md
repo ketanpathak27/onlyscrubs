@@ -62,4 +62,4 @@ The breathing exercise on the [wellbeing page](/wellbeing.html) is a few minutes
 
 ## What we will not publish
 
-OnlyScrubs will not publish the story of what happened to a patient, a named colleague, or a named workplace. That includes "de-identified" versions. The [submission rules](/submission-rules.html) are the line. Asking for help belongs with people who can hold it safely. The internet is not one of those people.
+OnlyScrubs will not publish the story of what happened to a patient, a named colleague, or a named workplace. That includes "de-identified" versions. The [submission rules](/submission-rules.html) are the line. Asking for help belongs with people who can hold it safely. The internet is not one of those people. Once you are registered, the same habit is in the [first graduate year guide](/guides/first-graduate-year.html).

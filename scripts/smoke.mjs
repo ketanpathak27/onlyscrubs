@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 const base = process.env.SMOKE_URL || "http://127.0.0.1:8787";
 const token = process.env.ADMIN_TOKEN || "local-test-token";
 let failed = 0;
@@ -22,7 +24,12 @@ async function get(path, init) {
 await check("home", async () => {
   const { res, body } = await get("/");
   if (res.status !== 200 || !body.includes("OnlyScrubs")) throw new Error(String(res.status));
-  if (!res.headers.get("content-security-policy")?.includes("script-src")) throw new Error("missing CSP");
+  const csp = res.headers.get("content-security-policy") || "";
+  if (!csp.includes("script-src")) throw new Error("missing CSP");
+  const inline = body.match(/<script>([\s\S]*?)<\/script>/);
+  if (!inline) throw new Error("missing theme script");
+  const hash = "sha256-" + createHash("sha256").update(inline[1], "utf8").digest("base64");
+  if (!csp.includes(hash)) throw new Error("theme script not allowed by CSP");
   if (!res.headers.get("cache-control")?.includes("max-age=300")) throw new Error(res.headers.get("cache-control"));
 });
 
@@ -37,6 +44,7 @@ await check("guide and gear", async () => {
   if (!guide.body.includes("Not clinical advice")) throw new Error("disclaimer");
   const gear = await get("/gear-guide.html");
   if (!gear.body.includes("no extra cost") || gear.body.includes("affiliateUrl")) throw new Error("gear disclosure");
+  if (!gear.body.includes(">Ad<") || !gear.body.includes("Sponsored")) throw new Error("ad label");
   const slot = gear.body.match(/data-ad-slot="[^"]+"[^>]*hidden/);
   if (!slot) throw new Error("ad slot not hidden");
 });
@@ -46,6 +54,22 @@ await check("robots and sitemap", async () => {
   if (!robots.body.includes("Disallow: /admin") || !robots.body.includes("Disallow: /api/")) throw new Error(robots.body);
   const map = await get("/sitemap.xml");
   if (!map.body.includes("/guides/night-shift.html") || map.body.includes("/admin.html")) throw new Error("sitemap");
+  if (!map.body.includes("<lastmod>") || !map.body.includes("/terms.html") || !map.body.includes("/complaints.html")) throw new Error("sitemap pages");
+  if (map.body.includes("/unsubscribe")) throw new Error("unsubscribe in sitemap");
+  if (!robots.body.includes("Sitemap: https://onlyscrubs.org/sitemap.xml") || !robots.body.includes("Disallow: /unsubscribe")) throw new Error("robots");
+});
+
+await check("legal pages", async () => {
+  const home = await get("/");
+  if (!home.body.includes("Terms") || !home.body.includes("/complaints.html") || !home.body.includes("SearchAction") || !home.body.includes("Organization")) throw new Error("home legal or schema");
+  const terms = await get("/terms.html");
+  if (terms.res.status !== 200 || !terms.body.includes("Victoria") || !terms.body.includes("Australian Consumer Law") || !terms.body.includes("18")) throw new Error("terms");
+  const complaints = await get("/complaints.html");
+  if (!complaints.body.includes("7 days") || !complaints.body.includes("hello@onlyscrubs.org") || !complaints.body.includes("Concern notice")) throw new Error("complaints");
+  const privacy = await get("/privacy.html");
+  if (!privacy.body.includes("oaic.gov.au") || !privacy.body.includes("os_admin") || !privacy.body.includes("not</strong> published")) throw new Error("privacy");
+  const rack = await get("/scrub-rack.html");
+  if (!rack.body.includes("Before you post") || !rack.body.includes("By posting you agree")) throw new Error("rack note");
 });
 
 await check("admin noindex", async () => {
@@ -131,11 +155,27 @@ await check("relay message", async () => {
   if (!queue.body.items.some((item) => item.email === "alex@example.com")) throw new Error("relay missing");
 });
 
-await check("newsletter csv", async () => {
-  const joined = await get("/api/newsletter", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: "notes@example.com" }) });
-  if (!joined.body.ok) throw new Error(JSON.stringify(joined.body));
+await check("newsletter consent and unsubscribe", async () => {
+  const denied = await get("/api/newsletter", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: "notes@example.com" }) });
+  if (denied.res.status !== 400) throw new Error("consent " + denied.res.status);
+  const joined = await get("/api/newsletter", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: "notes@example.com", consent: true }) });
+  if (!joined.body.ok || !joined.body.unsubscribeUrl?.includes("/unsubscribe?token=")) throw new Error("signup");
+  if (joined.body.unsubscribeUrl.includes(token)) throw new Error("unsubscribe link contained the admin token");
   const csv = await get("/api/admin/newsletter.csv", { headers: { authorization: "Bearer " + token } });
-  if (!csv.body.includes("notes@example.com")) throw new Error(csv.body.slice(0, 200));
+  if (!csv.body.includes("notes@example.com") || !csv.body.includes("unsubscribeUrl")) throw new Error(csv.body.slice(0, 200));
+  const off = new URL(joined.body.unsubscribeUrl);
+  const removed = await get(off.pathname + off.search);
+  if (removed.res.status !== 200 || !removed.body.includes("removed from the OnlyScrubs newsletter")) throw new Error("unsubscribe");
+  if (removed.res.headers.get("x-robots-tag") !== "noindex, nofollow") throw new Error(removed.res.headers.get("x-robots-tag"));
+});
+
+await check("listing report hides the card", async () => {
+  const reported = await get("/api/report", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: listingId, kind: "listing", reason: "Please review this listing" }) });
+  if (!reported.body.hidden) throw new Error(JSON.stringify(reported.body));
+  const pub = await get("/api/listings");
+  if (pub.body.listings.some((entry) => entry.id === listingId)) throw new Error("listing still public");
+  const queue = await get("/api/admin?kind=listing&status=reported", { headers: { authorization: "Bearer " + token } });
+  if (!queue.body.items.some((entry) => entry.id === listingId && entry.reportsCount >= 1)) throw new Error("report missing from admin");
 });
 
 await check("admin cookie session", async () => {

@@ -63,7 +63,7 @@ export async function apiListings(request, env) {
   const kv = env.CONFESSIONS_KV;
   if (!kv) return json({ error: "Storage is not configured" }, 500);
   if (request.method === "GET") {
-    const items = await listByPrefix(kv, "listing:", "approved");
+    const items = (await listByPrefix(kv, "listing:", "approved")).filter((item) => !item.hiddenAt);
     return json({ listings: items.map(publicListing) });
   }
   if (request.method === "POST") {

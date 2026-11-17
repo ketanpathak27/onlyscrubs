@@ -39,7 +39,7 @@ If the feeling comes with not sleeping, panic before every shift, or dread that 
 
 Registration changes the responsibility. You are accountable for what you sign. If you did not do it, or you did not see it, do not let a busy shift talk you into clicking as if you did. Policies exist for verbal orders, alterations, and late entries. Use them. Do not invent a workaround because the computer is slow.
 
-You will be asked to do things you have not done since a lab, or have never done. The sentence is still: "I have not done this independently. I need someone with me the first time." A good team expects that sentence. A team that mocks it is a team to tell your educator about.
+You will be asked to do things you have not done since a lab, or have never done. The sentence is still: "I have not done this independently. I need someone with me the first time." A good team expects that sentence. A team that mocks it is a team to tell your educator about. The [asking for help guide](/guides/asking-for-help.html) is that sentence, and what to do after a hard shift, without turning it into a public story.
 
 ## Rosters, nights, and leaving on time
 
