@@ -76,7 +76,16 @@ export async function verifySession(token, cookieValue, now = Date.now()) {
 }
 
 export function sessionCookie(value, maxAge = SESSION_SECONDS) {
-  return `${SESSION_COOKIE}=${value}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=${maxAge}`;
+  const parts = [
+    `${SESSION_COOKIE}=${value}`,
+    "HttpOnly",
+    "Secure",
+    "SameSite=Strict",
+    "Path=/",
+    `Max-Age=${maxAge}`
+  ];
+  if (Number(maxAge) <= 0) parts.push("Expires=Thu, 01 Jan 1970 00:00:00 GMT");
+  return parts.join("; ");
 }
 
 export async function signMessage(secret, message) {

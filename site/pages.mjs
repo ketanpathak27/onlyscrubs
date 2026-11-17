@@ -678,6 +678,7 @@ export function admin(assets) {
         <p class="eyebrow">Signed in</p>
         <h2>Moderation</h2>
         <p>Approve, reject or delete pending confessions and listings. A report hides the item from the public page. Approve it again to show it. Newsletter CSV rows include an unsubscribe link. Every email must name OnlyScrubs, hello@onlyscrubs.org, and include that link.</p>
+        <div class="button-row"><button class="button" id="admin-logout" type="button" data-admin-logout>Log out</button></div>
       </div>
       <div class="metrics" id="admin-headlines"></div>
       <form class="form" id="admin-tools">
@@ -688,7 +689,7 @@ export function admin(assets) {
           <button class="button secondary" id="show-reported" type="button">Reported</button>
           <button class="button secondary" id="archive-old" type="button">Archive posts over 1 year</button>
           <button class="button secondary" id="export-newsletter" type="button">Export newsletter CSV</button>
-          <button class="button" id="admin-logout" type="button">Log out</button>
+          <button class="button secondary" id="submit-indexnow" type="button">Submit pages to IndexNow</button>
         </div>
         <div class="admin-bar">
           <label>Bulk action<select id="bulk-action"><option value="approve">Approve</option><option value="reject">Reject</option><option value="read">Mark read</option><option value="delete">Delete</option></select></label>

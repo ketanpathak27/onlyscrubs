@@ -105,6 +105,10 @@ export function layout(options) {
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <meta name="theme-color" content="#f3f6f4">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="OnlyScrubs">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta property="og:title" content="${esc(fullTitle)}">
   <meta property="og:description" content="${esc(description)}">
   <meta property="og:url" content="${canonical}">
@@ -129,11 +133,12 @@ export function layout(options) {
   <header class="site-header">
     <a class="brand" href="/"><span class="brand-mark">OS</span><span>OnlyScrubs</span></a>
     <div class="header-tools">
+      <button class="nav-logout header-logout" type="button" data-admin-logout hidden>Log out</button>
       <a class="icon-button nav-lock" href="/admin.html" data-admin-lock hidden aria-label="Admin"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></a>
       <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch colour theme">${icon("sun")}${icon("moon")}</button>
       <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav">Menu</button>
     </div>
-    <nav class="site-nav" id="site-nav" data-nav aria-label="Primary">${nav}</nav>
+    <nav class="site-nav" id="site-nav" data-nav aria-label="Primary">${nav}<button class="nav-logout" type="button" data-admin-logout hidden>Log out</button></nav>
   </header>
   <main id="main">${main}</main>
   <footer class="site-footer">
@@ -150,9 +155,17 @@ export function layout(options) {
         <a href="/guides.html">Guides</a>
       </nav>
       <p class="fine">General information only. Not a clinic and not medical advice. <a href="/terms.html">Terms</a> · <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> <a class="admin-entry" href="/admin.html">Admin</a></p>
-      <div class="button-row no-print">${support}<button class="button compact" type="button" data-install hidden>Install app</button></div>
+      <div class="button-row no-print">${support}<button class="button compact" type="button" data-install>Install app</button></div>
     </div>
   </footer>
+  <dialog class="sheet" id="install-sheet" data-install-sheet aria-labelledby="install-sheet-title">
+    <div class="sheet-card">
+      <h2 id="install-sheet-title">Add OnlyScrubs to your home screen</h2>
+      <p data-install-intro>You can keep OnlyScrubs on this device and open it like an app.</p>
+      <ol data-install-steps></ol>
+      <button class="button primary" type="button" data-install-close>Close</button>
+    </div>
+  </dialog>
   <script src="${assets.site}" defer></script>
   ${scripts.map((src) => `<script src="${src}" defer></script>`).join("\n  ")}
 </body>

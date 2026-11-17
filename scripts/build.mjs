@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { siteConfig } from "../src/config.js";
 import { parseGuide } from "../site/markdown.mjs";
 import * as pages from "../site/pages.mjs";
 
@@ -204,6 +205,7 @@ const manifest = {
   display: "standalone",
   background_color: "#f3f6f4",
   theme_color: "#0c6b68",
+  id: "/",
   lang: "en-AU",
   icons: [
     { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
@@ -222,5 +224,6 @@ const sitemapUrls = [...rendered.keys()].filter((urlPath) => !["/admin.html", "/
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls.map((urlPath) => `  <url><loc>https://onlyscrubs.org${urlPath === "/" ? "/" : urlPath}</loc><lastmod>${lastmod(urlPath)}</lastmod><changefreq>weekly</changefreq></url>`).join("\n")}\n</urlset>\n`;
 fs.writeFileSync(path.join(publicDir, "sitemap.xml"), sitemap);
 fs.writeFileSync(path.join(publicDir, "robots.txt"), `User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /admin\nDisallow: /api/\nDisallow: /unsubscribe\n\nSitemap: https://onlyscrubs.org/sitemap.xml\n`);
+fs.writeFileSync(path.join(publicDir, `${siteConfig.indexNowKey}.txt`), siteConfig.indexNowKey);
 
 console.log(`built ${rendered.size} pages, ${hashes.size} content hashes`);
