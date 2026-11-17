@@ -62,8 +62,15 @@ function writeHtml(urlPath, html) {
   return urlPath;
 }
 
-function jsonLdBodies(html) {
-  return [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((match) => match[1]);
+function inlineScriptBodies(html) {
+  const bodies = [];
+  const pattern = /<script\b([^>]*)>([\s\S]*?)<\/script>/g;
+  let match;
+  while ((match = pattern.exec(html))) {
+    if (/\bsrc\s*=/.test(match[1])) continue;
+    bodies.push(match[2]);
+  }
+  return bodies;
 }
 
 function cspHash(body) {
@@ -85,7 +92,6 @@ for (const name of fs.readdirSync(path.join(root, "client", "fonts"))) {
 const plannerLib = fs.readFileSync(path.join(root, "src", "lib", "planner.js"), "utf8").replace(/^export function /gm, "function ");
 const assets = {
   styles: writeHashed("styles", "css", fs.readFileSync(path.join(root, "client", "styles.css"))),
-  theme: writeHashed("theme-init", "js", fs.readFileSync(path.join(root, "client", "theme-init.js"))),
   site: writeHashed("site", "js", fs.readFileSync(path.join(root, "client", "site.js"))),
   confessions: writeHashed("confessions", "js", fs.readFileSync(path.join(root, "client", "confessions.js"))),
   rack: writeHashed("rack", "js", fs.readFileSync(path.join(root, "client", "rack.js"))),
@@ -109,6 +115,8 @@ rendered.set("/confessions.html", pages.confessions(assets));
 rendered.set("/submit.html", pages.submitPage(assets));
 rendered.set("/wellbeing.html", pages.wellbeing(assets));
 rendered.set("/submission-rules.html", pages.rules(assets));
+rendered.set("/terms.html", pages.terms(assets));
+rendered.set("/complaints.html", pages.complaints(assets));
 rendered.set("/privacy.html", pages.privacy(assets));
 rendered.set("/disclaimer.html", pages.disclaimer(assets));
 rendered.set("/admin.html", pages.admin(assets));
@@ -118,7 +126,7 @@ rendered.set("/offline.html", pages.offline(assets));
 const hashes = new Set();
 for (const [urlPath, html] of rendered) {
   writeHtml(urlPath, html);
-  for (const body of jsonLdBodies(html)) hashes.add(cspHash(body));
+  for (const body of inlineScriptBodies(html)) hashes.add(cspHash(body));
 }
 
 const canonical = { "/index.html": "/" };
@@ -142,7 +150,6 @@ const precache = [
   "/wellbeing.html",
   assets.styles,
   assets.site,
-  assets.theme,
   "/icons/icon-192.png",
   "/icons/icon-512.png",
   "/manifest.webmanifest",
@@ -206,9 +213,14 @@ const manifest = {
 };
 fs.writeFileSync(path.join(publicDir, "manifest.webmanifest"), JSON.stringify(manifest, null, 2));
 
+const builtOn = new Date().toISOString().slice(0, 10);
+function lastmod(urlPath) {
+  const guide = guides.find((item) => item.path === urlPath);
+  return String(guide?.updated || guide?.date || builtOn).slice(0, 10);
+}
 const sitemapUrls = [...rendered.keys()].filter((urlPath) => !["/admin.html", "/404.html", "/offline.html"].includes(urlPath));
-const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls.map((urlPath) => `  <url><loc>https://onlyscrubs.org${urlPath === "/" ? "/" : urlPath}</loc><changefreq>weekly</changefreq></url>`).join("\n")}\n</urlset>\n`;
+const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls.map((urlPath) => `  <url><loc>https://onlyscrubs.org${urlPath === "/" ? "/" : urlPath}</loc><lastmod>${lastmod(urlPath)}</lastmod><changefreq>weekly</changefreq></url>`).join("\n")}\n</urlset>\n`;
 fs.writeFileSync(path.join(publicDir, "sitemap.xml"), sitemap);
-fs.writeFileSync(path.join(publicDir, "robots.txt"), `User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /admin\nDisallow: /api/\n\nSitemap: https://onlyscrubs.org/sitemap.xml\n`);
+fs.writeFileSync(path.join(publicDir, "robots.txt"), `User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /admin\nDisallow: /api/\nDisallow: /unsubscribe\n\nSitemap: https://onlyscrubs.org/sitemap.xml\n`);
 
 console.log(`built ${rendered.size} pages, ${hashes.size} content hashes`);

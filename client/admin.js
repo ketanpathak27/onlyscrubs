@@ -43,10 +43,12 @@
   function summary(item) {
     return item.text || item.title || item.message || item.email || item.listingTitle || "";
   }
-  function actions(itemKind, itemStatus) {
+  function actions(itemKind, item) {
+    const itemStatus = item.status || "";
     if (itemKind === "relay") return '<button class="button compact" data-action="read" type="button">Mark read</button><button class="button danger compact" data-action="delete" type="button">Delete</button>';
     let html = "";
     if (itemStatus === "pending") html += '<button class="button compact" data-action="approve" type="button">Approve</button><button class="button compact" data-action="reject" type="button">Reject</button>';
+    if (item.hiddenAt) html += '<button class="button compact" data-action="approve" type="button">Show again</button>';
     if (itemKind === "confession" && itemStatus === "approved") html += '<button class="button secondary compact" data-action="archive" type="button">Archive</button>';
     if (itemKind === "confession" && itemStatus === "archived") html += '<button class="button compact" data-action="restore" type="button">Restore</button>';
     html += '<button class="button danger compact" data-action="delete" type="button">Delete</button>';
@@ -60,7 +62,7 @@
     }
     feed.innerHTML = '<label class="check"><input id="select-all" type="checkbox"><span>Select all</span></label>' + items.map(function (item) {
       const privateBits = [item.contactEmail, item.email, item.toEmail].filter(Boolean).join(" · ");
-      return '<article class="confession admin-card" data-id="' + esc(item.id) + '"><header><input type="checkbox" data-select value="' + esc(item.id) + '" aria-label="Select item"></header><p>' + esc(summary(item)) + '</p><p class="meta-row">' + esc(item.status || "") + " · " + esc(item.createdAt ? new Date(item.createdAt).toLocaleString("en-AU") : "") + (item.score != null ? " · score " + esc(item.score) : "") + (item.reportsCount ? " · reports " + esc(item.reportsCount) : "") + (item.lastReportReason ? " · " + esc(item.lastReportReason) : "") + (privateBits ? " · " + esc(privateBits) : "") + '</p><div class="button-row">' + actions(itemKind, item.status) + "</div></article>";
+      return '<article class="confession admin-card" data-id="' + esc(item.id) + '"><header><input type="checkbox" data-select value="' + esc(item.id) + '" aria-label="Select item"></header><p>' + esc(summary(item)) + '</p><p class="meta-row">' + esc(item.status || "") + " · " + esc(item.createdAt ? new Date(item.createdAt).toLocaleString("en-AU") : "") + (item.score != null ? " · score " + esc(item.score) : "") + (item.reportsCount ? " · reports " + esc(item.reportsCount) : "") + (item.hiddenAt ? " · hidden from public" : "") + (item.lastReportReason ? " · " + esc(item.lastReportReason) : "") + (privateBits ? " · " + esc(privateBits) : "") + '</p><div class="button-row">' + actions(itemKind, item) + "</div></article>";
     }).join("");
   }
   function metric(value, label) {

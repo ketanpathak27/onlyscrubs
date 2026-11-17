@@ -54,4 +54,4 @@ If concentration has fallen apart for weeks, or you are using alcohol or other s
 
 You do not need a new app for every unit, a wall of sticky notes, or a more expensive stethoscope to pass pathophysiology. You need the readings that are actually set, a way to test your memory, and enough sleep to use both. The [gear guide](/gear-guide.html) is about shift kit, not about stationery that promises a HD.
 
-If money is the thing making study harder, the [budgeting guide](/guides/budgeting.html) covers the costs that show up in Australian courses, including unpaid placement.
+If money is the thing making study harder, the [budgeting guide](/guides/budgeting.html) covers the costs that show up in Australian courses, including unpaid placement. When the library weeks turn into shifts, use the [first placement guide](/guides/first-clinical-placement.html). It is about showing up, not about another textbook.

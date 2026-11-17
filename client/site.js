@@ -112,6 +112,7 @@
           headers: { "content-type": "application/json" },
           body: JSON.stringify({
             email: form.email.value,
+            consent: Boolean(form.consent && form.consent.checked),
             website: form.website ? form.website.value : "",
             turnstileToken: window.OnlyScrubs.token(form)
           })
@@ -119,7 +120,7 @@
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Could not subscribe.");
         form.reset();
-        message.textContent = "You are on the list. We only use this address for OnlyScrubs updates.";
+        message.textContent = "You are on the list. OnlyScrubs (hello@onlyscrubs.org) will email you, and every message has an unsubscribe link.";
       } catch (error) {
         message.textContent = error.message;
       }

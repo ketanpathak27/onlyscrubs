@@ -56,4 +56,4 @@ You may be asked to give a short handover before you are comfortable. That is pr
 
 Read your university's documentation and communication learning outcomes. The [Nursing and Midwifery Board of Australia](https://www.nursingmidwiferyboard.gov.au/) sets professional standards for registered nurses and midwives. Students are expected to work towards those standards inside their course rules, not to freelance.
 
-After a handover that felt messy, ask for one tip, not a performance review. Then use it on the next one. The [first placement guide](/guides/first-clinical-placement.html) has more on feedback that does not spiral.
+After a handover that felt messy, ask for one tip, not a performance review. Then use it on the next one. The [first placement guide](/guides/first-clinical-placement.html) has more on feedback that does not spiral. If you are not sure you should be the person making the call, start with [how to ask for help](/guides/asking-for-help.html).

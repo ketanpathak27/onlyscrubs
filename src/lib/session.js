@@ -78,3 +78,20 @@ export async function verifySession(token, cookieValue, now = Date.now()) {
 export function sessionCookie(value, maxAge = SESSION_SECONDS) {
   return `${SESSION_COOKIE}=${value}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=${maxAge}`;
 }
+
+export async function signMessage(secret, message) {
+  return hmac(secret, message);
+}
+
+export async function verifyMessage(secret, message, signature) {
+  if (!secret || !message || !signature) return false;
+  return signaturesMatch(await hmac(secret, message), signature);
+}
+
+export function encodeTokenPart(text) {
+  return bytesToB64url(new TextEncoder().encode(String(text)));
+}
+
+export function decodeTokenPart(value) {
+  return new TextDecoder().decode(b64urlToBytes(String(value || "")));
+}
