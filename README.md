@@ -77,7 +77,7 @@ Ad slots are dashed boxes labelled “Advertisement”. Turning `ADS_ENABLED` on
 
 ### Gear partner links
 
-In `data/gear.json`, set `affiliateUrl` on an item. The build renders it with `rel="sponsored nofollow noopener noreferrer"`. Leave it unset and there is no outbound product link. The gear page always shows the affiliate disclosure. Do not invent prices or reviews.
+In `data/gear.json`, set `affiliateUrl` on an item. The build renders it with a prominent **Sponsored** label and `rel="sponsored nofollow noopener noreferrer"`. Leave it unset and there is no outbound product link. The gear page always shows the affiliate disclosure. Ad slots are labelled **Ad**. Do not invent prices or reviews.
 
 ## URLs and APIs
 
@@ -99,10 +99,11 @@ New keys use `listing:`, `relay:`, `react:`, and `meta:`.
 | GET, POST | `/api/comments` | Unchanged contract |
 | POST | `/api/rate` | One vote per hashed IP. `{ ok, score, alreadyRated? }` |
 | POST | `/api/react` | `{ id, reaction: "same" \| "hug" }`. Separate from ratings |
-| POST | `/api/report` | Confessions, or `{ kind: "listing" }` |
+| POST | `/api/report` | Confessions, or `{ kind: "listing" }`. Hides the item from the public page and keeps it in the reported queue |
 | GET, POST | `/api/listings` | Public list is approved only and has no email |
 | POST | `/api/messages` | Relay stored for admin. No email is sent |
-| POST | `/api/newsletter` | Stores the address. Repeat submits stay `ok` |
+| POST | `/api/newsletter` | Needs `consent: true`. Stores the address. The response includes an unsubscribe URL. Repeat submits stay `ok` |
+| GET, POST | `/unsubscribe?token=` | Signed token. Removes that address from KV immediately. Not indexed |
 | GET | `/api/config` | Public flags only |
 | POST | `/api/admin/login` | Password is the existing admin token. Sets an HttpOnly, Secure, SameSite=Strict cookie for 12 hours. Five failed tries per IP each 15 minutes |
 | POST | `/api/admin/logout` | Clears that cookie |
@@ -134,7 +135,13 @@ Wellbeing numbers were checked against the services’ own sites on 17 November 
 
 `/manifest.webmanifest`, icons, and `/sw.js` make the site installable. The service worker is network-first for pages, cache-first for hashed assets, and ignores `/api/` and `/admin`. Offline navigation falls back to `/offline.html`.
 
-HTML is cached for five minutes. Hashed CSS and JS are immutable for a year. API responses are `no-store`. `/admin` sends `noindex`. `robots.txt` disallows `/admin` and `/api/`. The sitemap lists public pages, including every guide.
+HTML is cached for five minutes. Hashed CSS and JS are immutable for a year. The theme script is inlined so it does not add a render-blocking request. API responses are `no-store`. `/admin` and `/unsubscribe` send `noindex`. `robots.txt` disallows `/admin`, `/api/`, and `/unsubscribe`, and points at the sitemap. The sitemap lists public pages, including the terms and complaints pages and every guide, with `lastmod`.
+
+## Legal pages
+
+`/terms.html` is the Terms of Use. `/complaints.html` is the report and takedown page. `/privacy.html` covers the Australian Privacy Principles, including the `os_admin` cookie, hashed IP addresses used for rate limits, overseas processing by Cloudflare, and the fact that a Scrub Rack contact email is not shown on the listing. Footer links are on every page. Submission forms say that posting agrees to the Terms.
+
+Newsletter emails must use `renderNewsletterEmail` in `src/lib/newsletter.js`. That template names OnlyScrubs and hello@onlyscrubs.org and includes the one-click unsubscribe link. The admin CSV has the same link in `unsubscribeUrl`. Do not send a newsletter that skips it. Signup stores consent only when the box is ticked. The signing key is the existing `ADMIN_TOKEN`. This does not rotate it, and the token is not written into the link.
 
 ## Deploy
 

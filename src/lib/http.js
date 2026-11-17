@@ -101,7 +101,7 @@ export async function rateLimit(kv, key, limit, windowSec) {
 }
 
 export function cacheControlFor(pathname) {
-  if (pathname === "/sw.js" || pathname.startsWith("/admin")) return "no-store";
+  if (pathname === "/sw.js" || pathname.startsWith("/admin") || pathname === "/unsubscribe") return "no-store";
   if (pathname.startsWith("/assets/fonts/")) return "public, max-age=604800";
   if (pathname.startsWith("/assets/")) return "public, max-age=31536000, immutable";
   if (pathname === "/robots.txt" || pathname === "/favicon.svg" || pathname === "/favicon.ico") {
@@ -142,7 +142,8 @@ export function applySecurityHeaders(response, pathname, scriptHashes) {
   headers.set("permissions-policy", "camera=(), microphone=(), geolocation=(), payment=(), usb=()");
   headers.set("strict-transport-security", "max-age=15552000; includeSubDomains");
   headers.set("cache-control", cacheControlFor(pathname));
-  if (pathname.startsWith("/admin")) headers.set("x-robots-tag", "noindex, nofollow");
+  if (pathname.startsWith("/admin") || pathname === "/unsubscribe") headers.set("x-robots-tag", "noindex, nofollow");
+  if (pathname === "/unsubscribe") headers.set("referrer-policy", "no-referrer");
   if (isHtml || pathname.endsWith(".svg")) {
     headers.set("content-security-policy", contentSecurityPolicy(isHtml ? scriptHashes : []));
   }

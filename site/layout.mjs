@@ -1,4 +1,13 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { CONSENT_TEXT } from "../src/lib/newsletter.js";
 import { esc } from "./markdown.mjs";
+
+const themeBoot = fs.readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "../client/theme-init.js"),
+  "utf8"
+).trim();
 
 const NAV = [
   ["/guides.html", "Guides"],
@@ -11,8 +20,8 @@ const NAV = [
 ];
 
 export function heroArt() {
-  return `<div class="hero-art" aria-hidden="true">
-    <svg viewBox="0 0 640 560" xmlns="http://www.w3.org/2000/svg">
+  return `<div class="hero-art" role="img" aria-label="Illustration of folded scrubs and a fob watch">
+    <svg viewBox="0 0 640 560" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <rect width="640" height="560" fill="var(--mist)"/>
       <circle cx="520" cy="96" r="72" fill="var(--coral-fill)" opacity="0.9"/>
       <circle cx="78" cy="470" r="86" fill="var(--gold-fill)" opacity="0.85"/>
@@ -28,8 +37,8 @@ export function heroArt() {
 }
 
 export function adSlot(id) {
-  return `<aside class="ad-slot no-print" data-ad-slot="${esc(id)}" hidden>
-    <p class="ad-label">Advertisement</p>
+  return `<aside class="ad-slot no-print" data-ad-slot="${esc(id)}" hidden aria-label="Ad">
+    <p class="ad-label">Ad</p>
     <div class="ad-frame" id="${esc(id)}">Ad slot. No ad network is connected.</div>
   </aside>`;
 }
@@ -37,11 +46,12 @@ export function adSlot(id) {
 export function newsletterForm() {
   return `<form class="form" data-newsletter>
     <label>Email address<input name="email" type="email" autocomplete="email" required placeholder="you@example.com"></label>
+    <label class="check"><input name="consent" type="checkbox" required><span>${esc(CONSENT_TEXT)}</span></label>
     <input class="honeypot" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
     <div data-turnstile></div>
     <button class="button primary" type="submit">Send me occasional notes</button>
     <p class="form-message" data-form-message role="status"></p>
-    <p class="disclosure">No spam and no patient stories. You can ask us to delete the address. Read the <a href="/privacy.html">privacy page</a>.</p>
+    <p class="disclosure">Sender: OnlyScrubs, <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a>. Guides and site news only. Every email includes an unsubscribe link. Read the <a href="/privacy.html">privacy page</a>.</p>
   </form>`;
 }
 
@@ -85,6 +95,7 @@ export function layout(options) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>${themeBoot}</script>
   <title>${esc(fullTitle)}</title>
   <meta name="description" content="${esc(description)}">
   ${robots ? `<meta name="robots" content="${esc(robots)}">` : ""}
@@ -101,13 +112,16 @@ export function layout(options) {
   <meta property="og:site_name" content="OnlyScrubs">
   <meta property="og:locale" content="en_AU">
   <meta property="og:image" content="https://onlyscrubs.org/og.png">
+  <meta property="og:image:alt" content="OnlyScrubs, practical notes for Australian healthcare workers">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${esc(fullTitle)}">
   <meta name="twitter:description" content="${esc(description)}">
   <meta name="twitter:image" content="https://onlyscrubs.org/og.png">
+  <meta name="twitter:image:alt" content="OnlyScrubs, practical notes for Australian healthcare workers">
   <link rel="preload" href="/assets/fonts/source-sans-3-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="${assets.styles}">
-  <script src="${assets.theme}"></script>
   ${jsonScripts.join("\n  ")}
 </head>
 <body>
@@ -128,12 +142,14 @@ export function layout(options) {
       <nav class="footer-nav" aria-label="Footer">
         <a href="/wellbeing.html">Wellbeing</a>
         <a href="/submission-rules.html">Rules</a>
+        <a href="/terms.html">Terms</a>
+        <a href="/complaints.html">Complaints</a>
         <a href="/privacy.html">Privacy</a>
         <a href="/disclaimer.html">Disclaimer</a>
         <a href="/submit.html">Submit</a>
         <a href="/guides.html">Guides</a>
       </nav>
-      <p class="fine">General information only. Not a clinic and not medical advice. <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> <a class="admin-entry" href="/admin.html">Admin</a></p>
+      <p class="fine">General information only. Not a clinic and not medical advice. <a href="/terms.html">Terms</a> · <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> <a class="admin-entry" href="/admin.html">Admin</a></p>
       <div class="button-row no-print">${support}<button class="button compact" type="button" data-install hidden>Install app</button></div>
     </div>
   </footer>

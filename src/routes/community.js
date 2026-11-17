@@ -1,5 +1,6 @@
-import { json, limited, readJson, clientKey, rateLimit, auth } from "../lib/http.js";
+import { applySecurityHeaders, json, limited, readJson, clientKey, rateLimit, auth } from "../lib/http.js";
 import { clean, risky, hasDirectContact, normaliseTags, mergeTags, validEmail } from "../lib/moderation.js";
+import { CONSENT_TEXT, consentGiven, emailFromUnsubscribeToken, unsubscribeToken, unsubscribeUrl } from "../lib/newsletter.js";
 import { archiveOld, findById, listByPrefix, strip } from "../lib/store.js";
 import { verifyTurnstile, turnstileFailure } from "../lib/turnstile.js";
 
@@ -35,6 +36,8 @@ function examples() {
 function toPublic(item, commentsCount) {
   const copy = strip(item);
   delete copy.lastReportReason;
+  delete copy.hiddenAt;
+  delete copy.reportedAt;
   copy.score = Number(copy.score) || 0;
   copy.hugs = Number(copy.hugs) || 0;
   copy.sames = Number(copy.sames) || 0;
@@ -68,7 +71,9 @@ export async function apiConfessions(request, env) {
     const status = url.searchParams.get("status") || "approved";
     if (status !== "approved" && !(await auth(request, env))) return json({ error: "Admin token required." }, 401);
     const counts = await commentCounts(kv);
-    let items = (await listByPrefix(kv, "confession:", status)).map((item) => toPublic(item, counts.get(item.id) || 0));
+    let stored = await listByPrefix(kv, "confession:", status);
+    if (status === "approved") stored = stored.filter((item) => !item.hiddenAt);
+    let items = stored.map((item) => toPublic(item, counts.get(item.id) || 0));
     const q = clean(url.searchParams.get("q")).toLowerCase();
     const tag = clean(url.searchParams.get("tag")).toLowerCase();
     const sort = clean(url.searchParams.get("sort")).toLowerCase();
@@ -221,10 +226,13 @@ export async function apiReport(request, env) {
   if (!item || item.status !== "approved") {
     return json({ error: kind === "listing" ? "Listing not found." : "Confession not found." }, 404);
   }
+  const now = new Date().toISOString();
   item.reportsCount = (Number(item.reportsCount) || 0) + 1;
   item.lastReportReason = clean(parsed.body.reason).slice(0, 220) || "Community report";
+  item.reportedAt = now;
+  item.hiddenAt = item.hiddenAt || now;
   await kv.put(item._key, JSON.stringify(strip(item)));
-  return json({ ok: true });
+  return json({ ok: true, hidden: true });
 }
 
 export async function apiNewsletter(request, env) {
@@ -238,11 +246,82 @@ export async function apiNewsletter(request, env) {
   if (parsed.body.website) return json({ ok: true });
   const turnstile = await verifyTurnstile(request, env, parsed.body.turnstileToken);
   if (!turnstile.ok) return turnstileFailure(turnstile);
+  if (!consentGiven(parsed.body.consent)) {
+    return json({ error: "Please confirm you agree to hear from OnlyScrubs." }, 400);
+  }
   const email = String(parsed.body.email || "").trim().toLowerCase();
   if (!validEmail(email)) return json({ error: "Enter a valid email address." }, 400);
+  if (!env.ADMIN_TOKEN) return json({ error: "Newsletter signup is unavailable." }, 503);
   const existing = await kv.get("newsletter:" + email);
+  const now = new Date().toISOString();
   if (!existing) {
-    await kv.put("newsletter:" + email, JSON.stringify({ email, createdAt: new Date().toISOString() }));
+    await kv.put("newsletter:" + email, JSON.stringify({
+      email,
+      createdAt: now,
+      consentAt: now,
+      consent: CONSENT_TEXT,
+      source: "website"
+    }));
   }
-  return json({ ok: true });
+  const token = await unsubscribeToken(env.ADMIN_TOKEN, email);
+  return json({ ok: true, unsubscribeUrl: unsubscribeUrl(token) });
+}
+
+function escPage(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[char]));
+}
+
+function unsubscribePage(title, message, status = 200) {
+  const html = `<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>${escPage(title)} | OnlyScrubs</title>
+</head>
+<body>
+  <main>
+    <h1>${escPage(title)}</h1>
+    <p>${escPage(message)}</p>
+    <p><a href="/">Back to OnlyScrubs</a></p>
+    <p>OnlyScrubs, <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a></p>
+  </main>
+</body>
+</html>`;
+  const response = new Response(html, {
+    status,
+    headers: { "content-type": "text/html; charset=utf-8" }
+  });
+  return applySecurityHeaders(response, "/unsubscribe", []);
+}
+
+export async function apiUnsubscribe(request, env) {
+  if (request.method !== "GET" && request.method !== "POST") {
+    return json({ error: "Method not allowed" }, 405);
+  }
+  const kv = env.CONFESSIONS_KV;
+  if (!kv) return unsubscribePage("Unsubscribe", "Storage is not configured. Email hello@onlyscrubs.org and we will remove you.", 500);
+  const limit = await rateLimit(kv, "unsub:" + (await clientKey(request)), 30, 3600);
+  if (!limit.ok) return limited(limit);
+  const token = new URL(request.url).searchParams.get("token") || "";
+  const email = await emailFromUnsubscribeToken(env.ADMIN_TOKEN, token);
+  if (!email) {
+    return unsubscribePage(
+      "Link not valid",
+      "This unsubscribe link is not valid. Email hello@onlyscrubs.org and we will remove the address.",
+      400
+    );
+  }
+  await kv.delete("newsletter:" + email);
+  return unsubscribePage(
+    "Unsubscribed",
+    "You have been removed from the OnlyScrubs newsletter. You will not get further notes unless you sign up again."
+  );
 }

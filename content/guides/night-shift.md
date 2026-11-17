@@ -32,7 +32,7 @@ Eat a proper meal before the shift if you can. Pack food you can eat cold or qui
 
 Bright light at the start of a night can help you feel more awake. Dimmer light on the way home, and sunglasses if the morning sun hits you in the car, helps some people avoid feeling suddenly wired at 7am. Do not drive in sunglasses so dark you cannot see. This is a comfort trick, not a treatment.
 
-Alcohol does not improve daytime sleep. It shortens it and makes it lighter. If the shift was hard, alcohol is also a poor debrief. See [how to ask for help](/guides/asking-for-help.html).
+Alcohol does not improve daytime sleep. It shortens it and makes it lighter. If the shift was hard, alcohol is also a poor debrief. See [how to ask for help](/guides/asking-for-help.html). Standing for a whole night is also a body problem. The [feet and back guide](/guides/feet-and-back.html) covers shoes and loads, not sleep.
 
 ## The drive home is part of the shift
 

@@ -1,5 +1,6 @@
 import { json, readJson, auth, clientKey, rateLimit, rateLimitState, limited, timingSafeEqual } from "../lib/http.js";
 import { clean } from "../lib/moderation.js";
+import { unsubscribeToken, unsubscribeUrl } from "../lib/newsletter.js";
 import { sessionCookie, signSession } from "../lib/session.js";
 import { archiveOld, findById, listByPrefix, strip } from "../lib/store.js";
 
@@ -25,6 +26,7 @@ function applyAction(item, kind, action) {
   if (action === "approve" && kind !== "relay") {
     item.status = "approved";
     item.approvedAt = now;
+    delete item.hiddenAt;
     return { item };
   }
   if (action === "reject" && kind !== "relay") {
@@ -218,19 +220,23 @@ export async function apiNewsletterExport(request, env) {
   const gate = await requireAdmin(request, env);
   if (gate.error) return gate.error;
   const listed = await gate.kv.list({ prefix: "newsletter:" });
-  const rows = [["email", "createdAt"]];
+  const rows = [["email", "createdAt", "consentAt", "unsubscribeUrl"]];
+  const secret = env.ADMIN_TOKEN || "";
   for (const key of listed.keys) {
     const raw = await gate.kv.get(key.name);
     let email = key.name.slice("newsletter:".length);
     let createdAt = "";
+    let consentAt = "";
     try {
       const parsed = JSON.parse(raw);
       email = parsed.email || email;
       createdAt = parsed.createdAt || "";
+      consentAt = parsed.consentAt || "";
     } catch {
       /* keep the key */
     }
-    rows.push([email, createdAt]);
+    const link = secret ? unsubscribeUrl(await unsubscribeToken(secret, email)) : "";
+    rows.push([email, createdAt, consentAt, link]);
   }
   const csv = rows.map((row) => row.map(csvCell).join(",")).join("\n") + "\n";
   return new Response(csv, {

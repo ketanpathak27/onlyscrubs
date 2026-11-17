@@ -2,7 +2,7 @@ import { CANONICAL, SCRIPT_HASHES } from "./generated/meta.js";
 import { siteConfig } from "./config.js";
 import { applySecurityHeaders, json } from "./lib/http.js";
 import { turnstileSiteKey } from "./lib/turnstile.js";
-import { apiComments, apiConfessions, apiNewsletter, apiRate, apiReact, apiReport } from "./routes/community.js";
+import { apiComments, apiConfessions, apiNewsletter, apiRate, apiReact, apiReport, apiUnsubscribe } from "./routes/community.js";
 import { apiListings, apiMessages } from "./routes/rack.js";
 import { apiAdmin, apiAdminBulk, apiAdminLogin, apiAdminLogout, apiAdminSession, apiNewsletterExport, apiStats } from "./routes/admin.js";
 
@@ -76,6 +76,7 @@ export default {
     if (path === "/api/react") return apiReact(request, env);
     if (path === "/api/report") return apiReport(request, env);
     if (path === "/api/newsletter") return apiNewsletter(request, env);
+    if (path === "/unsubscribe") return apiUnsubscribe(request, env);
     if (path === "/api/listings") return apiListings(request, env);
     if (path === "/api/messages") return apiMessages(request, env);
     if (path === "/api/config") return apiConfig(env);

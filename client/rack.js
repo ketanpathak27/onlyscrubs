@@ -36,7 +36,7 @@
       return;
     }
     list.innerHTML = items.map(function (item) {
-      return '<article class="listing" data-id="' + esc(item.id) + '"><div class="meta-row"><span class="pill">' + esc(item.type) + '</span><span>' + esc(item.condition) + '</span><span>' + esc(item.suburb) + ', ' + esc(item.state) + '</span></div><h3>' + esc(item.title) + '</h3><p>' + esc(item.description).replace(/\n/g, "<br>") + '</p><p class="meta-row">Size ' + esc(item.size) + (item.brand ? ' · ' + esc(item.brand) : '') + ' · ' + esc(item.colour) + '</p><button class="button secondary compact" type="button" data-contact>Send a message</button><div data-contact-slot></div></article>';
+      return '<article class="listing" data-id="' + esc(item.id) + '"><div class="meta-row"><span class="pill">' + esc(item.type) + '</span><span>' + esc(item.condition) + '</span><span>' + esc(item.suburb) + ', ' + esc(item.state) + '</span></div><h3>' + esc(item.title) + '</h3><p>' + esc(item.description).replace(/\n/g, "<br>") + '</p><p class="meta-row">Size ' + esc(item.size) + (item.brand ? ' · ' + esc(item.brand) : '') + ' · ' + esc(item.colour) + '</p><div class="post-actions"><button class="button secondary compact" type="button" data-contact>Send a message</button><button class="button compact" type="button" data-report>Report</button></div><div data-contact-slot></div></article>';
     }).join("");
     status.textContent = "Showing " + items.length + " listing" + (items.length === 1 ? "." : "s.");
   }
@@ -57,18 +57,47 @@
   });
 
   list.addEventListener("click", async function (event) {
+    const report = event.target.closest("[data-report]");
+    if (report) {
+      const card = report.closest("[data-id]");
+      if (card.querySelector("[data-report-form]")) return;
+      const box = document.createElement("form");
+      box.className = "form";
+      box.dataset.reportForm = "1";
+      box.innerHTML = '<label>What should moderation look at?<input name="reason" maxlength="220" required></label><button class="button compact" type="submit">Send report</button><p class="form-message"></p>';
+      card.appendChild(box);
+      return;
+    }
     const button = event.target.closest("[data-contact]");
     if (!button) return;
     const card = button.closest("[data-id]");
     const slot = card.querySelector("[data-contact-slot]");
     if (slot.childElementCount) return;
-    slot.innerHTML = '<form class="form" data-relay><p>Your email is sent to moderation, not published on the listing.</p><label>Your name<input name="name" required maxlength="60"></label><label>Your email<input name="email" type="email" required></label><label>Message<textarea name="message" required minlength="12" maxlength="800" placeholder="Size you need, pickup suburb, and whether you can collect this week."></textarea></label><label class="check"><input name="confirm" type="checkbox" required><span>This message does not name a workplace, patient or clinical matter.</span></label><input class="honeypot" name="website" tabindex="-1" autocomplete="off"><div data-turnstile></div><button class="button primary" type="submit">Send via OnlyScrubs</button><p class="form-message"></p></form>';
+    slot.innerHTML = '<form class="form" data-relay><p>Your email is sent to moderation, not published on the listing.</p><label>Your name<input name="name" required maxlength="60"></label><label>Your email<input name="email" type="email" required></label><label>Message<textarea name="message" required minlength="12" maxlength="800" placeholder="Size you need, pickup suburb, and whether you can collect this week."></textarea></label><label class="check"><input name="confirm" type="checkbox" required><span>This message does not name a workplace, patient or clinical matter.</span></label><p class="disclosure">By posting you agree to the <a href="/terms.html">Terms</a>.</p><input class="honeypot" name="website" tabindex="-1" autocomplete="off"><div data-turnstile></div><button class="button primary" type="submit">Send via OnlyScrubs</button><p class="form-message"></p></form>';
     const cfg = await window.OnlyScrubs.config();
     const widget = slot.querySelector("[data-turnstile]");
     if (widget && cfg.turnstileSiteKey && window.turnstile) window.turnstile.render(widget, { sitekey: cfg.turnstileSiteKey });
   });
 
   list.addEventListener("submit", async function (event) {
+    const reportForm = event.target.closest("[data-report-form]");
+    if (reportForm) {
+      event.preventDefault();
+      const card = reportForm.closest("[data-id]");
+      const message = reportForm.querySelector(".form-message");
+      message.textContent = "Sending…";
+      try {
+        await read(await fetch("/api/report", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ id: card.dataset.id, kind: "listing", reason: reportForm.reason.value })
+        }));
+        card.innerHTML = "<p>Reported. This listing is hidden while moderation reviews it.</p>";
+      } catch (error) {
+        message.textContent = error.message;
+      }
+      return;
+    }
     const relay = event.target.closest("[data-relay]");
     if (!relay) return;
     event.preventDefault();
