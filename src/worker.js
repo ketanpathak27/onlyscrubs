@@ -4,7 +4,7 @@ import { applySecurityHeaders, json } from "./lib/http.js";
 import { turnstileSiteKey } from "./lib/turnstile.js";
 import { apiComments, apiConfessions, apiNewsletter, apiRate, apiReact, apiReport, apiUnsubscribe } from "./routes/community.js";
 import { apiListings, apiMessages } from "./routes/rack.js";
-import { apiAdmin, apiAdminBulk, apiAdminIndexNow, apiAdminLogin, apiAdminLogout, apiAdminSession, apiNewsletterExport, apiStats } from "./routes/admin.js";
+import { apiAdmin, apiAdminBulk, apiAdminIndexNow, apiAdminLogin, apiAdminLogout, apiAdminSession, apiDigest, apiDigestHtml, apiNewsletterExport, apiStats } from "./routes/admin.js";
 
 const SITE_HOST = "onlyscrubs.org";
 
@@ -98,6 +98,8 @@ export default {
     if (path === "/api/admin/stats") return apiStats(request, env);
     if (path === "/api/admin/bulk") return apiAdminBulk(request, env);
     if (path === "/api/admin/newsletter.csv") return apiNewsletterExport(request, env);
+    if (path === "/api/admin/digest") return apiDigest(request, env);
+    if (path === "/api/admin/digest.html") return apiDigestHtml(request, env);
     if (path === "/api/admin") return apiAdmin(request, env);
     if (path.startsWith("/api/")) return json({ error: "Not found" }, 404);
 

@@ -28,6 +28,20 @@ export async function findById(kv, prefix, id) {
   return items.find((item) => item.id === id) || null;
 }
 
+export async function publicShift(kv) {
+  const meta = await read(kv, "meta:shift-of-week");
+  if (!meta?.id) return null;
+  const item = await findById(kv, "confession:", meta.id);
+  if (!item || item.status !== "approved") return null;
+  return {
+    id: item.id,
+    text: item.text,
+    createdAt: item.createdAt,
+    score: (Number(item.score) || 0) + (Number(item.hugs) || 0) + (Number(item.sames) || 0),
+    pinnedAt: meta.pinnedAt || ""
+  };
+}
+
 export function strip(obj) {
   const copy = { ...obj };
   delete copy._key;

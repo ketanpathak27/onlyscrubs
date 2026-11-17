@@ -41,7 +41,9 @@ test("listing validation hides nothing required", () => {
   assert.equal(good.value.state, "VIC");
   assert.equal(good.value.contactEmail, "student@example.com");
   const named = validateListing({ ...good.value, description: "A spare set from the hospital pool, clean and ready.", contactEmail: "student@example.com", title: "Navy scrub pants", suburb: "Footscray", state: "VIC", condition: "good", colour: "navy", size: "12", type: "swap" });
-  assert.match(named.error, /workplace/i);
+  assert.equal(named.error, undefined);
+  assert.equal(named.screen.flagged, true);
+  assert.match(named.screen.flagReason, /workplace|hospital|clinical/i);
 });
 
 test("night shift plan has a caffeine cutoff six hours before sleep", () => {

@@ -1,8 +1,11 @@
 import { applySecurityHeaders, json, limited, readJson, clientKey, rateLimit, auth } from "../lib/http.js";
-import { clean, risky, hasDirectContact, normaliseTags, mergeTags, validEmail } from "../lib/moderation.js";
+import { clean, normaliseTags, mergeTags, validEmail } from "../lib/moderation.js";
 import { CONSENT_TEXT, consentGiven, emailFromUnsubscribeToken, unsubscribeToken, unsubscribeUrl } from "../lib/newsletter.js";
-import { archiveOld, findById, listByPrefix, strip } from "../lib/store.js";
+import { attachScreen, screenText } from "../lib/screen.js";
+import { decideReport, normaliseCategory } from "../lib/reports.js";
+import { archiveOld, findById, listByPrefix, publicShift, strip } from "../lib/store.js";
 import { verifyTurnstile, turnstileFailure } from "../lib/turnstile.js";
+import { engagementScore, inCurrentWeek, sydneyDayKey } from "../lib/week.js";
 
 function examples() {
   return [
@@ -36,6 +39,11 @@ function examples() {
 function toPublic(item, commentsCount) {
   const copy = strip(item);
   delete copy.lastReportReason;
+  delete copy.lastReportCategory;
+  delete copy.flagReason;
+  delete copy.flagCodes;
+  delete copy.flagged;
+  delete copy.hiddenReason;
   delete copy.hiddenAt;
   delete copy.reportedAt;
   copy.score = Number(copy.score) || 0;
@@ -57,9 +65,18 @@ async function commentCounts(kv) {
   return counts;
 }
 
-function screenText(text, message) {
-  if (risky(text) || hasDirectContact(text)) return message;
-  return "";
+function heldBody(screen) {
+  const body = { ok: true, status: "pending" };
+  if (screen.flagged) body.held = true;
+  if (screen.support) body.support = screen.support;
+  return body;
+}
+
+function topThisWeek(items, now = new Date()) {
+  return items
+    .filter((item) => inCurrentWeek(item.createdAt, now))
+    .sort((a, b) => engagementScore(b) - engagementScore(a) || String(b.createdAt).localeCompare(String(a.createdAt)))
+    .slice(0, 5);
 }
 
 export async function apiConfessions(request, env) {
@@ -74,6 +91,7 @@ export async function apiConfessions(request, env) {
     let stored = await listByPrefix(kv, "confession:", status);
     if (status === "approved") stored = stored.filter((item) => !item.hiddenAt);
     let items = stored.map((item) => toPublic(item, counts.get(item.id) || 0));
+    const week = topThisWeek(items);
     const q = clean(url.searchParams.get("q")).toLowerCase();
     const tag = clean(url.searchParams.get("tag")).toLowerCase();
     const sort = clean(url.searchParams.get("sort")).toLowerCase();
@@ -85,10 +103,11 @@ export async function apiConfessions(request, env) {
     if (sort === "top") {
       items.sort((a, b) => b.score + b.hugs + b.sames - (a.score + a.hugs + a.sames));
     }
+    const shiftOfTheWeek = await publicShift(kv);
     if (status === "approved" && !items.length && !filtering) {
-      return json({ confessions: examples(), examples: true });
+      return json({ confessions: examples(), examples: true, topThisWeek: [], shiftOfTheWeek });
     }
-    return json({ confessions: items });
+    return json({ confessions: items, topThisWeek: week, shiftOfTheWeek });
   }
   if (request.method === "POST") {
     const limit = await rateLimit(kv, "confessions:" + (await clientKey(request)), 5, 3600);
@@ -103,14 +122,10 @@ export async function apiConfessions(request, env) {
     if (!body.confirm) return json({ error: "Please confirm the submission rules first." }, 400);
     if (text.length < 20) return json({ error: "Make it at least 20 characters." }, 400);
     if (text.length > 700) return json({ error: "Keep it under 700 characters." }, 400);
-    const blocked = screenText(
-      text,
-      "This looks like it may include patient, workplace or clinical details. Please rewrite it as harmless shift-life humour."
-    );
-    if (blocked) return json({ error: blocked }, 400);
+    const screen = screenText(text);
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
-    const record = {
+    const record = attachScreen({
       id,
       text,
       status: "pending",
@@ -118,10 +133,11 @@ export async function apiConfessions(request, env) {
       score: 0,
       hugs: 0,
       sames: 0,
-      tags: normaliseTags(body.tags)
-    };
+      tags: normaliseTags(body.tags),
+      reportsCount: 0
+    }, screen);
     await kv.put("confession:" + now + ":" + id, JSON.stringify(record));
-    return json({ ok: true, status: "pending" }, 201);
+    return json(heldBody(screen), 201);
   }
   return json({ error: "Method not allowed" }, 405);
 }
@@ -150,19 +166,18 @@ export async function apiComments(request, env) {
     if (!parent || parent.status !== "approved") return json({ error: "Confession not found." }, 404);
     if (text.length < 8) return json({ error: "Comment is too short." }, 400);
     if (text.length > 500) return json({ error: "Keep comments under 500 characters." }, 400);
-    if (risky(text) || hasDirectContact(text)) {
-      return json({ error: "Please remove patient, workplace or clinical details." }, 400);
-    }
+    const screen = screenText(text);
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
-    await kv.put("comment:" + confessionId + ":" + now + ":" + id, JSON.stringify({
+    await kv.put("comment:" + confessionId + ":" + now + ":" + id, JSON.stringify(attachScreen({
       id,
       confessionId,
       text,
       status: "pending",
-      createdAt: now
-    }));
-    return json({ ok: true, status: "pending" }, 201);
+      createdAt: now,
+      reportsCount: 0
+    }, screen)));
+    return json(heldBody(screen), 201);
   }
   return json({ error: "Method not allowed" }, 405);
 }
@@ -216,21 +231,38 @@ export async function apiReport(request, env) {
   const kv = env.CONFESSIONS_KV;
   if (!kv) return json({ error: "Storage is not configured" }, 500);
   if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
-  const limit = await rateLimit(kv, "report:" + (await clientKey(request)), 10, 3600);
-  if (!limit.ok) return limited(limit);
+  const hash = await clientKey(request);
   const parsed = await readJson(request);
   if (parsed.error) return json({ error: parsed.error === "Invalid request." ? "Invalid report." : parsed.error }, parsed.status || 400);
-  const kind = parsed.body.kind === "listing" ? "listing" : "confession";
-  const prefix = kind === "listing" ? "listing:" : "confession:";
+  const kind = parsed.body.kind === "listing" ? "listing" : parsed.body.kind === "comment" ? "comment" : "confession";
+  const prefix = kind === "listing" ? "listing:" : kind === "comment" ? "comment:" : "confession:";
   const item = await findById(kv, prefix, clean(parsed.body.id));
   if (!item || item.status !== "approved") {
-    return json({ error: kind === "listing" ? "Listing not found." : "Confession not found." }, 404);
+    return json({ error: kind === "listing" ? "Listing not found." : kind === "comment" ? "Comment not found." : "Confession not found." }, 404);
   }
   const now = new Date().toISOString();
-  item.reportsCount = (Number(item.reportsCount) || 0) + 1;
+  const dayKey = "reportday:" + hash + ":" + sydneyDayKey();
+  const reportKey = "report:" + kind + ":" + item.id + ":" + hash;
+  const decision = decideReport({
+    duplicate: Boolean(await kv.get(reportKey)),
+    usedToday: Number(await kv.get(dayKey) || 0),
+    distinctCount: Number(item.reportsCount) || 0,
+    category: normaliseCategory(parsed.body.category)
+  });
+  if (decision.action === "duplicate") return json({ ok: true, duplicate: true, hidden: Boolean(item.hiddenAt) });
+  if (decision.action === "limited") {
+    return json({ error: "You have reached today's report limit." }, 429, { retryAfter: 3600 });
+  }
+  await kv.put(dayKey, String(Number(await kv.get(dayKey) || 0) + 1), { expirationTtl: 60 * 60 * 48 });
+  await kv.put(reportKey, decision.category, { expirationTtl: 60 * 60 * 24 * 400 });
+  item.reportsCount = decision.reportsCount;
+  item.lastReportCategory = decision.category;
   item.lastReportReason = clean(parsed.body.reason).slice(0, 220) || "Community report";
   item.reportedAt = now;
   item.hiddenAt = item.hiddenAt || now;
+  item.hiddenReason = decision.high
+    ? "Hidden immediately: " + decision.category
+    : "Hidden after a community report";
   await kv.put(item._key, JSON.stringify(strip(item)));
   return json({ ok: true, hidden: true });
 }

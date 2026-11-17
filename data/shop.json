@@ -1,0 +1,48 @@
+{
+  "products": [
+    {
+      "id": "nursing-toolkit",
+      "name": "Australian Nursing Student & New Grad Toolkit",
+      "price": "19",
+      "priceLabel": "A$19",
+      "url": "https://lofiluffyy.gumroad.com/l/ozfbx",
+      "description": "Fillable A4 templates and concise study notes for Australian nursing students, grad nurses and ENs: ISBAR handover sheets, a shift brain, A-G assessment notes, placement log with Gibbs' reflections linked to the NMBA standards, grad year & CPD tracker, and study notes linked to official sources.",
+      "alt": "Cover of the Australian Nursing Student and New Grad Toolkit, with ISBAR sheets and a checklist.",
+      "width": 960,
+      "height": 540
+    },
+    {
+      "id": "renter-kit",
+      "name": "Australian Renter's Bond-Back Kit",
+      "price": "19",
+      "priceLabel": "A$19",
+      "url": "https://lofiluffyy.gumroad.com/l/kaqesn",
+      "description": "Keep clear records from move-in to move-out to help protect your rental bond. Condition record & photo log, move-out checklist, repair tracker and a state-by-state quick guide.",
+      "alt": "Cover of the Australian Renter's Bond-Back Kit, with a condition checklist.",
+      "width": 960,
+      "height": 540
+    },
+    {
+      "id": "budget-planner",
+      "name": "Australian Household Budget Planner",
+      "price": "19",
+      "priceLabel": "A$19",
+      "url": "https://lofiluffyy.gumroad.com/l/syfesl",
+      "description": "Plan and track your household budget in Aussie dollars. Spreadsheet planner with pay-cycle conversions, budget vs actual dashboard, bill calendar, savings goals and debt payoff, plus 19 printable fillable pages.",
+      "alt": "Cover of the Australian Household Budget Planner, with a budget spreadsheet and printable pages.",
+      "width": 960,
+      "height": 540
+    },
+    {
+      "id": "sole-trader-kit",
+      "name": "Australian Sole Trader Starter Kit",
+      "price": "24",
+      "priceLabel": "A$24",
+      "url": "https://lofiluffyy.gumroad.com/l/adzqwv",
+      "description": "GST and non-GST invoice templates, income & expense tracker with BAS-prep totals, car logbook and home office log, plus start-up and tax-time checklists. General information only – not tax advice.",
+      "alt": "Cover of the Australian Sole Trader Starter Kit, with an invoice and tracker pages.",
+      "width": 960,
+      "height": 540
+    }
+  ]
+}

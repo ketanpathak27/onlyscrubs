@@ -122,7 +122,7 @@
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
       const message = form.querySelector("[data-form-message]");
-      message.textContent = "Sending…";
+      message.textContent = "Writing you in…";
       try {
         const res = await fetch("/api/newsletter", {
           method: "POST",
@@ -137,7 +137,7 @@
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Could not subscribe.");
         form.reset();
-        message.textContent = "You are on the list. OnlyScrubs (hello@onlyscrubs.org) will email you, and every message has an unsubscribe link.";
+        message.textContent = "You're on the list. OnlyScrubs (hello@onlyscrubs.org) will email you, and every message has an unsubscribe link.";
       } catch (error) {
         message.textContent = error.message;
       }
@@ -294,6 +294,50 @@
       button.textContent = "Could not log out";
     }
   });
+
+  const unsub = document.querySelector("[data-unsubscribe]");
+  if (unsub) {
+    const token = new URLSearchParams(location.search).get("token");
+    if (token && unsub.token) unsub.token.value = token;
+    unsub.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      const message = unsub.querySelector("[data-form-message]");
+      message.textContent = "Removing…";
+      try {
+        const res = await fetch("/api/newsletter/unsubscribe", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ token: unsub.token.value })
+        });
+        const data = await res.json().catch(function () { return {}; });
+        if (!res.ok) throw new Error(data.error || "Could not unsubscribe.");
+        message.textContent = "You are unsubscribed. You will not get further notes.";
+      } catch (error) {
+        message.textContent = error.message;
+      }
+    });
+  }
+
+  const tearoom = document.querySelector("[data-tearoom-line]");
+  if (tearoom) {
+    const lines = [
+      "Cold coffee is still coffee. This is the science.",
+      "The roster is a suggestion. The printer is a nemesis.",
+      "Full moon, short staff, and the label printer is out of labels.",
+      "3am pages are not a personality test.",
+      "Handover is a sport. Pens are the equipment.",
+      "Paperwork breeds in the dark. Do not feed it.",
+      "If you say the Q word, you are doing the paperwork."
+    ];
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduce) {
+      let index = 0;
+      window.setInterval(function () {
+        index = (index + 1) % lines.length;
+        tearoom.textContent = lines[index];
+      }, 8000);
+    }
+  }
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/sw.js").catch(function () {});
