@@ -1,11 +1,15 @@
 {
   "name": "onlyscrubs",
   "private": true,
+  "type": "module",
   "description": "OnlyScrubs website and Cloudflare Worker",
   "scripts": {
+    "build": "node scripts/build.mjs",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "build:assets": "python3 scripts/build-assets.py"
+    "check": "wrangler deploy --dry-run",
+    "test": "node --test test/",
+    "smoke": "node scripts/smoke.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.164.0"

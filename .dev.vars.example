@@ -1,2 +1,12 @@
 # Copy to .dev.vars for local wrangler dev. Do not commit the real file.
+# ADMIN_TOKEN is the existing Worker secret. Do not rotate the production value.
 ADMIN_TOKEN=change-me-local-dev-token
+
+# Turnstile is optional. Leave both empty and forms work without the widget.
+# Set both to enable it. One without the other is treated as off.
+TURNSTILE_SITE_KEY=
+TURNSTILE_SECRET=
+
+# Optional. Empty hides the support link. Ads stay off unless this is true.
+SUPPORT_URL=
+ADS_ENABLED=false
