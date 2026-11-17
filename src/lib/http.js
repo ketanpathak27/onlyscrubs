@@ -1,3 +1,5 @@
+import { readCookie, SESSION_COOKIE, verifySession } from "./session.js";
+
 export function json(data, status = 200, extra = {}) {
   const headers = new Headers({
     "content-type": "application/json; charset=utf-8",
@@ -55,8 +57,20 @@ export async function auth(request, env) {
   if (!expected) return false;
   const header = request.headers.get("authorization") || "";
   const prefix = "Bearer ";
-  if (!header.startsWith(prefix)) return false;
-  return timingSafeEqual(header.slice(prefix.length), expected);
+  if (header.startsWith(prefix)) return timingSafeEqual(header.slice(prefix.length), expected);
+  return verifySession(expected, readCookie(request, SESSION_COOKIE));
+}
+
+/** Read a rate-limit bucket without incrementing it. */
+export async function rateLimitState(kv, key, limit) {
+  if (!kv) return { ok: true, count: 0 };
+  const raw = await kv.get("rl:" + key, { type: "json" });
+  const now = Date.now();
+  if (!raw || !raw.reset || raw.reset <= now) return { ok: true, count: 0 };
+  if (raw.count >= limit) {
+    return { ok: false, retryAfter: Math.max(1, Math.ceil((raw.reset - now) / 1000)), count: raw.count };
+  }
+  return { ok: true, count: raw.count };
 }
 
 /** SHA-256 of the client IP, truncated. Matches the original vote-dedupe key material. */

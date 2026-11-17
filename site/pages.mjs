@@ -505,17 +505,32 @@ export function admin(assets) {
     robots: "noindex, nofollow",
     newsletter: "none",
     scripts: [assets.admin],
-    main: `<section class="wrap page-hero"><p class="eyebrow">Private</p><h1>Moderation</h1><p>Confessions, comments, Scrub Rack listings, relay messages and the newsletter. This page is not indexed.</p></section>
-    <section class="wrap section">
-      <form class="form" id="admin-login">
-        <label for="admin-token">Admin token<input id="admin-token" type="password" autocomplete="current-password" required></label>
+    main: `<section class="wrap page-hero" id="admin-gate">
+      <p class="eyebrow">Private</p>
+      <h1>Admin</h1>
+      <p>Sign in to review confessions and Scrub Rack listings. This page is not indexed.</p>
+      <form class="form panel admin-gate" id="admin-signin">
+        <label for="admin-password">Password<input id="admin-password" name="password" type="password" autocomplete="current-password" required></label>
+        <button class="button primary" type="submit">Sign in</button>
+        <p class="form-message" id="admin-signin-message" role="status"></p>
+      </form>
+    </section>
+    <section class="wrap section" id="admin-app" hidden>
+      <div class="page-hero">
+        <p class="eyebrow">Signed in</p>
+        <h1>Moderation</h1>
+        <p>Approve, reject or delete pending confessions and listings. Reports stay on the item.</p>
+      </div>
+      <div class="metrics" id="admin-headlines"></div>
+      <form class="form" id="admin-tools">
         <div class="admin-bar">
           <label>Queue<select id="admin-kind"><option value="confession">Confessions</option><option value="comment">Comments</option><option value="listing">Scrub Rack</option><option value="relay">Messages</option></select></label>
           <label>Status<select id="admin-status"><option value="pending">Pending</option><option value="new">New messages</option><option value="approved">Approved</option><option value="reported">Reported</option><option value="rejected">Rejected</option><option value="archived">Archived</option><option value="read">Read messages</option></select></label>
           <button class="button primary" type="submit">Load</button>
+          <button class="button secondary" id="show-reported" type="button">Reported</button>
           <button class="button secondary" id="archive-old" type="button">Archive posts over 1 year</button>
           <button class="button secondary" id="export-newsletter" type="button">Export newsletter CSV</button>
-          <button class="button" id="admin-logout" type="button">Forget token</button>
+          <button class="button" id="admin-logout" type="button">Log out</button>
         </div>
         <div class="admin-bar">
           <label>Bulk action<select id="bulk-action"><option value="approve">Approve</option><option value="reject">Reject</option><option value="read">Mark read</option><option value="delete">Delete</option></select></label>

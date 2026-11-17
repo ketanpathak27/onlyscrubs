@@ -73,6 +73,11 @@
     return field ? field.value : "";
   };
 
+  fetch("/api/admin/session").then(function (res) { return res.json(); }).then(function (data) {
+    if (!data || !data.signedIn) return;
+    document.querySelectorAll("[data-admin-lock]").forEach(function (link) { link.hidden = false; });
+  }).catch(function () {});
+
   loadConfig().then(function (cfg) {
     document.querySelectorAll("[data-support-link]").forEach(function (link) {
       if (cfg.supportUrl) {

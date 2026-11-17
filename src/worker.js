@@ -4,7 +4,7 @@ import { applySecurityHeaders, json } from "./lib/http.js";
 import { turnstileSiteKey } from "./lib/turnstile.js";
 import { apiComments, apiConfessions, apiNewsletter, apiRate, apiReact, apiReport } from "./routes/community.js";
 import { apiListings, apiMessages } from "./routes/rack.js";
-import { apiAdmin, apiAdminBulk, apiNewsletterExport, apiStats } from "./routes/admin.js";
+import { apiAdmin, apiAdminBulk, apiAdminLogin, apiAdminLogout, apiAdminSession, apiNewsletterExport, apiStats } from "./routes/admin.js";
 
 const SITE_HOST = "onlyscrubs.org";
 
@@ -79,6 +79,9 @@ export default {
     if (path === "/api/listings") return apiListings(request, env);
     if (path === "/api/messages") return apiMessages(request, env);
     if (path === "/api/config") return apiConfig(env);
+    if (path === "/api/admin/login") return apiAdminLogin(request, env);
+    if (path === "/api/admin/logout") return apiAdminLogout();
+    if (path === "/api/admin/session") return apiAdminSession(request, env);
     if (path === "/api/admin/stats") return apiStats(request, env);
     if (path === "/api/admin/bulk") return apiAdminBulk(request, env);
     if (path === "/api/admin/newsletter.csv") return apiNewsletterExport(request, env);

@@ -1,5 +1,6 @@
-import { json, readJson, auth, clientKey, rateLimit, limited } from "../lib/http.js";
+import { json, readJson, auth, clientKey, rateLimit, rateLimitState, limited, timingSafeEqual } from "../lib/http.js";
 import { clean } from "../lib/moderation.js";
+import { sessionCookie, signSession } from "../lib/session.js";
 import { archiveOld, findById, listByPrefix, strip } from "../lib/store.js";
 
 const KIND_PREFIX = {
@@ -47,6 +48,40 @@ function applyAction(item, kind, action) {
     return { item };
   }
   return { error: "Unknown action." };
+}
+
+function withCookie(response, cookie) {
+  const headers = new Headers(response.headers);
+  headers.append("set-cookie", cookie);
+  return new Response(response.body, { status: response.status, headers });
+}
+
+export async function apiAdminSession(request, env) {
+  return json({ signedIn: await auth(request, env) });
+}
+
+export async function apiAdminLogin(request, env) {
+  const kv = env.CONFESSIONS_KV;
+  if (!kv) return json({ error: "Storage is not configured" }, 500);
+  if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
+  const bucket = "adminlogin:" + (await clientKey(request));
+  const state = await rateLimitState(kv, bucket, 5);
+  if (!state.ok) return limited(state);
+  const parsed = await readJson(request);
+  const password = parsed.error ? "" : String(parsed.body.password ?? "");
+  const expected = env.ADMIN_TOKEN || "";
+  const matches = Boolean(expected) && (await timingSafeEqual(password, expected));
+  if (!matches) {
+    const limit = await rateLimit(kv, bucket, 5, 900);
+    if (!limit.ok) return limited(limit);
+    return json({ error: "Incorrect password." }, 401);
+  }
+  const cookie = sessionCookie(await signSession(expected));
+  return withCookie(json({ ok: true }), cookie);
+}
+
+export async function apiAdminLogout() {
+  return withCookie(json({ ok: true }), sessionCookie("", 0));
 }
 
 export async function apiAdmin(request, env) {
@@ -134,16 +169,22 @@ export async function apiStats(request, env) {
   const listings = await listByPrefix(kv, "listing:");
   const relays = await listByPrefix(kv, "relay:");
   const newsletter = await kv.list({ prefix: "newsletter:" });
+  const today = sydneyDay(new Date().toISOString());
+  const approvedToday = [...conf, ...listings].filter((item) => item.status === "approved" && sydneyDay(item.approvedAt) === today).length;
+  const pendingConfessions = conf.filter((item) => item.status === "pending").length;
+  const pendingListings = listings.filter((item) => item.status === "pending").length;
   return json({
     totals: {
       approved: conf.filter((item) => item.status === "approved").length,
-      pending: conf.filter((item) => item.status === "pending").length,
+      pending: pendingConfessions,
+      pendingItems: pendingConfessions + pendingListings,
+      approvedToday,
       archived: conf.filter((item) => item.status === "archived").length,
       pendingComments: comments.filter((item) => item.status === "pending").length,
       reports: conf.reduce((sum, item) => sum + (Number(item.reportsCount) || 0), 0) +
         listings.reduce((sum, item) => sum + (Number(item.reportsCount) || 0), 0),
       newsletter: newsletter.keys.length,
-      pendingListings: listings.filter((item) => item.status === "pending").length,
+      pendingListings,
       approvedListings: listings.filter((item) => item.status === "approved").length,
       newMessages: relays.filter((item) => item.status === "new").length
     },
@@ -158,6 +199,12 @@ export async function apiStats(request, env) {
       .slice(0, 10)
       .map(strip)
   });
+}
+
+function sydneyDay(value) {
+  const date = value ? new Date(value) : null;
+  if (!date || Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Sydney" }).format(date);
 }
 
 function csvCell(value) {

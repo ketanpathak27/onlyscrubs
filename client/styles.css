@@ -446,6 +446,10 @@ fieldset.group legend { font-family: var(--font-display); padding: 0 6px; }
 .gear-card h3 { margin-bottom: 6px; }
 .gear-card ul { margin: 8px 0 0; padding-left: 1.1em; }
 
+.admin-gate { width: min(440px, 100%); margin-top: 8px; }
+.admin-gate .button { width: 100%; }
+.admin-entry { margin-left: 8px; font-size: 0.82rem; }
+.nav-lock[hidden], #admin-app[hidden], #admin-gate[hidden] { display: none !important; }
 .admin-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
 .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
 .metric { padding: 14px; border-radius: 14px; background: var(--bg-elev); border: 1px solid var(--line); }

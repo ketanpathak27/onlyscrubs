@@ -136,6 +136,25 @@ await check("newsletter csv", async () => {
   if (!csv.body.includes("notes@example.com")) throw new Error(csv.body.slice(0, 200));
 });
 
+await check("admin cookie session", async () => {
+  const session = await get("/api/admin/session");
+  if (session.body.signedIn !== false) throw new Error(JSON.stringify(session.body));
+  const bad = await get("/api/admin/login", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ password: "not-the-token" }) });
+  if (bad.res.status !== 401) throw new Error("bad login " + bad.res.status);
+  const login = await fetch(base + "/api/admin/login", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ password: token }) });
+  const setCookie = login.headers.get("set-cookie") || "";
+  if (!/os_admin=/.test(setCookie) || !/HttpOnly/i.test(setCookie) || !/Secure/i.test(setCookie) || !/SameSite=Strict/i.test(setCookie)) throw new Error(setCookie);
+  if (setCookie.includes(token)) throw new Error("cookie contained the token");
+  const stats = await get("/api/admin/stats", { headers: { cookie: setCookie.split(";")[0] } });
+  if (stats.res.status !== 200 || stats.body.totals.approvedToday == null || stats.body.totals.newsletter == null) throw new Error(JSON.stringify(stats.body.totals));
+  const page = await get("/admin.html");
+  if (!page.body.includes('name="robots" content="noindex, nofollow"') || !page.body.includes("admin-signin")) throw new Error("login page");
+  const home = await get("/");
+  if (!home.body.includes('class="admin-entry"') || !home.body.includes("data-admin-lock")) throw new Error("entry points");
+  const out = await fetch(base + "/api/admin/logout", { method: "POST" });
+  if (!/Max-Age=0/i.test(out.headers.get("set-cookie") || "")) throw new Error("logout cookie");
+});
+
 await check("wellbeing numbers", async () => {
   const { body } = await get("/wellbeing.html");
   for (const number of ["1800 667 877", "13 11 14", "1300 22 4636", "13 92 76", ">000<"]) {

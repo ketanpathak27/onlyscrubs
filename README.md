@@ -53,7 +53,7 @@ Set these in the Cloudflare dashboard or with `wrangler secret put` / vars. Do n
 
 | Name | Required | Effect |
 | --- | --- | --- |
-| `ADMIN_TOKEN` | Yes, already set | Bearer token for `/admin.html` and `/api/admin`. Leave the existing secret alone |
+| `ADMIN_TOKEN` | Yes, already set | Admin password and bearer token. Also the key that signs the session cookie. Leave the existing secret alone |
 | `TURNSTILE_SITE_KEY` | No | Public site key. The widget loads only when this and the secret are both set |
 | `TURNSTILE_SECRET` | No | Server check for Turnstile. If either value is missing, forms skip the check |
 | `SUPPORT_URL` | No | “Buy the next round of coffee” link. Hidden when empty |
@@ -104,12 +104,17 @@ New keys use `listing:`, `relay:`, `react:`, and `meta:`.
 | POST | `/api/messages` | Relay stored for admin. No email is sent |
 | POST | `/api/newsletter` | Stores the address. Repeat submits stay `ok` |
 | GET | `/api/config` | Public flags only |
-| GET, PATCH | `/api/admin` | Existing actions, plus `reject`, listings, and relay messages |
+| POST | `/api/admin/login` | Password is the existing admin token. Sets an HttpOnly, Secure, SameSite=Strict cookie for 12 hours. Five failed tries per IP each 15 minutes |
+| POST | `/api/admin/logout` | Clears that cookie |
+| GET | `/api/admin/session` | `{ signedIn }` only. Does not return the token |
+| GET, PATCH | `/api/admin` | Bearer token or the session cookie. Existing actions, plus `reject`, listings, and relay messages |
 | POST | `/api/admin/bulk` | `{ kind, action, ids }`, up to 50 |
 | GET | `/api/admin/stats` | Old totals, plus listings and messages |
 | GET | `/api/admin/newsletter.csv` | CSV download |
 
-Posts approved more than a year ago are archived, at most once a day on read, or immediately from the admin button.
+The footer has a small Admin link. After a successful sign-in, a lock icon appears in the header. The password is not stored in the browser; the cookie is signed with the admin token and does not contain it. Scripts that already send `Authorization: Bearer` keep working.
+
+Posts approved more than a year ago are archived, at most once a day on read, or immediately from the admin button. Counts on the dashboard include pending confessions and listings, items approved today in Australia/Sydney, reports, and newsletter signups.
 
 The keyword filter still blocks patient, workplace, and clinical wording. Emails, links, and long phone numbers in public text are blocked too. The private email fields are separate.
 

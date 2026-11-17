@@ -115,6 +115,7 @@ export function layout(options) {
   <header class="site-header">
     <a class="brand" href="/"><span class="brand-mark">OS</span><span>OnlyScrubs</span></a>
     <div class="header-tools">
+      <a class="icon-button nav-lock" href="/admin.html" data-admin-lock hidden aria-label="Admin"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></a>
       <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch colour theme">${icon("sun")}${icon("moon")}</button>
       <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav">Menu</button>
     </div>
@@ -132,7 +133,7 @@ export function layout(options) {
         <a href="/submit.html">Submit</a>
         <a href="/guides.html">Guides</a>
       </nav>
-      <p class="fine">General information only. Not a clinic and not medical advice. <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a></p>
+      <p class="fine">General information only. Not a clinic and not medical advice. <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> <a class="admin-entry" href="/admin.html">Admin</a></p>
       <div class="button-row no-print">${support}<button class="button compact" type="button" data-install hidden>Install app</button></div>
     </div>
   </footer>
