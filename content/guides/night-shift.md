@@ -50,4 +50,4 @@ Social plans at 11am on your sleep day can wait. Friends who have never worked n
 
 Low mood, using alcohol or other drugs to get to sleep, or dreading every roster are reasons to talk to someone, not reasons to be tougher. Your GP is the right person for health concerns. For nurses, midwives and students, Nurse & Midwife Support is on [1800 667 877](https://www.nmsupport.org.au/), 24 hours. If you are in immediate danger, call 000.
 
-Nothing on this page tells you how to manage a patient overnight. Your workplace education and your own registration or student scope do that.
+Nothing on this page tells you how to manage a patient overnight. Your workplace education and your own registration or student scope do that. A longer note on fatigue, driving and who to tell is in [managing fatigue and night-shift sleep](/guides/fatigue-and-night-shift-sleep.html).

@@ -73,7 +73,9 @@ await check("confession validation", async () => {
   const missing = await get("/api/confessions", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: confessionText, confirm: false }) });
   if (missing.res.status !== 400) throw new Error("confirm");
   const risky = await get("/api/confessions", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: "A patient on my ward did something funny today honestly", confirm: true }) });
-  if (risky.res.status !== 400) throw new Error("risky " + JSON.stringify(risky.body));
+  if (risky.res.status !== 201 || risky.body.held !== true || risky.body.status !== "pending") throw new Error("risky " + JSON.stringify(risky.body));
+  const leaked = await get("/api/confessions");
+  if (JSON.stringify(leaked.body).includes("patient on my ward")) throw new Error("risky leaked");
   const created = await get("/api/confessions", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: confessionText, confirm: true, tags: ["pens", "not-a-tag"], website: "" }) });
   if (created.res.status !== 201 || created.body.status !== "pending") throw new Error(JSON.stringify(created.body));
 });
@@ -153,6 +155,21 @@ await check("admin cookie session", async () => {
   if (!home.body.includes('class="admin-entry"') || !home.body.includes("data-admin-lock")) throw new Error("entry points");
   const out = await fetch(base + "/api/admin/logout", { method: "POST" });
   if (!/Max-Age=0/i.test(out.headers.get("set-cookie") || "")) throw new Error("logout cookie");
+});
+
+await check("trust, shop and voice", async () => {
+  const home = await get("/");
+  if (!home.body.includes("not affiliated with AHPRA") || !home.body.includes("tearoom")) throw new Error("home voice");
+  const about = await get("/about.html");
+  if (about.res.status !== 200 || !about.body.includes("hello@onlyscrubs.org") || !about.body.includes("AboutPage")) throw new Error("about");
+  const moderation = await get("/moderation.html");
+  if (!moderation.body.includes("within 7 days") || !moderation.body.includes("How to appeal")) throw new Error("moderation");
+  const shop = await get("/shop.html");
+  if (!shop.body.includes("Buy on Gumroad") || !shop.body.includes("Australian Consumer Law") || shop.body.includes("gumroad.js")) throw new Error("shop");
+  const missing = await get("/this-page-is-not-real");
+  if (!missing.body.includes("discharged against medical advice")) throw new Error("404");
+  const map = await get("/sitemap.xml");
+  if (!map.body.includes("/about.html") || !map.body.includes("/shop.html") || !map.body.includes("/guides/cpd-for-new-grads.html")) throw new Error("sitemap pages");
 });
 
 await check("wellbeing numbers", async () => {

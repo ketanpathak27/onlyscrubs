@@ -4,6 +4,8 @@
   if (!feed) return;
   const status = document.getElementById("feed-status");
   let all = [];
+  let topWeek = [];
+  let shift = null;
   let activeTag = "";
 
   function esc(value) {
@@ -20,6 +22,30 @@
     button.classList.remove("is-pop");
     void button.offsetWidth;
     button.classList.add("is-pop");
+  }
+  function showResult(message, data) {
+    message.replaceChildren();
+    const line = document.createElement("span");
+    line.textContent = data && data.support
+      ? "Held for a moderator. It will not be published as it is."
+      : data && data.held
+        ? "Held for a human to read before it hits the board."
+        : "Charted. Go drink your cold coffee.";
+    message.appendChild(line);
+    if (!data || !data.support) return;
+    const note = document.createElement("span");
+    note.className = "support-lines";
+    const help = document.createElement("p");
+    help.textContent = data.support.message || "";
+    note.appendChild(help);
+    (data.support.lines || []).forEach(function (item) {
+      const link = document.createElement("a");
+      link.href = item.href;
+      if (String(item.href || "").startsWith("http")) link.rel = "noopener noreferrer";
+      link.textContent = item.name + " " + item.phone;
+      note.appendChild(link);
+    });
+    message.appendChild(note);
   }
   function selectedTags() {
     return Array.from(form.querySelectorAll('input[name="tag"]:checked')).map(function (input) { return input.value; });
@@ -48,7 +74,7 @@
       button.setAttribute("aria-pressed", on ? "true" : "false");
     });
     if (!items.length) {
-      feed.innerHTML = '<div class="empty"><h2>Nothing in this filter.</h2><p>Try another tag, or be the first to send something harmless.</p></div>';
+      feed.innerHTML = '<div class="empty"><h2>Suspiciously quiet. Don\'t say the Q word.</h2><p>Nothing in this filter yet. Try another tag, or chart something harmless.</p></div>';
       status.textContent = "No matching confessions.";
       return;
     }
@@ -63,7 +89,7 @@
           return '<button class="tag-pill" type="button" data-feed-tag="' + esc(tag) + '">#' + esc(tag) + '</button>';
         }).join("") + '</div>' +
         '<div class="post-actions">' +
-        '<button class="button compact secondary" type="button" data-rate ' + (item.example ? "disabled" : "") + '>Rate <strong>' + esc(item.score || 0) + '</strong></button>' +
+        '<button class="button compact secondary" type="button" data-rate ' + (item.example ? "disabled" : "") + '>Upvote <strong>' + esc(item.score || 0) + '</strong></button>' +
         '<button class="button compact secondary" type="button" data-react="same" ' + (item.example ? "disabled" : "") + '>Same <strong>' + esc(item.sames || 0) + '</strong></button>' +
         '<button class="button compact secondary" type="button" data-react="hug" ' + (item.example ? "disabled" : "") + '>Hug <strong>' + esc(item.hugs || 0) + '</strong></button>' +
         '<button class="button compact secondary" type="button" data-share data-share-url="' + esc(shareUrl) + '" data-share-title="OnlyScrubs confession">Share</button>' +
@@ -74,15 +100,29 @@
         '</article>';
     }).join("");
     status.textContent = "Showing " + items.length + (items.length === 1 ? " confession." : " confessions.");
+    const shiftHost = document.getElementById("shift-of-week");
+    if (shiftHost) {
+      shiftHost.innerHTML = shift ? '<article class="confession shift-card"><p class="kicker">Shift of the week</p><p>“' + esc(shift.text) + '”</p></article>' : "";
+    }
+    const topHost = document.getElementById("top-week");
+    const topList = document.querySelector("[data-top-week]");
+    if (topHost && topList) {
+      topHost.hidden = false;
+      topList.innerHTML = topWeek.length ? topWeek.map(function (item) {
+        return '<article class="confession"><p>“' + esc(item.text) + '”</p><p class="meta-row">Upvotes ' + esc(item.score || 0) + ' · Same ' + esc(item.sames || 0) + ' · Hug ' + esc(item.hugs || 0) + '</p></article>';
+      }).join("") : '<p class="meta-row">No votes this week. The leaderboard is having a lie-down.</p>';
+    }
   }
 
   async function load() {
     try {
       const data = await read(await fetch("/api/confessions"));
       all = data.confessions || [];
+      topWeek = data.topThisWeek || [];
+      shift = data.shiftOfTheWeek || null;
       render();
     } catch (error) {
-      feed.innerHTML = '<div class="empty"><h2>Could not load the feed.</h2><p>' + esc(error.message) + '</p></div>';
+      feed.innerHTML = '<div class="empty"><h2>The feed did not load.</h2><p>' + esc(error.message) + '</p></div>';
       status.textContent = "Could not load confessions.";
     }
   }
@@ -116,7 +156,7 @@
       rate.disabled = true;
       try {
         const data = await read(await fetch("/api/rate", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: id }) }));
-        rate.innerHTML = (data.alreadyRated ? "Rated" : "Rated") + " <strong>" + esc(data.score) + "</strong>";
+        rate.innerHTML = (data.alreadyRated ? "Upvoted" : "Upvoted") + " <strong>" + esc(data.score) + "</strong>";
         pop(rate);
         const found = all.find(function (item) { return item.id === id; });
         if (found) found.score = data.score;
@@ -147,7 +187,7 @@
       const box = document.createElement("form");
       box.className = "form";
       box.dataset.reportForm = "1";
-      box.innerHTML = '<label>What should moderation look at?<input name="reason" maxlength="220" required></label><button class="button compact" type="submit">Send report</button><p class="form-message"></p>';
+      box.innerHTML = '<label>Category<select name="category"><option value="other">Something else</option><option value="spam">Spam</option><option value="harassment">Harassment</option><option value="patient-info">Patient information</option><option value="threats">Threat</option></select></label><label>What should moderation look at?<input name="reason" maxlength="220" required></label><button class="button compact" type="submit">Send report</button><p class="form-message"></p>';
       card.appendChild(box);
       box.addEventListener("submit", async function (submitEvent) {
         submitEvent.preventDefault();
@@ -156,9 +196,9 @@
           await read(await fetch("/api/report", {
             method: "POST",
             headers: { "content-type": "application/json" },
-            body: JSON.stringify({ id: id, reason: box.reason.value })
+            body: JSON.stringify({ id: id, reason: box.reason.value, category: box.category.value })
           }));
-          message.textContent = "Reported. Thank you.";
+          message.textContent = "Report received. A person will look at it.";
           box.reason.disabled = true;
         } catch (error) {
           message.textContent = error.message;
@@ -171,13 +211,13 @@
       thread.hidden = !open;
       comments.setAttribute("aria-expanded", open ? "true" : "false");
       if (open && !thread.dataset.loaded) {
-        thread.innerHTML = '<p class="meta-row">Loading comments…</p>';
+        thread.innerHTML = '<p class="meta-row">Fetching the comments…</p>';
         try {
           const data = await read(await fetch("/api/comments?confessionId=" + encodeURIComponent(id)));
           const list = (data.comments || []).map(function (comment) {
             return '<div class="comment"><p>' + esc(comment.text) + '</p><span class="meta-row">' + esc(new Date(comment.createdAt).toLocaleDateString("en-AU")) + '</span></div>';
           }).join("") || '<p class="meta-row">No comments yet.</p>';
-          thread.innerHTML = list + (example ? "" : '<form class="form" data-comment-form><label>Comment<textarea minlength="8" maxlength="500" required placeholder="Kind, harmless, and not about a real shift you could be identified from."></textarea></label><div data-turnstile></div><button class="button secondary" type="submit">Submit comment</button><p class="form-message"></p></form>');
+          thread.innerHTML = list + (example ? "" : '<form class="form" data-comment-form><label>Comment<textarea minlength="8" maxlength="500" required placeholder="Kind, harmless, and not about a real shift you could be identified from."></textarea></label><div data-turnstile></div><button class="button secondary" type="submit">Add a note</button><p class="form-message"></p></form>');
           thread.dataset.loaded = "1";
           const widget = thread.querySelector("[data-turnstile]");
           const cfg = await window.OnlyScrubs.config();
@@ -195,9 +235,9 @@
     event.preventDefault();
     const card = commentForm.closest("[data-id]");
     const message = commentForm.querySelector(".form-message");
-    message.textContent = "Submitting…";
+    message.textContent = "Charting…";
     try {
-      await read(await fetch("/api/comments", {
+      const data = await read(await fetch("/api/comments", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -207,7 +247,7 @@
         })
       }));
       commentForm.reset();
-      message.textContent = "Comment submitted for moderation.";
+      showResult(message, data);
     } catch (error) {
       message.textContent = error.message;
     }
@@ -216,9 +256,9 @@
   form?.addEventListener("submit", async function (event) {
     event.preventDefault();
     const message = document.getElementById("confession-message");
-    message.textContent = "Submitting…";
+    message.textContent = "Charting…";
     try {
-      await read(await fetch("/api/confessions", {
+      const data = await read(await fetch("/api/confessions", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -230,7 +270,7 @@
         })
       }));
       form.reset();
-      message.textContent = "Submitted. It will appear after moderation.";
+      showResult(message, data);
     } catch (error) {
       message.textContent = error.message;
     }

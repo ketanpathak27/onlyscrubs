@@ -1,7 +1,9 @@
 import { json, readJson, auth, clientKey, rateLimit, rateLimitState, limited, timingSafeEqual } from "../lib/http.js";
+import { buildDigest, EMAIL_SENDING_REASON, unsubscribeLink } from "../lib/digest.js";
+import { GUIDES } from "../generated/meta.js";
 import { clean } from "../lib/moderation.js";
 import { sessionCookie, signSession } from "../lib/session.js";
-import { archiveOld, findById, listByPrefix, strip } from "../lib/store.js";
+import { archiveOld, findById, listByPrefix, publicShift, read, strip } from "../lib/store.js";
 
 const KIND_PREFIX = {
   confession: "confession:",
@@ -41,6 +43,10 @@ function applyAction(item, kind, action) {
     item.status = "approved";
     item.restoredAt = now;
     return { item };
+  }
+  if (kind === "confession" && action === "pin-shift") {
+    if (item.status !== "approved") return { error: "Only an approved confession can be pinned." };
+    return { pin: { id: item.id, pinnedAt: now } };
   }
   if (kind === "relay" && (action === "read" || action === "approve")) {
     item.status = "read";
@@ -97,6 +103,8 @@ export async function apiAdmin(request, env) {
     let items = await listByPrefix(kv, prefix);
     if (status === "reported") {
       items = items.filter((item) => (Number(item.reportsCount) || 0) > 0);
+    } else if (status === "flagged") {
+      items = items.filter((item) => item.flagged || item.flagReason);
     } else if (status) {
       items = items.filter((item) => item.status === status);
     }
@@ -111,7 +119,13 @@ export async function apiAdmin(request, env) {
     }
     if (body.kind === "newsletter" && body.action === "delete") {
       const email = clean(body.id).toLowerCase();
+      const existing = await read(kv, "newsletter:" + email);
+      if (existing?.token) await kv.delete("unsub:" + existing.token);
       await kv.delete("newsletter:" + email);
+      return json({ ok: true });
+    }
+    if (body.action === "unpin-shift") {
+      await kv.delete("meta:shift-of-week");
       return json({ ok: true });
     }
     const kind = KIND_PREFIX[body.kind] ? body.kind : "confession";
@@ -119,6 +133,10 @@ export async function apiAdmin(request, env) {
     if (!item) return json({ error: "Item not found." }, 404);
     const result = applyAction(item, kind, body.action);
     if (result.error) return json({ error: result.error }, 400);
+    if (result.pin) {
+      await kv.put("meta:shift-of-week", JSON.stringify(result.pin));
+      return json({ ok: true, pinned: result.pin.id });
+    }
     if (result.delete) {
       await kv.delete(item._key);
       return json({ ok: true });
@@ -173,6 +191,7 @@ export async function apiStats(request, env) {
   const approvedToday = [...conf, ...listings].filter((item) => item.status === "approved" && sydneyDay(item.approvedAt) === today).length;
   const pendingConfessions = conf.filter((item) => item.status === "pending").length;
   const pendingListings = listings.filter((item) => item.status === "pending").length;
+  const shift = await publicShift(kv);
   return json({
     totals: {
       approved: conf.filter((item) => item.status === "approved").length,
@@ -186,8 +205,12 @@ export async function apiStats(request, env) {
       newsletter: newsletter.keys.length,
       pendingListings,
       approvedListings: listings.filter((item) => item.status === "approved").length,
-      newMessages: relays.filter((item) => item.status === "new").length
+      newMessages: relays.filter((item) => item.status === "new").length,
+      hidden: [...conf, ...comments, ...listings].filter((item) => item.status === "hidden").length,
+      flaggedItems: [...conf, ...comments, ...listings].filter((item) => item.flagged || item.flagReason).length,
+      shiftPinned: shift ? 1 : 0
     },
+    shiftOfTheWeek: shift,
     flagged: conf
       .filter((item) => (Number(item.reportsCount) || 0) > 0)
       .sort((a, b) => (b.reportsCount || 0) - (a.reportsCount || 0))
@@ -214,30 +237,93 @@ function csvCell(value) {
   return cell;
 }
 
+async function subscriberRows(kv) {
+  const listed = await kv.list({ prefix: "newsletter:" });
+  const rows = [];
+  for (const key of listed.keys) {
+    const raw = await kv.get(key.name);
+    let email = key.name.slice("newsletter:".length);
+    let createdAt = "";
+    let token = "";
+    try {
+      const parsed = JSON.parse(raw) || {};
+      email = parsed.email || email;
+      createdAt = parsed.createdAt || "";
+      token = parsed.token || "";
+      if (!token) {
+        token = crypto.randomUUID();
+        parsed.email = email;
+        parsed.token = token;
+        await kv.put(key.name, JSON.stringify(parsed));
+      }
+      if (token) await kv.put("unsub:" + token, email);
+    } catch {
+      token = "";
+    }
+    rows.push({ email, createdAt, token, unsubscribeUrl: token ? unsubscribeLink(token) : "" });
+  }
+  return rows;
+}
+
+export async function composeDigest(env) {
+  const kv = env.CONFESSIONS_KV;
+  const confessions = await listByPrefix(kv, "confession:", "approved");
+  const shift = await publicShift(kv);
+  const digest = buildDigest({ confessions, guides: GUIDES, shift });
+  const subscribers = await subscriberRows(kv);
+  return {
+    subject: digest.subject,
+    html: digest.html,
+    text: digest.text,
+    subscriberCount: subscribers.length,
+    subscribers,
+    sendingEnabled: false,
+    sendingReason: EMAIL_SENDING_REASON
+  };
+}
+
+export async function apiDigest(request, env) {
+  const gate = await requireAdmin(request, env);
+  if (gate.error) return gate.error;
+  if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
+  const digest = await composeDigest(env);
+  return json({
+    subject: digest.subject,
+    html: digest.html,
+    text: digest.text,
+    subscriberCount: digest.subscriberCount,
+    sendingEnabled: false,
+    sendingReason: digest.sendingReason
+  });
+}
+
+export async function apiDigestHtml(request, env) {
+  const gate = await requireAdmin(request, env);
+  if (gate.error) return gate.error;
+  const digest = await composeDigest(env);
+  return new Response(digest.html, {
+    status: 200,
+    headers: {
+      "content-type": "text/html; charset=utf-8",
+      "content-disposition": "attachment; filename=\"onlyscrubs-digest.html\"",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-robots-tag": "noindex, nofollow"
+    }
+  });
+}
+
 export async function apiNewsletterExport(request, env) {
   const gate = await requireAdmin(request, env);
   if (gate.error) return gate.error;
-  const listed = await gate.kv.list({ prefix: "newsletter:" });
-  const rows = [["email", "createdAt"]];
-  for (const key of listed.keys) {
-    const raw = await gate.kv.get(key.name);
-    let email = key.name.slice("newsletter:".length);
-    let createdAt = "";
-    try {
-      const parsed = JSON.parse(raw);
-      email = parsed.email || email;
-      createdAt = parsed.createdAt || "";
-    } catch {
-      /* keep the key */
-    }
-    rows.push([email, createdAt]);
-  }
+  const people = await subscriberRows(gate.kv);
+  const rows = [["email", "createdAt", "unsubscribeUrl"], ...people.map((person) => [person.email, person.createdAt, person.unsubscribeUrl])];
   const csv = rows.map((row) => row.map(csvCell).join(",")).join("\n") + "\n";
   return new Response(csv, {
     status: 200,
     headers: {
       "content-type": "text/csv; charset=utf-8",
-      "content-disposition": "attachment; filename=\"onlyscrubs-newsletter.csv\"",
+      "content-disposition": "attachment; filename=\"onlyscrubs-subscribers.csv\"",
       "cache-control": "no-store",
       "x-content-type-options": "nosniff",
       "x-robots-tag": "noindex, nofollow"

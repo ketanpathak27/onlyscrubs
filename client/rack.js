@@ -26,12 +26,12 @@
       return (!type || item.type === type) && (!state || item.state === state) && (!condition || item.condition === condition) && (!query || blob.includes(query));
     });
     if (!all.length) {
-      list.innerHTML = '<div class="empty"><h2>The rack is clear.</h2><p>No approved listings yet. If you have clean scrubs to pass on, or you need a size for placement, send a listing. It stays private until it is moderated.</p><a class="button primary" href="#list-form">List scrubs</a></div>';
+      list.innerHTML = '<div class="empty"><h2>The rack is suspiciously bare.</h2><p>No approved listings yet. Clean scrubs can go up after a person checks them. Your email stays off the card.</p><a class="button primary" href="#list-form">List scrubs</a></div>';
       status.textContent = "No listings yet.";
       return;
     }
     if (!items.length) {
-      list.innerHTML = '<div class="empty"><h2>No listings match those filters.</h2><p>Clear a filter or check another state.</p></div>';
+      list.innerHTML = '<div class="empty"><h2>Nothing in that size.</h2><p>Clear a filter, or try another state. The scrubs may be on a break.</p></div>';
       status.textContent = "No matching listings.";
       return;
     }
@@ -99,7 +99,7 @@
   form?.addEventListener("submit", async function (event) {
     event.preventDefault();
     const message = document.getElementById("listing-message");
-    message.textContent = "Submitting…";
+    message.textContent = "Charting…";
     const payload = {
       type: form.type.value,
       title: form.title.value,
@@ -117,9 +117,15 @@
       turnstileToken: window.OnlyScrubs.token(form)
     };
     try {
-      await read(await fetch("/api/listings", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) }));
+      const data = await read(await fetch("/api/listings", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) }));
       form.reset();
-      message.textContent = "Listing submitted. It appears after moderation, without your email.";
+      if (data.support) {
+        message.textContent = data.support.message || "Held for a moderator.";
+      } else {
+        message.textContent = data.held
+          ? "Held for a human to read. Your email stays private either way."
+          : "Charted. It appears after a person checks it, without your email.";
+      }
     } catch (error) {
       message.textContent = error.message;
     }

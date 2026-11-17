@@ -1,3 +1,4 @@
+import shopData from "../data/shop.json" with { type: "json" };
 import { TAGS } from "../src/lib/moderation.js";
 import { adSlot, heroArt, layout, newsletterForm } from "./layout.mjs";
 import { esc } from "./markdown.mjs";
@@ -14,6 +15,10 @@ const states = ["ACT", "NSW", "NT", "QLD", "SA", "TAS", "VIC", "WA"]
 
 function tags(field = "tag") {
   return TAGS.map((tag) => `<label><input type="checkbox" name="${field}" value="${tag}"> ${esc(tag)}</label>`).join("");
+}
+
+function toolkitCallout() {
+  return `<aside class="callout shop-callout"><p><strong>From the OnlyScrubs creator.</strong> Fillable templates and study notes for students and new grads are on the <a href="/shop.html">shop</a>. They are independent templates, not clinical advice, and not an NMBA or Ahpra product.</p></aside>`;
 }
 
 function guideCards(guides) {
@@ -33,6 +38,7 @@ export function home(assets, guides) {
     path: "/",
     active: "/",
     assets,
+    tearoom: true,
     newsletter: "band",
     jsonLd: [{
       "@context": "https://schema.org",
@@ -45,39 +51,40 @@ export function home(assets, guides) {
     main: `<section class="wrap hero">
       <div class="hero-copy">
         <p class="eyebrow">Nurses, midwives, students</p>
-        <h1>Useful stuff for people in scrubs.</h1>
-        <p class="lede">Mildly unhinged, professionally safe. Guides, gear notes, scrub swaps and harmless confessions. No patients. No workplaces named.</p>
+        <h1>The tearoom, minus the patient stories.</h1>
+        <p class="lede">Guides, scrub swaps and harmless confessions for people who live in scrubs. We will joke about rosters, paperwork and cold coffee. We will not joke about patients.</p>
         <div class="hero-actions">
-          <a class="button primary" href="/guides.html">Read the guides</a>
-          <a class="button secondary" href="/confessions.html">Open confessions</a>
+          <a class="button primary" href="/guides.html">Open the guides</a>
+          <a class="button secondary" href="/confessions.html">Enter the tearoom</a>
         </div>
       </div>
       ${heroArt()}
     </section>
-    <div class="wrap"><p class="banner"><strong>Clean boundary.</strong> OnlyScrubs is not a clinic, not medical advice, and not a place for patient stories. It is a resource and mutual-support project for healthcare workers and students.</p></div>
+    <div class="wrap"><p class="banner"><strong>Clean boundary.</strong> Pens, rosters, full moons and the Q word are fair game. Patient stories, workplaces and clinical claims are not. OnlyScrubs is not a clinic and not medical advice.</p></div>
     <section class="section wrap reveal">
       <p class="kicker">Start here</p>
-      <h2>Pick a bay.</h2>
+      <h2>Pick a bay before the roster does.</h2>
       <div class="grid cards">
-        <a class="card link-card" href="/guides.html"><span class="icon-blob">01</span><h3>Guides</h3><p>Placement, nights, handover, study, money, and asking for help.</p></a>
-        <a class="card link-card" href="/scrub-rack.html"><span class="icon-blob">02</span><h3>Scrub Rack</h3><p>Donate, request or swap clean scrubs. Emails stay private.</p></a>
-        <a class="card link-card" href="/shift-kit.html"><span class="icon-blob">03</span><h3>Shift Kit</h3><p>A rest and caffeine planner for rotating shifts.</p></a>
-        <a class="card link-card" href="/student-bay.html"><span class="icon-blob">04</span><h3>Student Bay</h3><p>A placement checklist you can save and print.</p></a>
-        <a class="card link-card" href="/gear-guide.html"><span class="icon-blob">05</span><h3>Gear</h3><p>Honest notes on shoes, socks, watches, bags and pens.</p></a>
-        <a class="card link-card" href="/wellbeing.html"><span class="icon-blob">06</span><h3>Wellbeing</h3><p>Australian support lines, and a short breathing pause.</p></a>
+        <a class="card link-card" href="/guides.html"><span class="icon-blob">01</span><h3>Guides</h3><p>Registration, placement, nights, handover, pay and how to ask for help. Factual. Still not clinical advice.</p></a>
+        <a class="card link-card" href="/scrub-rack.html"><span class="icon-blob">02</span><h3>Scrub Rack</h3><p>Donate, request or swap clean scrubs. Your email stays off the card, like a pen you actually want back.</p></a>
+        <a class="card link-card" href="/shift-kit.html"><span class="icon-blob">03</span><h3>Shift Kit</h3><p>A rest and caffeine sketch for rosters that think sleep is optional.</p></a>
+        <a class="card link-card" href="/student-bay.html"><span class="icon-blob">04</span><h3>Student Bay</h3><p>A placement checklist that lives in this browser, not in the group chat.</p></a>
+        <a class="card link-card" href="/gear-guide.html"><span class="icon-blob">05</span><h3>Gear</h3><p>Shoes, socks, watches, bags and the eternal pen shortage. No fake reviews.</p></a>
+        <a class="card link-card" href="/shop.html"><span class="icon-blob">06</span><h3>Shop</h3><p>Templates from the person who runs this site. Checkout is on Gumroad.</p></a>
+        <a class="card link-card" href="/wellbeing.html"><span class="icon-blob">07</span><h3>Wellbeing</h3><p>Australian support lines, and a short breathing pause. This one stays serious.</p></a>
       </div>
     </section>
     <section class="section wrap reveal">
       <p class="kicker">From the guides</p>
-      <h2>Practical, and deliberately not clinical.</h2>
+      <h2>Practical. Deliberately not clinical. Mildly caffeinated.</h2>
       <div class="grid cards">${guideCards(featured)}</div>
     </section>
     <section class="section wrap reveal">
       <div class="split">
         <div>
           <p class="kicker">Cheeky, with rails</p>
-          <h2>Confessions are welcome. Identifiers are not.</h2>
-          <p>Harmless shift-life humour is fine. Patient information, clinical incidents, colleague call-outs, employer names and treatment claims are not.</p>
+          <h2>Confess the pen crime. Not the patient.</h2>
+          <p>Rosters, paperwork, cold coffee and 3am pages are fair game. Patient information, clinical incidents, colleague call-outs, employer names and treatment claims are not.</p>
           <a class="button primary" href="/submission-rules.html">Read the rules</a>
         </div>
         <div class="stack">
@@ -90,8 +97,8 @@ export function home(assets, guides) {
       <div class="newsletter-band">
         <div>
           <p class="kicker">Newsletter</p>
-          <h2>Occasional notes. No mailing-list theatre.</h2>
-          <p>Guides and site news only. Stored so we can email you. Deleted if you ask.</p>
+          <h2>Occasional notes. We will not page you at 3am.</h2>
+          <p>Guides and site news only. Stored so we can email you. Unsubscribe any time, or ask and we delete the address.</p>
         </div>
         ${newsletterForm()}
       </div>
@@ -107,7 +114,8 @@ export function guideIndex(assets, guides) {
     path: "/guides.html",
     active: "/guides.html",
     assets,
-    main: `<section class="wrap page-hero"><p class="eyebrow">Read this, not a patient record</p><h1>Guides</h1><p class="lede">General, practical notes for study, placement and shift life. Not clinical advice. Each guide says so again, on purpose.</p></section>
+    tearoom: true,
+    main: `<section class="wrap page-hero"><p class="eyebrow">Read this, not a patient record</p><h1>Guides</h1><p class="lede">Practical notes for study, placement, registration and the parts of the job that are mostly paperwork. Not clinical advice. Each guide says so again, on purpose.</p>${toolkitCallout()}</section>
       <section class="wrap section">
         <div class="filters" data-guide-filters role="group" aria-label="Filter guides">
           <button class="tag-pill" type="button" data-tag="" aria-pressed="true">All</button>
@@ -126,6 +134,7 @@ export function guideArticle(assets, guide, related) {
     path: guide.path,
     active: "/guides.html",
     assets,
+    tearoom: true,
     jsonLd: [{
       "@context": "https://schema.org",
       "@type": "Article",
@@ -146,6 +155,7 @@ export function guideArticle(assets, guide, related) {
       <p class="reading">${guide.minutes} min read · Updated ${esc(guide.updated || guide.date)}</p>
       <div class="button-row no-print"><button class="button secondary compact" type="button" data-share data-share-title="${esc(guide.title)}">Share</button></div>
       <blockquote class="callout"><p><strong>Not clinical advice.</strong> General information for healthcare workers and students in Australia. It does not replace your university, employer, facilitator, or professional standards.</p></blockquote>
+      ${guide.toolkit === "yes" ? toolkitCallout() : ""}
       ${adSlot("guide-top")}
       ${guide.html}
       ${adSlot("guide-end")}
@@ -162,8 +172,9 @@ export function scrubRack(assets) {
     path: "/scrub-rack.html",
     active: "/scrub-rack.html",
     assets,
+    tearoom: true,
     scripts: [assets.rack],
-    main: `<section class="wrap page-hero"><p class="eyebrow">Donate, request, swap</p><h1>Scrub Rack</h1><p class="lede">A low-drama place for clean scrub gear. Listings are checked before they appear. Your email is never shown on the card.</p></section>
+    main: `<section class="wrap page-hero"><p class="eyebrow">Donate, request, swap</p><h1>Scrub Rack</h1><p class="lede">Clean scrubs, looking for a second life. Listings are checked before they appear. Your email never makes it onto the card.</p></section>
     <section class="wrap section page-split">
       <div>
         <div class="filters" aria-label="Filter listings">
@@ -181,7 +192,7 @@ export function scrubRack(assets) {
         <form class="form" id="listing-form">
           <label>I want to<select name="type" required><option value="donate">Donate</option><option value="request">Request</option><option value="swap">Swap</option></select></label>
           <label>Title<input name="title" required minlength="4" maxlength="80" placeholder="Navy scrub top, size 12"></label>
-          <label>Description<textarea name="description" required minlength="20" maxlength="800" placeholder="Clean, no stains, pickup from a suburb station this month."></textarea></label>
+          <label>Description<textarea name="description" required minlength="20" maxlength="800" placeholder="Clean, survived placement, pickup from a station. No workplace names."></textarea></label>
           <label>Size<input name="size" required maxlength="32" placeholder="12 or M"></label>
           <label>Brand, if you know it<input name="brand" maxlength="40"></label>
           <label>Colour<input name="colour" required maxlength="32" placeholder="Navy"></label>
@@ -193,7 +204,7 @@ export function scrubRack(assets) {
           <label class="check"><input name="confirm" type="checkbox" required><span>I confirm this does not name a workplace, patient, or clinical matter.</span></label>
           <input class="honeypot" name="website" tabindex="-1" autocomplete="off">
           <div data-turnstile></div>
-          <button class="button primary" type="submit">Submit for moderation</button>
+          <button class="button primary" type="submit">List it for review</button>
           <p class="form-message" id="listing-message" role="status"></p>
         </form>
       </div>
@@ -208,8 +219,9 @@ export function shiftKit(assets) {
     path: "/shift-kit.html",
     active: "/shift-kit.html",
     assets,
+    tearoom: true,
     scripts: [assets.planner],
-    main: `<section class="wrap page-hero"><p class="eyebrow">Shift tools</p><h1>Shift Kit</h1><p class="lede">Plan rest around a roster. Nothing on this page is uploaded. It is a sketch, not a medical plan.</p></section>
+    main: `<section class="wrap page-hero"><p class="eyebrow">Shift tools</p><h1>Shift Kit</h1><p class="lede">Sketch sleep around a roster that has never met a circadian rhythm. Nothing here is uploaded. It is a sketch, not a medical plan. If you are drowsy, do not drive.</p></section>
     <section class="wrap section page-split">
       <form class="panel form" data-planner>
         <h2>Rest and caffeine sketch</h2>
@@ -245,8 +257,9 @@ export function studentBay(assets) {
     path: "/student-bay.html",
     active: "/student-bay.html",
     assets,
+    tearoom: true,
     scripts: [assets.checklist],
-    main: `<section class="wrap page-hero"><p class="eyebrow">Placement prep</p><h1>Student Bay</h1><p class="lede">Pack the boring things before the shift starts inventing extra problems. Ticks stay in this browser.</p></section>
+    main: `<section class="wrap page-hero"><p class="eyebrow">Placement prep</p><h1>Student Bay</h1><p class="lede">Pack the boring things before the shift invents new paperwork. Ticks stay in this browser. They do not join the roster.</p></section>
     <section class="wrap section">
       <form id="placement-checklist">
         <p class="progress" id="check-progress" aria-live="polite">0 packed</p>
@@ -313,8 +326,9 @@ export function gearGuide(assets, gear) {
     path: "/gear-guide.html",
     active: "/gear-guide.html",
     assets,
+    tearoom: true,
     scripts: [assets.gear],
-    main: `<section class="wrap page-hero"><p class="eyebrow">Comfort is not a personality flaw</p><h1>Gear guide</h1><p class="lede">What to look for before you spend money. No star ratings, no made-up prices, no pretend reviews.</p>
+    main: `<section class="wrap page-hero"><p class="eyebrow">Comfort is not a personality flaw</p><h1>Gear guide</h1><p class="lede">What to look for before your pay cycle files a complaint. No star ratings, no made-up prices, no pretend reviews.</p>
       <p class="disclosure">If a link is ever marked as a partner link, OnlyScrubs may earn a commission at no extra cost to you. There are no partner links on this page today. Ordinary links are not ads.</p></section>
     <section class="wrap section">
       ${adSlot("gear-top")}
@@ -341,28 +355,34 @@ export function confessions(assets) {
     path: "/confessions.html",
     active: "/confessions.html",
     assets,
+    tearoom: true,
     scripts: [assets.confessions],
-    main: `<section class="wrap page-hero"><p class="eyebrow">Harmless shift-life chaos</p><h1>Confessions</h1><p class="lede">Post the funny bit. Rate it, mark Same, or send a hug. Comments wait for moderation.</p></section>
+    main: `<section class="wrap page-hero"><p class="eyebrow">Harmless shift-life chaos</p><h1>Confessions</h1><p class="lede">The funny bit only: pens, rosters, cold coffee, the Q word. Upvote it, mark Same, or send a hug. A person reads it before it appears.</p></section>
     <section class="wrap section page-split">
       <div>
         <div class="filters">
-          <label>Search<input id="feed-search" type="search" placeholder="Pens, nights, placement"></label>
+          <label>Search<input id="feed-search" type="search" placeholder="Pens, nights, cold coffee"></label>
           <label>Sort<select id="feed-sort"><option value="new">Newest</option><option value="top">Top</option></select></label>
         </div>
         <div class="tag-row" id="feed-tags">${pills}</div>
         <p id="feed-status" class="visually-hidden" aria-live="polite">Loading confessions</p>
+        <div id="shift-of-week"></div>
+        <section id="top-week" hidden>
+          <h2>Top this week</h2>
+          <div data-top-week class="stack"></div>
+        </section>
         <div id="confession-feed" class="stack"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
       </div>
       <div class="panel">
-        <h2>Submit a confession</h2>
-        <p>It stays pending until a person approves it. Read the <a href="/submission-rules.html">rules</a> first.</p>
+        <h2>Chart a confession</h2>
+        <p>It stays in the queue until a person approves it. Read the <a href="/submission-rules.html">rules</a> first. No patients, no workplaces, no names.</p>
         <form class="form" id="confession-form">
-          <label for="confession-text">Your confession<textarea id="confession-text" maxlength="700" minlength="20" required placeholder="Example: I came home with three pens, none of them mine, and one of them was somehow a highlighter."></textarea></label>
+          <label for="confession-text">Your confession<textarea id="confession-text" maxlength="700" minlength="20" required placeholder="Example: I came home with three pens, none of them mine, and the coffee was already cold."></textarea></label>
           <fieldset class="tag-picker"><legend>Tags, if they fit</legend>${tags()}</fieldset>
           <label class="check"><input type="checkbox" id="confession-confirm" required><span>I confirm this does not identify a patient, colleague, hospital, employer, date, incident or clinical detail.</span></label>
           <input class="honeypot" name="website" tabindex="-1" autocomplete="off">
           <div data-turnstile></div>
-          <button class="button primary" type="submit">Submit for moderation</button>
+          <button class="button primary" type="submit">Chart it for review</button>
           <p class="form-message" id="confession-message" role="status"></p>
         </form>
       </div>
@@ -377,7 +397,8 @@ export function submitPage(assets) {
     path: "/submit.html",
     active: "/submit.html",
     assets,
-    main: `<section class="wrap page-hero"><p class="eyebrow">Send it in</p><h1>Submit</h1><p class="lede">Scrub listing, resource idea, or a confession that could survive a regulator with Wi-Fi.</p></section>
+    tearoom: true,
+    main: `<section class="wrap page-hero"><p class="eyebrow">Send it in</p><h1>Submit</h1><p class="lede">A scrub listing, a guide idea, or a confession that could survive a full moon and a regulator with Wi-Fi.</p></section>
     <section class="wrap section"><div class="grid cards">
       <a class="card link-card" href="/scrub-rack.html#list-form"><h3>Scrub Rack</h3><p>Donate, request or swap. Your email stays off the public card.</p></a>
       <a class="card link-card" href="/confessions.html"><h3>Confession</h3><p>Write it on the site. It waits for moderation.</p></a>
@@ -428,7 +449,7 @@ export function rules(assets) {
     active: "",
     assets,
     main: `<section class="wrap page-hero prose"><p class="eyebrow">Keep it kind, keep it safe</p><h1>Submission rules</h1>
-      <p>Submissions may be edited, rejected, archived or deleted. A keyword filter catches obvious risks. A person still reads the queue.</p>
+      <p>Submissions may be edited, held, rejected, archived or deleted. Nothing is public until a person approves it. A filter can hold a post for that review and record why. It does not publish the post. Read <a href="/moderation.html">how we moderate</a>.</p>
       <h2>Allowed</h2>
       <ul>
         <li>Harmless jokes about shift life, pens, socks, coffee, laundry and placement nerves.</li>
@@ -444,7 +465,8 @@ export function rules(assets) {
         <li>Bullying, harassment, discrimination, sexual content, hate, or workplace call-outs.</li>
         <li>Testimonials or claims about regulated health services.</li>
       </ul>
-      <p>Ratings, Same and Hug reactions are for approved posts only. One of each per person. Reports go to the moderation queue.</p>
+      <p>Upvotes, Same and Hug reactions are for approved posts only. One of each per person. Reports go to the moderation queue. The same person cannot report the same post twice, and there is a daily limit. A post leaves the public feed after three different reports, or straight away when the report is about patient information or a threat. A person still reviews it.</p>
+      <p>If a post looks like you are in crisis, we will show Australian support lines and hold the post. We are not a crisis service. Call 000 if you are in immediate danger.</p>
     </section>`
   });
 }
@@ -463,9 +485,11 @@ export function privacy(assets) {
       <h2>Scrub Rack and messages</h2>
       <p>A listing stores the public details you typed, plus the email and optional name in fields that are not shown on the public card. A relay message stores the sender's name, email and message so a moderator can pass it on. We do not run a paid email service. Passing a message on is a manual step.</p>
       <h2>Newsletter</h2>
-      <p>If you join the list, we store the email address and the date. We use it to send occasional OnlyScrubs notes. We do not give it to advertisers. Ask us and we will delete it. You can also remove it from the admin tools if you operate the site.</p>
-      <h2>Rate limits and reactions</h2>
-      <p>To slow spam and to stop repeat votes, we store a shortened hash of the connection address, not the address itself, next to a counter or a vote marker. We do not build a profile from it.</p>
+      <p>If you join the list, we store the email address, the date, and a random unsubscribe token so each note can carry your own unsubscribe link. We use it to send occasional OnlyScrubs notes. We do not give it to advertisers. Ask us and we will delete it, or use the unsubscribe link in a note. The site can prepare a digest for a person to send. It does not send that mail itself.</p>
+      <h2>Shop</h2>
+      <p>The shop lists digital templates from the OnlyScrubs creator. Choosing Buy on Gumroad takes you to Gumroad, which handles the checkout, the download and the payment. We do not receive your card number. Purchases are handled by Gumroad under <a href="https://gumroad.com/privacy" rel="noopener noreferrer">their privacy policy</a>.</p>
+      <h2>Rate limits, reactions and reports</h2>
+      <p>To slow spam, to stop repeat votes, and to ignore a second report from the same person, we store a shortened hash of the connection address, not the address itself, next to a counter, a vote marker or a report marker. We do not build a profile from it. If a filter holds a post, we store a short reason so a moderator can see why.</p>
       <h2>Spam check and analytics</h2>
       <p>If Turnstile keys are configured, forms ask Cloudflare Turnstile to check the submission. The site works without those keys. If Cloudflare Web Analytics is turned on for the domain, Cloudflare may collect aggregated visit metrics. We do not add a separate advertising tracker. Reserved ad slots on guides and the gear guide stay empty unless ads are explicitly switched on, and they never appear in the confessions feed.</p>
       <h2>Where it sits</h2>
@@ -483,6 +507,7 @@ export function disclaimer(assets) {
     assets,
     main: `<section class="wrap page-hero prose"><p class="eyebrow">Important boundary</p><h1>Disclaimer</h1>
       <p>OnlyScrubs provides general information, practical resources, humour and community support for healthcare workers and students. It does not provide medical advice, mental health treatment, diagnosis, clinical services, legal advice, employment advice, financial advice, or professional supervision.</p>
+      <p class="affiliation">OnlyScrubs is not affiliated with AHPRA, the Nursing and Midwifery Board of Australia (NMBA), any union, health service or employer.</p>
       <h2>Medical and emergency help</h2>
       <p>If you need medical advice, contact a qualified health practitioner. If you are in immediate danger or need urgent help in Australia, call 000. Support lines are listed on the <a href="/wellbeing.html">wellbeing page</a>.</p>
       <h2>Professional obligations</h2>
@@ -525,11 +550,12 @@ export function admin(assets) {
       <form class="form" id="admin-tools">
         <div class="admin-bar">
           <label>Queue<select id="admin-kind"><option value="confession">Confessions</option><option value="comment">Comments</option><option value="listing">Scrub Rack</option><option value="relay">Messages</option></select></label>
-          <label>Status<select id="admin-status"><option value="pending">Pending</option><option value="new">New messages</option><option value="approved">Approved</option><option value="reported">Reported</option><option value="rejected">Rejected</option><option value="archived">Archived</option><option value="read">Read messages</option></select></label>
+          <label>Status<select id="admin-status"><option value="pending">Pending</option><option value="flagged">Flagged</option><option value="hidden">Hidden</option><option value="new">New messages</option><option value="approved">Approved</option><option value="reported">Reported</option><option value="rejected">Rejected</option><option value="archived">Archived</option><option value="read">Read messages</option></select></label>
           <button class="button primary" type="submit">Load</button>
           <button class="button secondary" id="show-reported" type="button">Reported</button>
+          <button class="button secondary" id="show-flagged" type="button">Flagged</button>
           <button class="button secondary" id="archive-old" type="button">Archive posts over 1 year</button>
-          <button class="button secondary" id="export-newsletter" type="button">Export newsletter CSV</button>
+          <button class="button secondary" id="unpin-shift" type="button">Unpin shift of the week</button>
           <button class="button" id="admin-logout" type="button">Log out</button>
         </div>
         <div class="admin-bar">
@@ -538,8 +564,198 @@ export function admin(assets) {
         </div>
         <p class="form-message" id="admin-message" role="status"></p>
       </form>
+      <section class="panel digest-panel" id="digest-panel">
+        <h2>Weekly digest</h2>
+        <p>Preview or export a note of this week's confessions, the newest guides, and the pinned shift. Each subscriber's unsubscribe link is in the CSV. Sending from this site is off.</p>
+        <p id="digest-sending" class="disclosure"></p>
+        <div class="button-row">
+          <button class="button secondary" id="preview-digest" type="button">Preview digest</button>
+          <button class="button secondary" id="export-digest" type="button">Export digest HTML</button>
+          <button class="button secondary" id="export-newsletter" type="button">Export subscriber CSV</button>
+        </div>
+        <div id="digest-preview" hidden>
+          <h3 id="digest-subject"></h3>
+          <pre id="digest-text" class="digest-text"></pre>
+        </div>
+      </section>
       <div class="metrics" id="admin-stats"></div>
       <div class="stack" id="admin-feed"></div>
+    </section>`
+  });
+}
+
+const AFFILIATION = "OnlyScrubs is not affiliated with AHPRA, the Nursing and Midwifery Board of Australia (NMBA), any union, health service or employer.";
+
+export function about(assets) {
+  return page({
+    title: "About",
+    description: "OnlyScrubs is an independent Australian project for nurses, midwives, students and healthcare workers. It is not a regulator, a union, a health service or an employer.",
+    path: "/about.html",
+    active: "/about.html",
+    assets,
+    jsonLd: [{
+      "@context": "https://schema.org",
+      "@type": "AboutPage",
+      name: "About OnlyScrubs",
+      url: `${SITE}/about.html`,
+      description: "Who runs OnlyScrubs, why it exists, and what it is not.",
+      inLanguage: "en-AU",
+      mainEntity: {
+        "@type": "Organization",
+        name: "OnlyScrubs",
+        url: `${SITE}/`,
+        email: "hello@onlyscrubs.org",
+        areaServed: "AU",
+        description: AFFILIATION
+      }
+    }],
+    main: `<section class="wrap page-hero prose"><p class="eyebrow">Who we are</p><h1>About OnlyScrubs</h1>
+      <p class="affiliation">${AFFILIATION}</p>
+      <h2>Who runs it</h2>
+      <p>OnlyScrubs is an independent Australian project. It is not a company holding itself out as a health service, and it is not run by a hospital, a university, a union or a regulator. One person keeps the site, reads the queue, and can be reached at <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a>.</p>
+      <h2>Why it exists</h2>
+      <p>Official information for nurses, midwives and students is scattered across boards, awards, state health pages and university handbooks. Shift life is also lonely, and the group chats that fill the gap are a poor place for anything that could identify a patient or a workplace. This site is a small, free, anonymous corner for practical notes, scrub swaps, shift tools and harmless humour, with a person between a post and the public page.</p>
+      <h2>What it is</h2>
+      <ul>
+        <li><a href="/guides.html">Guides</a> of general information, with sources, for students and new clinicians.</li>
+        <li>A moderated <a href="/scrub-rack.html">Scrub Rack</a> for clean gear. Emails stay off the public card.</li>
+        <li>Shift tools and a wellbeing page that points to real Australian services.</li>
+        <li>A moderated confessions feed for harmless shift-life humour.</li>
+        <li>A <a href="/shop.html">shop</a> of the creator's own digital templates. Checkout happens on Gumroad.</li>
+      </ul>
+      <h2>What it is not</h2>
+      <ul>
+        <li>Not clinical advice, not supervision, and not emergency care. If you are in immediate danger, call 000. Support lines are on the <a href="/wellbeing.html">wellbeing page</a>.</li>
+        <li>Not AHPRA, not the NMBA, not a union, not a health service and not your employer. Nothing here changes your registration, your award or a workplace decision.</li>
+        <li>Not a place for patient stories, testimonials, or claims about a regulated health service.</li>
+        <li>Not a complaints body. Workplace concerns and notifications have their own paths. <a href="/moderation.html">How we moderate</a> explains appeals about content on this site.</li>
+      </ul>
+      <p>The <a href="/disclaimer.html">disclaimer</a>, <a href="/terms.html">terms</a>, <a href="/privacy.html">privacy page</a> and <a href="/submission-rules.html">submission rules</a> are the boundaries. If something on the site is wrong, email hello@onlyscrubs.org.</p>
+    </section>`
+  });
+}
+
+export function moderation(assets) {
+  return page({
+    title: "How we moderate",
+    description: "OnlyScrubs pre-moderates posts. This page explains what is held or removed, how reports work, and how to appeal.",
+    path: "/moderation.html",
+    active: "",
+    assets,
+    jsonLd: [{
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "How OnlyScrubs moderates",
+      url: `${SITE}/moderation.html`,
+      description: "Pre-moderation, removals, reports and appeals for OnlyScrubs.",
+      inLanguage: "en-AU",
+      isPartOf: { "@type": "WebSite", name: "OnlyScrubs", url: `${SITE}/` }
+    }],
+    main: `<section class="wrap page-hero prose"><p class="eyebrow">A person reads the queue</p><h1>How we moderate</h1>
+      <p class="affiliation">${AFFILIATION} We do not make registration, employment or clinical decisions.</p>
+      <h2>Pre-moderation</h2>
+      <p>Confessions, comments and Scrub Rack listings stay pending until a person approves them. They are not public while they wait. Approved confessions older than a year move to an archive.</p>
+      <h2>What the filter holds</h2>
+      <p>A filter can hold a confession, comment or listing for review instead of refusing it outright. It looks for profanity or slurs, likely identifiers, and self-harm language. Identifiers include hospital and health service names, ward or unit names with a number, bed numbers, MRN or URN-style numbers, dates of birth, phone numbers, email addresses, and names, including “Dr” or “Nurse” followed by a name. The moderator sees the reason. The public page does not.</p>
+      <p>If the words look like you might be in crisis, the reply shows Australian support lines, including 000, Lifeline, Nurse &amp; Midwife Support, Beyond Blue and 13YARN. The post is still held. We are not a crisis service. The <a href="/wellbeing.html">wellbeing page</a> lists the same numbers.</p>
+      <h2>What gets removed</h2>
+      <ul>
+        <li>Patient information, even if you think it is de-identified.</li>
+        <li>Clinical detail, diagnoses, treatment, incidents, or workplace call-outs.</li>
+        <li>Names of hospitals, wards, employers, colleagues or patients.</li>
+        <li>Phone numbers, email addresses and links in public text.</li>
+        <li>Harassment, threats, hate, sexual content, and slurs.</li>
+        <li>Testimonials or advertising claims about a regulated health service.</li>
+        <li>Spam, and posts that are only there to sell something.</li>
+      </ul>
+      <p>Removed or rejected posts do not stay on the public pages. We may delete them. We do not promise to store a copy for you.</p>
+      <h2>Reports</h2>
+      <p>Anyone can report a public confession or listing. Tell us the category, especially if it is patient information or a threat. We aim to look at reports within 7 days.</p>
+      <p>A second report of the same post from the same connection is ignored. There is a daily limit so a pile-on cannot flood the queue. A post is hidden from the public feed after 3 different people report it. Patient information and threats are hidden straight away. Hiding is not the final decision. A person still approves, rejects or deletes it.</p>
+      <h2>How to appeal</h2>
+      <p>If your post was rejected, hidden or edited and you think that was wrong, email <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> with the rough time of the post and a short reason. Do not include patient information, a clinical story, or a workplace name in the appeal. A person reads appeals. We aim to reply within 7 days. The reply is an email. It is not a review by AHPRA, a union or an employer.</p>
+      <p>This is not the place to complain about a health service. For a notification about a registered practitioner, start with <a href="https://www.ahpra.gov.au/Notifications/mandatorynotifications.aspx" rel="noopener noreferrer">Ahpra's mandatory notifications guidance</a>. For an immediate safety emergency, call 000.</p>
+    </section>`
+  });
+}
+
+export function shop(assets) {
+  const products = shopData.products;
+  const cards = products.map((product) => `<article class="card shop-card">
+      <picture>
+        <source type="image/webp" srcset="/shop/${product.id}-thumb.webp 480w, /shop/${product.id}-cover.webp 960w" sizes="(min-width: 800px) 480px, 100vw">
+        <source type="image/png" srcset="/shop/${product.id}-thumb.png 480w, /shop/${product.id}-cover.png 960w" sizes="(min-width: 800px) 480px, 100vw">
+        <img src="/shop/${product.id}-cover.png" alt="${esc(product.alt)}" width="${product.width}" height="${product.height}">
+      </picture>
+      <h2>${esc(product.name)}</h2>
+      <p class="price">${esc(product.priceLabel)}</p>
+      <p>${esc(product.description)}</p>
+      <a class="button primary" href="${esc(product.url)}" target="_blank" rel="noopener noreferrer">Buy on Gumroad</a>
+    </article>`).join("");
+  return page({
+    title: "Shop",
+    description: "Digital templates from the OnlyScrubs creator: a nursing student toolkit, a renter's bond kit, a household budget planner and a sole trader starter kit. Checkout is on Gumroad.",
+    path: "/shop.html",
+    active: "/shop.html",
+    assets,
+    tearoom: true,
+    jsonLd: products.map((product) => ({
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: product.name,
+      description: product.description,
+      image: `${SITE}/shop/${product.id}-cover.webp`,
+      brand: { "@type": "Brand", "name": "OnlyScrubs" },
+      offers: {
+        "@type": "Offer",
+        priceCurrency: "AUD",
+        price: product.price,
+        url: product.url,
+        availability: "https://schema.org/InStock"
+      }
+    })),
+    main: `<section class="wrap page-hero"><p class="eyebrow">From the OnlyScrubs creator</p><h1>Shop</h1><p class="lede">Templates from the person who runs this site, for the paperwork the job keeps inventing. Not third-party ads. Checkout and delivery happen on Gumroad.</p>
+      <p>Digital downloads delivered via Gumroad. Your rights under the Australian Consumer Law apply.</p></section>
+      <section class="wrap section"><div class="grid shop-grid">${cards}</div>
+      <p class="affiliation shop-note">Independent templates. Not affiliated with or endorsed by any government agency, NMBA or Ahpra. General information only, not legal, financial, tax or clinical advice.</p></section>`
+  });
+}
+
+export function terms(assets) {
+  return page({
+    title: "Terms",
+    description: "Terms for using OnlyScrubs, including the shop. Checkout for digital templates is handled by Gumroad.",
+    path: "/terms.html",
+    active: "",
+    assets,
+    main: `<section class="wrap page-hero prose"><p class="eyebrow">The short version</p><h1>Terms</h1>
+      <p>OnlyScrubs is a free community and resource site. Using it means you will not post patient information, identifiers, or anything the <a href="/submission-rules.html">submission rules</a> disallow. The <a href="/disclaimer.html">disclaimer</a> explains what the site is not. The <a href="/privacy.html">privacy page</a> explains what is stored.</p>
+      <p class="affiliation">${AFFILIATION}</p>
+      <h2>Shop and third-party checkout</h2>
+      <p>Digital templates on the <a href="/shop.html">shop</a> are the creator's own products. When you choose Buy on Gumroad, you leave OnlyScrubs. The checkout is a third-party checkout on Gumroad. OnlyScrubs does not process the payment, store your card, or deliver the file. Digital downloads are delivered via Gumroad. Your rights under the Australian Consumer Law apply.</p>
+      <p>Product pages on this site show a plain price. They are general information and templates. They are not legal, financial, tax or clinical advice, and they are not endorsed by a government agency, the NMBA or Ahpra.</p>
+      <h2>Contact</h2>
+      <p>Questions about the site or a purchase notice can go to <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a>. Appeals about moderation are described on <a href="/moderation.html">how we moderate</a>.</p>
+    </section>`
+  });
+}
+
+export function unsubscribe(assets) {
+  return page({
+    title: "Unsubscribe",
+    description: "Stop OnlyScrubs notes.",
+    path: "/unsubscribe.html",
+    active: "",
+    assets,
+    robots: "noindex, nofollow",
+    newsletter: "none",
+    main: `<section class="wrap page-hero"><p class="eyebrow">Notes</p><h1>Unsubscribe</h1>
+      <p class="lede">This stops occasional OnlyScrubs notes. It does not delete a confession or a listing, because those are not tied to your email.</p>
+      <form class="form panel" data-unsubscribe>
+        <label>Unsubscribe token<input name="token" required autocomplete="off"></label>
+        <button class="button primary" type="submit">Unsubscribe</button>
+        <p class="form-message" data-form-message role="status"></p>
+      </form>
     </section>`
   });
 }
@@ -551,8 +767,9 @@ export function notFound(assets) {
     path: "/404.html",
     active: "",
     assets,
+    tearoom: true,
     newsletter: "none",
-    main: `<section class="wrap page-hero"><p class="eyebrow">404</p><h1>That page has left the building.</h1><p class="lede">Try the guides, the rack, or the confessions feed.</p><div class="hero-actions"><a class="button primary" href="/">Home</a><a class="button secondary" href="/guides.html">Guides</a></div></section>`
+    main: `<section class="wrap page-hero"><p class="eyebrow">404</p><h1>This page has been discharged against medical advice.</h1><p class="lede">It left before the paperwork was finished. Try home, the guides, or the tearoom.</p><div class="hero-actions"><a class="button primary" href="/">Back to the tearoom door</a><a class="button secondary" href="/guides.html">Open the guides</a></div></section>`
   });
 }
 
@@ -563,8 +780,9 @@ export function offline(assets) {
     path: "/offline.html",
     active: "",
     assets,
+    tearoom: true,
     newsletter: "none",
     robots: "noindex",
-    main: `<section class="wrap page-hero"><p class="eyebrow">Offline</p><h1>You are not on the network.</h1><p class="lede">Guides you opened recently may still be on this device. Confessions and the Scrub Rack need a connection.</p><div class="hero-actions"><a class="button primary" href="/">Try home</a><a class="button secondary" href="/guides.html">Guides</a></div></section>`
+    main: `<section class="wrap page-hero"><p class="eyebrow">Offline</p><h1>The wifi has gone on a break.</h1><p class="lede">Guides you opened recently may still be on this device. Confessions and the Scrub Rack need a connection. This is not a clinical emergency. If you need urgent help, call 000.</p><div class="hero-actions"><a class="button primary" href="/">Try home</a><a class="button secondary" href="/guides.html">Guides</a></div></section>`
   });
 }

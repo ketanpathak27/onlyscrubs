@@ -116,7 +116,19 @@ The footer has a small Admin link. After a successful sign-in, a lock icon appea
 
 Posts approved more than a year ago are archived, at most once a day on read, or immediately from the admin button. Counts on the dashboard include pending confessions and listings, items approved today in Australia/Sydney, reports, and newsletter signups.
 
-The keyword filter still blocks patient, workplace, and clinical wording. Emails, links, and long phone numbers in public text are blocked too. The private email fields are separate.
+The keyword filter holds confessions, comments and listings for a person to review when they look like they contain profanity or slurs, likely identifiers, or self-harm language. It does not publish them, and it does not bounce them with a refusal. Self-harm language returns Australian support lines to the poster. The flag reason is visible in the admin queue.
+
+Reports from the same hashed IP are counted once per post. Each hashed IP can file a limited number of reports per Sydney day. A post leaves the public feed after three distinct reports, or immediately when the report category is patient information or a threat. A person still approves, rejects or deletes it.
+
+Approved confessions can be upvoted once per hashed IP. The confessions page shows Top this week. An admin can pin one approved post as Shift of the week.
+
+## Weekly digest
+
+`GET /api/admin/digest` previews a note: top confessions of the week, newest guides, and the pinned shift, in HTML and text. `GET /api/admin/digest.html` downloads the HTML. `GET /api/admin/newsletter.csv` downloads subscribers with a personal unsubscribe URL. The HTML uses `{{unsubscribe_url}}` so a sender can merge that column. The note names OnlyScrubs and hello@onlyscrubs.org, and includes the unsubscribe link, for the Spam Act.
+
+Sending is off. Cloudflare Email Sending to arbitrary recipients requires the Workers Paid plan. On the free plan, a `send_email` binding can only reach verified destination addresses in the account, not this list. There is no send button. To turn sending on later, move the Worker to Workers Paid, onboard onlyscrubs.org for Email Sending, add a `send_email` binding, and keep the per-subscriber unsubscribe link. Do not put `ADMIN_TOKEN` in the digest.
+
+The shop at `/shop.html` lists the creator's own Gumroad templates. Checkout stays on Gumroad. The page does not load Gumroad's overlay script.
 
 ## Pages
 

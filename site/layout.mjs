@@ -6,8 +6,10 @@ const NAV = [
   ["/shift-kit.html", "Shift Kit"],
   ["/student-bay.html", "Student Bay"],
   ["/gear-guide.html", "Gear"],
+  ["/shop.html", "Shop"],
   ["/confessions.html", "Confessions"],
-  ["/wellbeing.html", "Wellbeing"]
+  ["/wellbeing.html", "Wellbeing"],
+  ["/about.html", "About"]
 ];
 
 export function heroArt() {
@@ -39,9 +41,9 @@ export function newsletterForm() {
     <label>Email address<input name="email" type="email" autocomplete="email" required placeholder="you@example.com"></label>
     <input class="honeypot" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
     <div data-turnstile></div>
-    <button class="button primary" type="submit">Send me occasional notes</button>
+    <button class="button primary" type="submit">Send the notes, not a 3am page</button>
     <p class="form-message" data-form-message role="status"></p>
-    <p class="disclosure">No spam and no patient stories. You can ask us to delete the address. Read the <a href="/privacy.html">privacy page</a>.</p>
+    <p class="disclosure">No spam and no patient stories. You can unsubscribe from any note, or ask us to delete the address. Read the <a href="/privacy.html">privacy page</a>.</p>
   </form>`;
 }
 
@@ -63,7 +65,8 @@ export function layout(options) {
     jsonLd = [],
     robots = "",
     newsletter = "footer",
-    active
+    active,
+    tearoom = false
   } = options;
   const fullTitle = title.includes("OnlyScrubs") ? title : `${title} | OnlyScrubs`;
   const canonicalPath = path === "/" ? "/" : path;
@@ -77,8 +80,11 @@ export function layout(options) {
     return `<a href="${href}"${current}>${label}</a>`;
   }).join("");
   const footerNews = newsletter === "footer"
-    ? `<div><p class="kicker">Occasional notes</p><h2>A short email, when there is something useful.</h2>${newsletterForm()}</div>`
+    ? `<div><p class="kicker">Occasional notes</p><h2>A short email when there is something useful. No full-moon specials.</h2>${newsletterForm()}</div>`
     : `<div><strong>OnlyScrubs</strong><p>For people who live in scrubs and still somehow care.</p></div>`;
+  const tearoomBlock = tearoom
+    ? `<p class="tearoom" data-tearoom><span data-tearoom-line>Cold coffee is still coffee. This is the science.</span></p><p class="night-note">Night shift. The printer is haunted and the coffee is a rumour. Don't say the Q word.</p>`
+    : "";
   const support = `<a class="button secondary compact" data-support-link hidden rel="noopener noreferrer">Buy the next round of coffee</a>`;
   return `<!doctype html>
 <html lang="en-AU">
@@ -120,19 +126,25 @@ export function layout(options) {
       <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav">Menu</button>
     </div>
     <nav class="site-nav" id="site-nav" data-nav aria-label="Primary">${nav}</nav>
+    ${tearoomBlock}
   </header>
   <main id="main">${main}</main>
   <footer class="site-footer">
     ${footerNews}
     <div>
       <nav class="footer-nav" aria-label="Footer">
+        <a href="/about.html">About</a>
+        <a href="/moderation.html">How we moderate</a>
+        <a href="/shop.html">Shop</a>
         <a href="/wellbeing.html">Wellbeing</a>
         <a href="/submission-rules.html">Rules</a>
         <a href="/privacy.html">Privacy</a>
+        <a href="/terms.html">Terms</a>
         <a href="/disclaimer.html">Disclaimer</a>
         <a href="/submit.html">Submit</a>
         <a href="/guides.html">Guides</a>
       </nav>
+      <p class="affiliation">OnlyScrubs is not affiliated with AHPRA, the Nursing and Midwifery Board of Australia (NMBA), any union, health service or employer.</p>
       <p class="fine">General information only. Not a clinic and not medical advice. <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> <a class="admin-entry" href="/admin.html">Admin</a></p>
       <div class="button-row no-print">${support}<button class="button compact" type="button" data-install hidden>Install app</button></div>
     </div>

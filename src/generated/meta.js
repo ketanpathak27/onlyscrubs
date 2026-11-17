@@ -10,6 +10,16 @@ export const CANONICAL = {
   "/guides/feet-and-back": "/guides/feet-and-back.html",
   "/guides/budgeting": "/guides/budgeting.html",
   "/guides/asking-for-help": "/guides/asking-for-help.html",
+  "/guides/ahpra-registration-new-grad": "/guides/ahpra-registration-new-grad.html",
+  "/guides/nmba-standards-for-practice": "/guides/nmba-standards-for-practice.html",
+  "/guides/graduate-programs-by-state": "/guides/graduate-programs-by-state.html",
+  "/guides/first-rotation": "/guides/first-rotation.html",
+  "/guides/difficult-preceptor": "/guides/difficult-preceptor.html",
+  "/guides/pay-and-penalty-rates": "/guides/pay-and-penalty-rates.html",
+  "/guides/cpd-for-new-grads": "/guides/cpd-for-new-grads.html",
+  "/guides/social-media-and-professionalism": "/guides/social-media-and-professionalism.html",
+  "/guides/fatigue-and-night-shift-sleep": "/guides/fatigue-and-night-shift-sleep.html",
+  "/guides/speaking-up-about-safety": "/guides/speaking-up-about-safety.html",
   "/scrub-rack": "/scrub-rack.html",
   "/shift-kit": "/shift-kit.html",
   "/student-bay": "/student-bay.html",
@@ -18,12 +28,217 @@ export const CANONICAL = {
   "/submit": "/submit.html",
   "/wellbeing": "/wellbeing.html",
   "/submission-rules": "/submission-rules.html",
+  "/about": "/about.html",
+  "/moderation": "/moderation.html",
+  "/shop": "/shop.html",
+  "/terms": "/terms.html",
   "/privacy": "/privacy.html",
   "/disclaimer": "/disclaimer.html",
+  "/unsubscribe": "/unsubscribe.html",
   "/admin": "/admin.html",
   "/404": "/404.html",
   "/offline": "/offline.html"
 };
+export const GUIDES = [
+  {
+    "title": "Surviving your first clinical placement",
+    "description": "A practical, non-clinical guide for Australian nursing and midwifery students starting placement: what to organise, how to show up, and when to ask for help.",
+    "path": "/guides/first-clinical-placement.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "placements",
+      "students"
+    ]
+  },
+  {
+    "title": "Night shift survival guide",
+    "description": "General, practical notes for Australian healthcare workers and students on nights: sleep timing, caffeine, food, light, and getting home safely.",
+    "path": "/guides/night-shift.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "nights",
+      "wellbeing"
+    ]
+  },
+  {
+    "title": "Handover tips using ISBAR",
+    "description": "How Australian students and new clinicians can structure a handover with ISBAR, including a blank template and the limits of what to write down.",
+    "path": "/guides/isbar-handover.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "handover",
+      "students"
+    ]
+  },
+  {
+    "title": "Study tips for nursing and midwifery students",
+    "description": "Practical study habits for Australian nursing and midwifery degrees: active recall, placement weeks, and how to revise without wrecking your sleep.",
+    "path": "/guides/study-tips.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "students",
+      "study"
+    ]
+  },
+  {
+    "title": "Your first graduate year",
+    "description": "What to expect, in general terms, from a first year as a registered nurse or midwife in Australia: recruitment rounds, supernumerary time, and asking early.",
+    "path": "/guides/first-graduate-year.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "grads",
+      "students"
+    ]
+  },
+  {
+    "title": "Looking after your feet and back",
+    "description": "General habits for healthcare workers who stand, walk, and move loads: shoes, socks, posture, and when to see your own clinician.",
+    "path": "/guides/feet-and-back.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "feet",
+      "wellbeing"
+    ]
+  },
+  {
+    "title": "Budgeting as a student nurse or midwife",
+    "description": "A plain-language look at the costs Australian nursing and midwifery students actually meet, and where to check current payments. Not personal financial advice.",
+    "path": "/guides/budgeting.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "students",
+      "money"
+    ]
+  },
+  {
+    "title": "How to ask for help and debrief",
+    "description": "Practical ways for Australian nurses, midwives and students to ask for help on a shift, and to debrief afterwards without identifying anyone.",
+    "path": "/guides/asking-for-help.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "wellbeing",
+      "students"
+    ]
+  },
+  {
+    "title": "AHPRA registration as a new grad",
+    "description": "The public steps for a new Australian nursing or midwifery graduate applying for registration with the NMBA through Ahpra, and what this page cannot decide for you.",
+    "path": "/guides/ahpra-registration-new-grad.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "registration",
+      "grads"
+    ]
+  },
+  {
+    "title": "NMBA standards for practice, explained simply",
+    "description": "A plain-language map of the NMBA standards for practice, the codes, and what they are for. Not a substitute for the standards themselves.",
+    "path": "/guides/nmba-standards-for-practice.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "standards",
+      "grads"
+    ]
+  },
+  {
+    "title": "Graduate programs by state",
+    "description": "Where to find the official new-graduate nursing and midwifery programs in each Australian state and territory, and what those pages will not promise you.",
+    "path": "/guides/graduate-programs-by-state.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "grads",
+      "students"
+    ]
+  },
+  {
+    "title": "Surviving your first rotation",
+    "description": "Practical, non-clinical notes for the first rotation of a graduate year or a new placement block in Australia: people, routines, and what to ask.",
+    "path": "/guides/first-rotation.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "grads",
+      "placements"
+    ]
+  },
+  {
+    "title": "Dealing with a difficult preceptor",
+    "description": "General steps for students and new graduates when a preceptor relationship is not working, without naming a workplace or turning it into a public story.",
+    "path": "/guides/difficult-preceptor.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "placements",
+      "students"
+    ]
+  },
+  {
+    "title": "Pay and penalty rates, without the folklore",
+    "description": "Where Australian nurses and midwives actually look up pay, penalties and agreements. No made-up figures.",
+    "path": "/guides/pay-and-penalty-rates.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "pay",
+      "grads"
+    ]
+  },
+  {
+    "title": "CPD requirements for new grads",
+    "description": "What the NMBA continuing professional development standard asks of new nurses and midwives, including the hours in the current standard and where to check for changes.",
+    "path": "/guides/cpd-for-new-grads.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "cpd",
+      "grads"
+    ]
+  },
+  {
+    "title": "Social media and professionalism",
+    "description": "How the NMBA social media guidance and Ahpra's advertising rules apply to nurses, midwives and students, in ordinary language.",
+    "path": "/guides/social-media-and-professionalism.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "professionalism",
+      "students"
+    ]
+  },
+  {
+    "title": "Managing fatigue and night-shift sleep",
+    "description": "General notes on fatigue, sleep and getting home after late or night shifts for Australian nurses, midwives and students. Not a sleep prescription.",
+    "path": "/guides/fatigue-and-night-shift-sleep.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "nights",
+      "wellbeing"
+    ]
+  },
+  {
+    "title": "When and how to speak up about safety",
+    "description": "An overview of raising safety concerns at work or on placement in Australia, including what mandatory notifications are. Not legal advice.",
+    "path": "/guides/speaking-up-about-safety.html",
+    "date": "2026-11-17",
+    "updated": "2026-11-17",
+    "tags": [
+      "safety",
+      "grads"
+    ]
+  }
+];
 export const SCRIPT_HASHES = [
   "sha256-H97NhiljHwovpTK6sV3WLtYOuADCllkQBSF6vMLjj+o=",
   "sha256-FGKzG5vidY7FmNpVW/6Sfwyb4hXuDGpGVUyhBAHW+vY=",
@@ -33,5 +248,21 @@ export const SCRIPT_HASHES = [
   "sha256-TUoXe/9Q6QiwJxTip3OdYHpF6b8/OPdg/5q1QtRbKSw=",
   "sha256-snEwDl5JNxuUgwWRGsBzNm7kActcV4pZSSLJVfCnhDY=",
   "sha256-3wFHb36IMqqiSFLScys1NOrF75/dFBgCGjX5IcL65xk=",
-  "sha256-ZjfA8Tb6L6rho+WHRRQmxjN//ZMbS6IwMXQdkzhO2aI="
+  "sha256-ZjfA8Tb6L6rho+WHRRQmxjN//ZMbS6IwMXQdkzhO2aI=",
+  "sha256-6uKStIQxRoHleJz/c1Sbpf1WDVesFX5BcWjqP6vb054=",
+  "sha256-z8WzN6LK8dpEnG5HSoXQRXaYW+2yBIzWHyFcwy7+XjQ=",
+  "sha256-BHyKqe6HknQeowWErmYQGuq0ClW3aON42agkQTkFLqE=",
+  "sha256-rTZI0YACbKO29qvgILWMyLVVm5ZeLSBefSI7+jdXuH4=",
+  "sha256-9sn3ENicYnUjGcYuPjaE7J/YSveIlAbclSuSi7vBhmA=",
+  "sha256-gWXIOrkDcwpfuo/LPX37FGS83CWYX2GIgbN0eQZSWxY=",
+  "sha256-ZRaJVIna3dLNTxgyuUAF0b/I5cHfYeSHGfqQrfQB+u0=",
+  "sha256-XJiHuIPFl5Uy3wk5ucy7YdYG8Zj9VGdhc51s0rKSAx4=",
+  "sha256-mKoXgSumqY0ac1ZOuxmeCmHQgeMNu5T+KvCmpBn3pSU=",
+  "sha256-rkz/enKqaf0jrbKkqnfmyA6ZeRAuN+wi+7KW/j73Q44=",
+  "sha256-Pdv9VAKMkNX00smSl1OWH6RbmWi+u/bT0g6Mxr66PXM=",
+  "sha256-Sl0jETEZiCgGmwJEB72mHwEbY1rbaFNy07Fs4kVja+w=",
+  "sha256-0hTF3kDVm0lHuM3bPlfVYvt+XlK7UHrgh7py4km4iWE=",
+  "sha256-mZqMXZJ9a1a/qZyLaVl/bAV77FeDJCDgaevtC12c/4c=",
+  "sha256-x66MVCyc5IC+3HpD9G80pryPHM0hcV8DJuh9jw/Coww=",
+  "sha256-9W5ZBquyMtjiH/bB90xjbXk6yAqhPeqZWSCD6aubMC0="
 ];

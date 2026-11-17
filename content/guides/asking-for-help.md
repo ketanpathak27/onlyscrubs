@@ -43,7 +43,7 @@ A short debrief has three parts:
 2. What you did, and what you were unsure about.
 3. What you need now: sleep, a roster change, a skill to practise in the lab, or a proper review.
 
-If there is a formal debrief, a riskman-style report, or a speaking-up process, use the one your organisation names. This website is not that process. Do not put the report text into OnlyScrubs, including the confessions feed.
+If there is a formal debrief, a riskman-style report, or a speaking-up process, use the one your organisation names. This website is not that process. Do not put the report text into OnlyScrubs, including the confessions feed. Raising a safety concern, including when a mandatory notification might apply, is covered in [when and how to speak up](/guides/speaking-up-about-safety.html). That page is an overview, not legal advice.
 
 Friends and family can support you without the details. "It was a heavy shift and I am sad" is a complete sentence. If they push for the story, you can say, "I cannot tell you that part, and I still want the company."
 

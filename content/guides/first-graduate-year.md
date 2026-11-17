@@ -4,6 +4,7 @@ description: What to expect, in general terms, from a first year as a registered
 date: 2026-11-17
 updated: 2026-11-17
 tags: grads, students
+toolkit: yes
 ---
 
 The graduate year is a job with a learning structure wrapped around it. The structure is not the same in every state, and it is not the same in public and private employers. Anyone who describes "the" grad program as if it were one national course is guessing.
@@ -14,7 +15,7 @@ This is general information about starting work. It is not employment advice, in
 
 Public health services usually run their own graduate recruitment rounds, with their own opening and closing dates. Private hospitals and aged care employers often recruit on a different timetable, sometimes later, sometimes directly. Put the dates in a calendar as soon as you see them. Missing a round is common and painful. It is not a judgement on whether you can do the work.
 
-Read what the round actually asks for: preferred areas, referee details, registration timing, and whether you must already hold registration with the Nursing and Midwifery Board of Australia or whether a pending application is accepted. Those rules change. The [NMBA site](https://www.nursingmidwiferyboard.gov.au/) is the place for registration facts, not a Facebook comment.
+Read what the round actually asks for: preferred areas, referee details, registration timing, and whether you must already hold registration with the Nursing and Midwifery Board of Australia or whether a pending application is accepted. Those rules change. The [NMBA site](https://www.nursingmidwiferyboard.gov.au/) is the place for registration facts, not a Facebook comment. The steps for a new graduate are on [AHPRA registration as a new grad](/guides/ahpra-registration-new-grad.html), and the state rounds are on [graduate programs by state](/guides/graduate-programs-by-state.html).
 
 Have a referee who has seen you in practice and who has agreed to be contacted. Ask them before you write their name. Give them the dates so they are not surprised by an email on a day off.
 

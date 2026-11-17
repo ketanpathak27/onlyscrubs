@@ -46,8 +46,8 @@
   function actions(itemKind, itemStatus) {
     if (itemKind === "relay") return '<button class="button compact" data-action="read" type="button">Mark read</button><button class="button danger compact" data-action="delete" type="button">Delete</button>';
     let html = "";
-    if (itemStatus === "pending") html += '<button class="button compact" data-action="approve" type="button">Approve</button><button class="button compact" data-action="reject" type="button">Reject</button>';
-    if (itemKind === "confession" && itemStatus === "approved") html += '<button class="button secondary compact" data-action="archive" type="button">Archive</button>';
+    if (itemStatus === "pending" || itemStatus === "hidden") html += '<button class="button compact" data-action="approve" type="button">Approve</button><button class="button compact" data-action="reject" type="button">Reject</button>';
+    if (itemKind === "confession" && itemStatus === "approved") html += '<button class="button secondary compact" data-action="pin-shift" type="button">Pin as shift of the week</button><button class="button secondary compact" data-action="archive" type="button">Archive</button>';
     if (itemKind === "confession" && itemStatus === "archived") html += '<button class="button compact" data-action="restore" type="button">Restore</button>';
     html += '<button class="button danger compact" data-action="delete" type="button">Delete</button>';
     return html;
@@ -60,7 +60,8 @@
     }
     feed.innerHTML = '<label class="check"><input id="select-all" type="checkbox"><span>Select all</span></label>' + items.map(function (item) {
       const privateBits = [item.contactEmail, item.email, item.toEmail].filter(Boolean).join(" · ");
-      return '<article class="confession admin-card" data-id="' + esc(item.id) + '"><header><input type="checkbox" data-select value="' + esc(item.id) + '" aria-label="Select item"></header><p>' + esc(summary(item)) + '</p><p class="meta-row">' + esc(item.status || "") + " · " + esc(item.createdAt ? new Date(item.createdAt).toLocaleString("en-AU") : "") + (item.score != null ? " · score " + esc(item.score) : "") + (item.reportsCount ? " · reports " + esc(item.reportsCount) : "") + (item.lastReportReason ? " · " + esc(item.lastReportReason) : "") + (privateBits ? " · " + esc(privateBits) : "") + '</p><div class="button-row">' + actions(itemKind, item.status) + "</div></article>";
+      const flag = item.flagReason ? '<p class="flag-note"><strong>Flagged for review.</strong> ' + esc(item.flagReason) + "</p>" : "";
+      return '<article class="confession admin-card" data-id="' + esc(item.id) + '"><header><input type="checkbox" data-select value="' + esc(item.id) + '" aria-label="Select item"></header>' + flag + '<p>' + esc(summary(item)) + '</p><p class="meta-row">' + esc(item.status || "") + " · " + esc(item.createdAt ? new Date(item.createdAt).toLocaleString("en-AU") : "") + (item.score != null ? " · score " + esc(item.score) : "") + " · reports " + esc(item.reportsCount || 0) + (item.lastReportCategory ? " · " + esc(item.lastReportCategory) : "") + (item.lastReportReason ? " · " + esc(item.lastReportReason) : "") + (item.hiddenReason ? " · " + esc(item.hiddenReason) : "") + (privateBits ? " · " + esc(privateBits) : "") + '</p><div class="button-row">' + actions(itemKind, item.status) + "</div></article>";
     }).join("");
   }
   function metric(value, label) {
@@ -120,6 +121,48 @@
     if (kind.value === "relay") kind.value = "confession";
     load().catch(function (error) { message.textContent = error.message; });
   });
+  document.getElementById("show-flagged")?.addEventListener("click", function () {
+    status.value = "flagged";
+    if (kind.value === "relay") kind.value = "confession";
+    load().catch(function (error) { message.textContent = error.message; });
+  });
+  document.getElementById("unpin-shift")?.addEventListener("click", async function () {
+    try {
+      await read(await fetch("/api/admin", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "unpin-shift" }) }));
+      message.textContent = "Shift of the week unpinned.";
+      await load();
+    } catch (error) { message.textContent = error.message; }
+  });
+  async function downloadAdmin(path, filename) {
+    const res = await fetch(path);
+    if (!res.ok) {
+      const data = await res.json().catch(function () { return {}; });
+      throw new Error(data.error || "Export failed.");
+    }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+  document.getElementById("preview-digest")?.addEventListener("click", async function () {
+    try {
+      const data = await read(await fetch("/api/admin/digest"));
+      document.getElementById("digest-sending").textContent = data.sendingReason || "";
+      document.getElementById("digest-subject").textContent = data.subject || "";
+      document.getElementById("digest-text").textContent = data.text || "";
+      document.getElementById("digest-preview").hidden = false;
+      message.textContent = "Digest preview. " + (data.subscriberCount || 0) + " subscribers. Nothing was sent.";
+    } catch (error) { message.textContent = error.message; }
+  });
+  document.getElementById("export-digest")?.addEventListener("click", async function () {
+    try {
+      await downloadAdmin("/api/admin/digest.html", "onlyscrubs-digest.html");
+      message.textContent = "Digest HTML downloaded. Replace {{unsubscribe_url}} with each subscriber's link from the CSV.";
+    } catch (error) { message.textContent = error.message; }
+  });
   document.getElementById("admin-logout")?.addEventListener("click", async function () {
     await fetch("/api/admin/logout", { method: "POST" });
     feed.innerHTML = "";
@@ -149,7 +192,7 @@
       link.download = "onlyscrubs-newsletter.csv";
       link.click();
       URL.revokeObjectURL(url);
-      message.textContent = "Newsletter CSV downloaded.";
+      message.textContent = "Subscriber CSV downloaded, with an unsubscribe link for each address.";
     } catch (error) { message.textContent = error.message; }
   });
   document.getElementById("bulk-apply")?.addEventListener("click", async function () {

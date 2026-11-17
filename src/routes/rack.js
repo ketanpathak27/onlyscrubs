@@ -1,5 +1,6 @@
 import { json, limited, readJson, clientKey, rateLimit } from "../lib/http.js";
 import { clean, cleanMultiline, risky, hasDirectContact, validEmail } from "../lib/moderation.js";
+import { attachScreen, screenText } from "../lib/screen.js";
 import { findById, listByPrefix, strip } from "../lib/store.js";
 import { verifyTurnstile, turnstileFailure } from "../lib/turnstile.js";
 
@@ -25,7 +26,6 @@ export function publicListing(item) {
     condition: item.condition,
     createdAt: item.createdAt,
     status: item.status,
-    reportsCount: Number(item.reportsCount) || 0
   };
 }
 
@@ -53,11 +53,9 @@ export function validateListing(body) {
   if (!validEmail(contactEmail)) return { error: "Add an email so we can pass on messages. It is not shown publicly." };
   if (contactName.length > 60) return { error: "Name is too long." };
   const blob = [title, description, size, brand, colour, suburb].join(" ");
-  if (blocked(blob)) {
-    return { error: "Remove workplace names, contact details in the description, and anything clinical. Your email stays in a separate private field." };
-  }
   return {
-    value: { type, title, description, size, brand, colour, suburb, state, condition, contactEmail, contactName }
+    value: { type, title, description, size, brand, colour, suburb, state, condition, contactEmail, contactName },
+    screen: screenText(blob)
   };
 }
 
@@ -81,14 +79,17 @@ export async function apiListings(request, env) {
     if (result.error) return json({ error: result.error }, 400);
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
-    await kv.put("listing:" + now + ":" + id, JSON.stringify({
+    await kv.put("listing:" + now + ":" + id, JSON.stringify(attachScreen({
       id,
       ...result.value,
       status: "pending",
       createdAt: now,
       reportsCount: 0
-    }));
-    return json({ ok: true, status: "pending" }, 201);
+    }, result.screen)));
+    const body = { ok: true, status: "pending" };
+    if (result.screen.flagged) body.held = true;
+    if (result.screen.support) body.support = result.screen.support;
+    return json(body, 201);
   }
   return json({ error: "Method not allowed" }, 405);
 }
