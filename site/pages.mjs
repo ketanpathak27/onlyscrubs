@@ -27,7 +27,8 @@ export function productCallout(key) {
   const product = siteConfig.upcomingProducts[key];
   const url = String(product?.url || "").trim();
   if (!url) return "";
-  return `<aside class="callout shop-callout"><p><strong>From the OnlyScrubs creator.</strong> <a href="${esc(url)}" rel="noopener noreferrer">${esc(product.label)}</a>. Independent templates, not an official NMBA or Ahpra product.</p></aside>`;
+  const note = product.note ? ` ${esc(product.note)}` : "";
+  return `<aside class="callout shop-callout"><p><strong>From the OnlyScrubs creator.</strong> <a href="${esc(url)}" rel="noopener noreferrer">${esc(product.label)}</a>.${note} Independent templates, not an official NMBA or Ahpra product.</p></aside>`;
 }
 
 function money(value) {
@@ -901,22 +902,29 @@ export function moderation(assets) {
   });
 }
 
-export function shop(assets) {
-  const products = shopData.products;
-  const cards = products.map((product) => `<article class="card shop-card">
+function shopCard(product) {
+  const note = product.note ? `<p>${esc(product.note)}</p>` : "";
+  return `<article class="card shop-card">
       <picture>
         <source type="image/webp" srcset="/shop/${product.id}-thumb.webp 480w, /shop/${product.id}-cover.webp 960w" sizes="(min-width: 800px) 480px, 100vw">
         <source type="image/png" srcset="/shop/${product.id}-thumb.png 480w, /shop/${product.id}-cover.png 960w" sizes="(min-width: 800px) 480px, 100vw">
         <img src="/shop/${product.id}-cover.png" alt="${esc(product.alt)}" width="${product.width}" height="${product.height}">
       </picture>
-      <h2>${esc(product.name)}</h2>
+      <h3>${esc(product.name)}</h3>
       <p class="price">${esc(product.priceLabel)}</p>
       <p>${esc(product.description)}</p>
+      ${note}
       <a class="button primary" href="${esc(product.url)}" target="_blank" rel="noopener noreferrer">Buy on Gumroad</a>
-    </article>`).join("");
+    </article>`;
+}
+
+export function shop(assets) {
+  const groups = shopData.groups;
+  const products = groups.flatMap((group) => group.products);
+  const sections = groups.map((group) => `<section class="shop-group"><h2>${esc(group.title)}</h2><div class="grid shop-grid">${group.products.map(shopCard).join("")}</div></section>`).join("");
   return page({
     title: "Shop | Australian templates for nurses, renters and sole traders",
-    description: "Printable Australian templates from OnlyScrubs: nursing study sheets, a rental bond record kit, a household budget planner and a sole trader starter kit.",
+    description: "Printable Australian templates from OnlyScrubs: nursing study sheets, a roster pay estimate tracker, an IQNM registration planner, and life-admin kits for renting, budgeting, moving and sole traders.",
     path: "/shop.html",
     active: "/shop.html",
     assets,
@@ -938,7 +946,7 @@ export function shop(assets) {
     })),
     main: `<section class="wrap page-hero"><p class="eyebrow">From the OnlyScrubs creator</p><h1>Australian templates we made</h1><p class="lede">Digital downloads for Australian nurses, students, renters and sole traders. They are organising tools and general information, sold on Gumroad. They are not official forms, and they are not legal, financial, tax or clinical advice. Not third-party ads.</p>
       <p>Digital downloads delivered via Gumroad. Your rights under the Australian Consumer Law apply.</p></section>
-      <section class="wrap section"><div class="grid shop-grid">${cards}</div>
+      <section class="wrap section">${sections}
       <p class="affiliation shop-note">Independent templates. Not affiliated with or endorsed by any government agency, NMBA or Ahpra. General information only, not legal, financial, tax or clinical advice.</p></section>`
   });
 }

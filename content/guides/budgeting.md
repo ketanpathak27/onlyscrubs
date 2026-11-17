@@ -5,6 +5,7 @@ date: 2026-11-17
 updated: 2026-11-17
 tags: students, money
 toolkit: yes
+product: payTracker
 ---
 
 Most pre-registration nursing and midwifery placements in Australia are unpaid. The degree can still be full-time while the income stops, and the costs go up: travel, parking, shoes, uniforms, and sometimes a second rent closer to the placement. This page names those costs in general terms. It is not personal financial advice, tax advice, or a list of dollar amounts, because payments and grants change.

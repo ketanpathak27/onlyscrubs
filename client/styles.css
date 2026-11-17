@@ -548,6 +548,9 @@ fieldset.group legend { font-family: var(--font-display); padding: 0 6px; }
   font-weight: 650;
   border-radius: 12px;
 }
+.shop-group { margin-top: var(--space-6); }
+.shop-group h2 { margin-bottom: var(--space-4); }
+.shop-card h3 { margin: 0 0 8px; line-height: 1.25; }
 .shop-card img { width: 100%; height: auto; border-radius: 12px; display: block; margin-bottom: 12px; }
 .price { font-family: var(--font-display); font-size: 1.8rem; margin: 0 0 8px; }
 .shop-note { margin-top: 18px; }

@@ -346,8 +346,14 @@ export const SCRIPT_HASHES = [
   "sha256-Pdv9VAKMkNX00smSl1OWH6RbmWi+u/bT0g6Mxr66PXM=",
   "sha256-Sl0jETEZiCgGmwJEB72mHwEbY1rbaFNy07Fs4kVja+w=",
   "sha256-0hTF3kDVm0lHuM3bPlfVYvt+XlK7UHrgh7py4km4iWE=",
+  "sha256-IjITj4IrR/99FrJYJOnyXo9K1oycH4aWaO9aaChPAr4=",
+  "sha256-hofVjJwqjS9J+ZZmdunlP4epT5fMaDtkMau1XNPH8Ec=",
   "sha256-mZqMXZJ9a1a/qZyLaVl/bAV77FeDJCDgaevtC12c/4c=",
   "sha256-x66MVCyc5IC+3HpD9G80pryPHM0hcV8DJuh9jw/Coww=",
   "sha256-9W5ZBquyMtjiH/bB90xjbXk6yAqhPeqZWSCD6aubMC0=",
+  "sha256-yaspVFA1Qd1363wUfFnlv4G+BEHV3tL9WEbcR6JAra8=",
+  "sha256-ljYnIIZPiG3qctxIaZuZP2vPrXBZjVR+MCIv9Pken1A=",
+  "sha256-s3DvQ/QprPvj8n1zWuy8adh1HQTLqQ/6OUswiJiipcw=",
+  "sha256-dhfIi3MYOIYqcC3RYVXsn57EL8cE0NkrMbThy9ZhUnw=",
   "sha256-9GmtW/L4DdssR9Vic2rfj1OVJZN6Aahc0RJ3bOXcqx0="
 ];
