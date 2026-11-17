@@ -266,6 +266,7 @@ export function scrubRack(assets) {
     tearoom: true,
     scripts: [assets.rack],
     main: `<section class="wrap page-hero"><p class="eyebrow">Donate, request, swap</p><h1>Scrub Rack</h1><p class="lede">Clean scrubs, looking for a second life. Listings are checked before they appear. Your email never makes it onto the card.</p></section>
+    ${adSlot("rack-top")}
     <section class="wrap section page-split">
       <div>
         <div class="filters" aria-label="Filter listings">
@@ -958,28 +959,26 @@ export function advertise(assets) {
       description: "Advertising rules and contact for OnlyScrubs.",
       inLanguage: "en-AU"
     }],
-    main: `<section class="wrap page-hero prose"><p class="eyebrow">A small site, labelled ads</p><h1>Advertise with us</h1>
-      <p>OnlyScrubs is a free Australian site for nurses, midwives, students and other healthcare workers. People come for practical guides, a moderated scrub swap, shift tools and a confessions feed that is not allowed to name patients or workplaces. General information only. This page is not a rate card.</p>
+    main: `<section class="wrap page-hero prose"><p class="eyebrow">The noticeboard by the tearoom</p><h1>Advertise with us</h1>
+      <p>OnlyScrubs is for Australian nurses, midwives, students and healthcare workers. They come for practical guides, the Scrub Rack, shift tools, and a confessions page that stays about the shift. Cold coffee is common here. Ads are not the reason the site exists.</p>
       <h2>Who is here</h2>
-      <p>The audience is people who work or study in nursing and midwifery in Australia, plus students getting ready for placement and a graduate year. We do not publish traffic numbers. If you need a count, ask, and we will only share a figure we can actually measure.</p>
-      <h2>What we will run</h2>
+      <p>The audience is Australian nurses, midwives, students and healthcare workers. We do not publish traffic numbers or prices on this page. Ask us for current numbers.</p>
+      <h2>What an ad can be</h2>
       <ul>
-        <li>A labelled <strong>Ad</strong> slot on guide and gear pages. The slot stays empty until an ad is switched on. It never appears in the confessions feed.</li>
-        <li>A <strong>Sponsored</strong> link on a gear note, marked as such, if we ever add one. Ordinary notes are not ads.</li>
-        <li>The creator's own templates on the <a href="/shop.html">shop</a>. Those are not third-party ads. They are labelled as from the OnlyScrubs creator.</li>
+        <li>A labelled <strong>Ad</strong> or <strong>Sponsored</strong> slot on guides and on the Scrub Rack. The label is part of the slot. An empty slot stays hidden until we switch an ad on.</li>
+        <li>A newsletter sponsor line in the occasional email, labelled the same way.</li>
       </ul>
-      <h2>What we will not run</h2>
-      <p>Ahpra's <a href="https://www.ahpra.gov.au/Resources/Advertising-hub.aspx" rel="noopener noreferrer">advertising guidelines</a> apply when an ad is about a regulated health service. We will not accept:</p>
+      <p>The creator's own templates on the <a href="/shop.html">shop</a> are not third-party ads. They are labelled as from the OnlyScrubs creator.</p>
+      <h2>The rules</h2>
       <ul>
-        <li>Testimonials about clinical care, or quotes that read like one.</li>
-        <li>Claims about treatment outcomes, cure rates, or that a service is better than another without evidence the guidelines allow.</li>
-        <li>Anything that pressures someone into unnecessary care.</li>
-        <li>Ads that look like they come from AHPRA, the NMBA, a health service, or this site's editorial guides.</li>
-        <li>Patient stories, even de-identified ones.</li>
+        <li>Ads are always labelled Ad or Sponsored.</li>
+        <li>Nothing on confession pages.</li>
+        <li>No ads for regulated health services that use testimonials or outcome claims. Ahpra's <a href="https://www.ahpra.gov.au/Resources/Advertising-hub.aspx" rel="noopener noreferrer">advertising guidelines</a> are the line.</li>
+        <li>We can refuse any ad.</li>
       </ul>
       <p>OnlyScrubs is not affiliated with AHPRA, the NMBA, any union, health service or employer. An ad on the site does not change that.</p>
       <h2>Ask</h2>
-      <p>Email <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> with what you want to run and where. We will say yes or no. There is no price list on this page, because we have not published one.</p>
+      <p>Email <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> with what you want to run and where it would sit.</p>
     </section>`
   });
 }

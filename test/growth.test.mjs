@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import figures from "../data/figures.json" with { type: "json" };
 import { siteConfig } from "../src/config.js";
-import { advertise, confessions, productCallout, shiftKit, studentBay } from "../site/pages.mjs";
+import { advertise, confessions, productCallout, scrubRack, shiftKit, studentBay } from "../site/pages.mjs";
 import { parseGuide } from "../site/markdown.mjs";
 import { readFileSync } from "node:fs";
 
@@ -46,10 +46,20 @@ test("shop callouts land on guides tools, not on confessions, and do not name un
 
 test("advertise page states the rules and invents no price or traffic figure", () => {
   const html = advertise(assets);
+  assert.match(html, /Australian nurses, midwives, students and healthcare workers/);
+  assert.match(html, /labelled <strong>Ad<\/strong> or <strong>Sponsored<\/strong> slot on guides and on the Scrub Rack/);
+  assert.match(html, /newsletter sponsor line/);
+  assert.match(html, /Ads are always labelled/);
+  assert.match(html, /Nothing on confession pages/);
+  assert.match(html, /We can refuse any ad/);
+  assert.match(html, /Ask us for current numbers/);
   assert.match(html, /hello@onlyscrubs\.org/);
   assert.match(html, /Advertising-hub/);
+  assert.match(html, /href="\/advertise\.html"/);
   assert.match(html, /canonical" href="https:\/\/onlyscrubs\.org\/advertise\.html"/);
   assert.match(html, /"@type":"WebPage"/);
   assert.doesNotMatch(html, /A\$\d|\$\d{2,}|best seller|visitors a month|pageviews/i);
   for (const name of hiddenNames) assert.equal(html.includes(name), false);
+  assert.doesNotMatch(confessions(assets), /data-ad-slot/);
+  assert.match(scrubRack(assets), /data-ad-slot="rack-top"/);
 });
