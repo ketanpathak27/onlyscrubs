@@ -196,7 +196,10 @@ test("new guides stay in range and point at official sources", () => {
     "cpd-for-new-grads.md": ["nursingmidwiferyboard.gov.au"],
     "social-media-and-professionalism.md": ["nursingmidwiferyboard.gov.au", "ahpra.gov.au"],
     "fatigue-and-night-shift-sleep.md": ["healthdirect.gov.au", "nmsupport.org.au"],
-    "speaking-up-about-safety.md": ["ahpra.gov.au", "nursingmidwiferyboard.gov.au"]
+    "speaking-up-about-safety.md": ["ahpra.gov.au", "nursingmidwiferyboard.gov.au"],
+    "nurse-patient-ratios-explained.md": ["wa.gov.au", "legislation.vic.gov.au", "health.nsw.gov.au", "parliament.vic.gov.au", "legislation.qld.gov.au"],
+    "enterprise-bargaining-and-industrial-action.md": ["fairwork.gov.au", "fwc.gov.au", "tas.gov.au"],
+    "protected-titles-who-can-call-themselves-a-nurse.md": ["nursingmidwiferyboard.gov.au", "ahpra.gov.au"]
   };
   for (const [file, hosts] of Object.entries(required)) {
     const raw = readFileSync(new URL("../content/guides/" + file, import.meta.url), "utf8");
@@ -207,7 +210,7 @@ test("new guides stay in range and point at official sources", () => {
     assert.doesNotMatch(raw, /best seller|\$\d/);
   }
   const names = readdirSync(new URL("../content/guides/", import.meta.url));
-  assert.equal(names.length, 24);
+  assert.equal(names.length, 27);
 });
 
 test("shop page keeps plain prices and the consumer-law lines", () => {

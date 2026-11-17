@@ -34,7 +34,10 @@ const guideOrder = [
   "renewal-and-recency",
   "nurse-midwife-tax",
   "placement-costs",
-  "graduate-program-hub"
+  "graduate-program-hub",
+  "nurse-patient-ratios-explained",
+  "enterprise-bargaining-and-industrial-action",
+  "protected-titles-who-can-call-themselves-a-nurse"
 ];
 
 function hash(content) {

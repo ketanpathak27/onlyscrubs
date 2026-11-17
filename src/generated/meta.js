@@ -26,6 +26,9 @@ export const CANONICAL = {
   "/guides/nurse-midwife-tax": "/guides/nurse-midwife-tax.html",
   "/guides/placement-costs": "/guides/placement-costs.html",
   "/guides/graduate-program-hub": "/guides/graduate-program-hub.html",
+  "/guides/nurse-patient-ratios-explained": "/guides/nurse-patient-ratios-explained.html",
+  "/guides/enterprise-bargaining-and-industrial-action": "/guides/enterprise-bargaining-and-industrial-action.html",
+  "/guides/protected-titles-who-can-call-themselves-a-nurse": "/guides/protected-titles-who-can-call-themselves-a-nurse.html",
   "/scrub-rack": "/scrub-rack.html",
   "/shift-kit": "/shift-kit.html",
   "/student-bay": "/student-bay.html",
@@ -310,6 +313,39 @@ export const GUIDES = [
       "grads",
       "students"
     ]
+  },
+  {
+    "title": "Nurse-to-patient ratios in Australia: where things stand (Nov 2026)",
+    "description": "What a nurse-to-patient ratio is, which jurisdictions have put minimum staffing in law or in an agreement, and what to do if a shift is short. Checked 18 November 2026.",
+    "path": "/guides/nurse-patient-ratios-explained.html",
+    "date": "2026-11-18",
+    "updated": "2026-11-18",
+    "tags": [
+      "staffing",
+      "safety"
+    ]
+  },
+  {
+    "title": "Stop-works, strikes and EBA votes: a plain-English guide for nurses",
+    "description": "What an enterprise agreement is, what protected industrial action means, and how to read an offer before you vote. Not advice on how to vote.",
+    "path": "/guides/enterprise-bargaining-and-industrial-action.html",
+    "date": "2026-11-18",
+    "updated": "2026-11-18",
+    "tags": [
+      "pay",
+      "safety"
+    ]
+  },
+  {
+    "title": "Who can call themselves a nurse? Protected titles, AINs and the public register",
+    "description": "Protected titles under the National Law, what students and assistants in nursing can call themselves, and how to check the public register.",
+    "path": "/guides/protected-titles-who-can-call-themselves-a-nurse.html",
+    "date": "2026-11-18",
+    "updated": "2026-11-18",
+    "tags": [
+      "registration",
+      "professionalism"
+    ]
   }
 ];
 export const SCRIPT_HASHES = [
@@ -340,6 +376,9 @@ export const SCRIPT_HASHES = [
   "sha256-fqIZJXQ7BejzcRaiZikjK3VjG3M/hYfWLXYrYFT9rYM=",
   "sha256-5CQ/8k6EI20ElNN0qFFgRKDQPg2gw4ELE1vTbbBPBcM=",
   "sha256-Z6OM7Oubyi5f2dSh/YrN7tXJb6NsUae/UnPZSIbJ38k=",
+  "sha256-3pL0bofsDzBxbwrWHfA1/sCKFvfxpf1zSA+ER00EU9c=",
+  "sha256-i4OB/6PhR4QGwhZSQxFdsGr5rNkzy2FmNFiydiY11iI=",
+  "sha256-vimc0cjpzGb4jkY9sz5RHtn190mQ6kWgbYNpjW6konQ=",
   "sha256-wQk8mEAWqYA0r2n2QkKuatylTcFdf8N9nFtGoNOT0MY=",
   "sha256-VEFahPjlfjonpzC7puGSvHGvc89sej9NCdW/1l6N2HE=",
   "sha256-lg7Dbab44hlpIpTiQTngBgsbexKPkdFFYx2dFa+qVqg=",
