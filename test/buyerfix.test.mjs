@@ -44,6 +44,10 @@ test("the Life Admin Bundle is featured first on the shop, with honest savings w
   assert.equal((html.match(/id="product-bundle"/g) || []).length, 1, "the bundle is not repeated in its group");
   assert.match(html, /Includes all 4 kits: save A\$32 vs buying separately \(A\$81\)\./);
   assert.match(html, /id="shop-featured-heading">The bundle</);
+  const bundleBlock = html.slice(html.indexOf('id="product-bundle"'), html.indexOf('id="product-nursing-toolkit"'));
+  assert.match(bundleBlock, /<h3>Australian Life Admin Bundle<\/h3>/, "featured card uses the shorter display title");
+  assert.doesNotMatch(bundleBlock, /Renter, Budget, Nursing Student/);
+  assert.match(html, /Australian Life Admin Bundle - Renter, Budget, Nursing Student & Sole Trader Kits/, "full product name stays in structured data");
   assert.equal((html.match(/"@type":"Product"/g) || []).length, 10);
 });
 
@@ -138,4 +142,10 @@ test("homepage product cards open Gumroad directly and still offer More in the s
     assert.match(main, new RegExp(`href="https://lofiluffyy\\.gumroad\\.com/l/${slug}" target="_blank" rel="noopener noreferrer"`));
   }
   assert.doesNotMatch(main, /shop-teaser" href="\/shop\.html#product-/);
+});
+
+test("shop callout cards have their own inner padding so they stay clear of PR 13 callout rules", () => {
+  const css = readFileSync(new URL("../client/styles.css", import.meta.url), "utf8");
+  assert.match(css, /\.shop-callout\s*\{[\s\S]*?padding:\s*var\(--card-pad\)/);
+  assert.match(css, /\.shop-callout\s*\{[\s\S]*?margin-inline:\s*0/);
 });

@@ -1007,7 +1007,7 @@ function shopCard(product, options = {}) {
         <img src="/shop/${product.id}-cover.png" alt="${esc(product.alt)}" width="${product.width}" height="${product.height}" ${loading} decoding="async"${priority}>
       </picture>
       <div class="shop-card-body">
-      <h3>${esc(product.name)}</h3>
+      <h3>${esc(featured ? shortName(product.name) : product.name)}</h3>
       <p class="price">${esc(product.priceLabel)}</p>
       <p>${esc(product.description)}</p>
       ${note}

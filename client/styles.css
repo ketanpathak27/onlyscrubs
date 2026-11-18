@@ -724,12 +724,28 @@ fieldset.group legend { font-family: var(--font-display); padding: 0 6px; }
     font-size: 1.0625rem;
     line-height: 1.65;
   }
+  .shop-featured-group h2 { margin-bottom: var(--space-3); }
+  .shop-featured img {
+    aspect-ratio: 2 / 1;
+    object-fit: cover;
+    object-position: center;
+  }
 }
 .table-wrap { overflow-x: auto; margin: var(--space-5) 0; }
 .table-wrap table { width: 100%; border-collapse: collapse; }
 .table-wrap th, .table-wrap td { text-align: left; padding: var(--space-3); border-bottom: 1px solid var(--line); vertical-align: top; }
 [data-cpd-list] button, [data-placement-calc] button, [data-cpd-tally] button { min-height: 44px; }
-.shop-callout { margin: var(--space-6) 0; }
+/* Padding and alignment are scoped here so they do not clash with
+   polish/floating-menu's shared .callout rule. */
+.shop-callout {
+  margin: var(--space-6) 0;
+  margin-inline: 0;
+  padding: var(--card-pad);
+  max-width: 100%;
+  border-radius: var(--radius);
+}
+.shop-callout > :first-child { margin-top: 0; }
+.shop-callout > :last-child { margin-bottom: 0; }
 .shop-callout .kicker { margin-bottom: var(--space-2); }
 .shop-callout .button-row { margin: var(--space-4) 0 0; }
 .shop-teaser .button-row { margin-top: 12px; }
