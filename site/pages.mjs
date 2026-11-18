@@ -23,16 +23,70 @@ function tags(field = "tag") {
   return TAGS.map((tag) => `<label><input type="checkbox" name="${field}" value="${tag}"> ${esc(tag)}</label>`).join("");
 }
 
+function allShopProducts() {
+  return shopData.groups.flatMap((group) => group.products);
+}
+
+function shopProductById(id) {
+  return allShopProducts().find((product) => product.id === id);
+}
+
+function shopProductByUrl(url) {
+  const target = String(url || "").trim();
+  return target ? allShopProducts().find((product) => product.url === target) : undefined;
+}
+
+function shortName(name) {
+  return String(name).split(" - ")[0];
+}
+
+/** Short callout blurbs. No prices. */
+const CALLOUT_BLURBS = {
+  "nursing-toolkit": "Fillable templates and study notes for students and new grads, including ISBAR sheets and a placement log.",
+  "nurse-roster-pay": "Log your shifts and estimate each pay with rates you enter yourself.",
+  "overseas-nurse-pack": "A planner and tracker for organising an internationally qualified registration pathway."
+};
+
+function shopCalloutCard(product, extraNote = "") {
+  const url = String(product?.url || "").trim();
+  if (!url) return "";
+  const blurb = CALLOUT_BLURBS[product.id] || "An independent template from the OnlyScrubs shop.";
+  const note = extraNote || product.note || "";
+  const noteHtml = note ? ` ${esc(note)}` : "";
+  return `<aside class="callout shop-callout"><p class="kicker">From the OnlyScrubs creator</p><p><strong>${esc(shortName(product.name || product.label || "Shop template"))}</strong></p><p>${esc(blurb)}${noteHtml} Independent templates, not clinical, legal, tax or financial advice, and not an official NMBA or Ahpra product.</p><p class="button-row"><a class="button primary" href="${esc(url)}" target="_blank" rel="noopener noreferrer">View on Gumroad</a> <a class="text-link" href="/shop.html">More in the shop</a></p></aside>`;
+}
+
 function toolkitCallout() {
-  return `<aside class="callout shop-callout"><p><strong>From the OnlyScrubs creator.</strong> Fillable templates and study notes for students and new grads are on the <a href="/shop.html">shop</a>. They are independent templates, not clinical advice, and not an NMBA or Ahpra product.</p></aside>`;
+  return shopCalloutCard(shopProductById("nursing-toolkit"));
 }
 
 export function productCallout(key) {
-  const product = siteConfig.upcomingProducts[key];
-  const url = String(product?.url || "").trim();
+  const meta = siteConfig.upcomingProducts[key];
+  const url = String(meta?.url || "").trim();
   if (!url) return "";
-  const note = product.note ? ` ${esc(product.note)}` : "";
-  return `<aside class="callout shop-callout"><p><strong>From the OnlyScrubs creator.</strong> <a href="${esc(url)}" rel="noopener noreferrer">${esc(product.label)}</a>.${note} Independent templates, not an official NMBA or Ahpra product.</p></aside>`;
+  const product = shopProductByUrl(url) || { name: meta.label, label: meta.label, url, note: meta.note };
+  return shopCalloutCard(product, meta.note);
+}
+
+function guideShopCallout(guide) {
+  return productCallout(guide.product) || (guide.toolkit === "yes" ? toolkitCallout() : "");
+}
+
+function insertAfterFirstSection(html, snippet) {
+  if (!snippet) return html;
+  const re = /<h2\b/gi;
+  let count = 0;
+  let secondIndex = -1;
+  let match;
+  while ((match = re.exec(html))) {
+    count += 1;
+    if (count === 2) {
+      secondIndex = match.index;
+      break;
+    }
+  }
+  if (secondIndex >= 0) return html.slice(0, secondIndex) + snippet + html.slice(secondIndex);
+  return html + snippet;
 }
 
 function money(value) {
@@ -198,7 +252,7 @@ export function home(assets, guides) {
           <p class="kicker">From the OnlyScrubs creator</p>
           <h2 id="home-shop">Templates, because the photocopier is broken again.</h2>
         </div>
-        <a class="text-link" href="/shop.html">Visit the shop</a>
+        <a class="text-link" href="/shop.html">More in the shop</a>
       </div>
       <div class="grid cards three">${shopTeaser()}</div>
       <p class="section-foot disclosure">Independent templates sold on Gumroad. Not official forms, and not clinical, legal, financial or tax advice.</p>
@@ -218,20 +272,17 @@ export function home(assets, guides) {
 
 const HOME_SHOP_PICKS = ["nursing-toolkit", "nurse-roster-pay", "bundle"];
 
-function shortName(name) {
-  return String(name).split(" - ")[0];
-}
-
 function shopTeaser() {
-  const all = shopData.groups.flatMap((group) => group.products);
-  return HOME_SHOP_PICKS.map((id) => all.find((product) => product.id === id)).filter(Boolean).map((product) => `<a class="card link-card shop-teaser" href="/shop.html#product-${esc(product.id)}">
+  const all = allShopProducts();
+  return HOME_SHOP_PICKS.map((id) => all.find((product) => product.id === id)).filter(Boolean).map((product) => `<article class="card shop-teaser">
         <picture>
           <source type="image/webp" srcset="/shop/${product.id}-cover.webp">
           <img src="/shop/${product.id}-cover.png" alt="" width="${product.width}" height="${product.height}" loading="lazy" decoding="async">
         </picture>
         <h3>${esc(shortName(product.name))}</h3>
         <p class="price-inline">${esc(product.priceLabel)}</p>
-      </a>`).join("");
+        <p class="button-row"><a class="button primary" href="${esc(product.url)}" target="_blank" rel="noopener noreferrer">View on Gumroad</a></p>
+      </article>`).join("");
 }
 
 export function guideIndex(assets, guides) {
@@ -286,11 +337,9 @@ export function guideArticle(assets, guide, related) {
       <p class="reading">${guide.minutes} min read · Updated ${esc(guide.updated || guide.date)}</p>
       <div class="button-row no-print"><button class="button secondary compact" type="button" data-share data-share-title="${esc(guide.title)}">Share</button></div>
       <blockquote class="callout"><p><strong>Not clinical advice.</strong> General information for healthcare workers and students in Australia. It does not replace your university, employer, facilitator, or professional standards.</p></blockquote>
-      ${guide.toolkit === "yes" ? toolkitCallout() : ""}
-      ${productCallout(guide.product)}
       ${toolBlock(guide)}
       ${adSlot("guide-top")}
-      ${guide.html}
+      ${insertAfterFirstSection(guide.html, guideShopCallout(guide))}
       ${adSlot("guide-end")}
       <h2>Keep going</h2>
       <div class="grid cards">${guideCards(related)}</div>
@@ -356,8 +405,7 @@ export function shiftKit(assets) {
     assets,
     tearoom: true,
     scripts: [assets.planner],
-    main: `<section class="wrap page-hero"><p class="eyebrow">Shift tools</p><h1>Shift Kit</h1><p class="lede">Sketch sleep around a roster that has never met a circadian rhythm. Nothing here is uploaded. It is a sketch, not a medical plan. If you are drowsy, do not drive.</p>
-    ${toolkitCallout()}</section>
+    main: `<section class="wrap page-hero"><p class="eyebrow">Shift tools</p><h1>Shift Kit</h1><p class="lede">Sketch sleep around a roster that has never met a circadian rhythm. Nothing here is uploaded. It is a sketch, not a medical plan. If you are drowsy, do not drive.</p></section>
     <section class="wrap section page-split">
       <form class="panel form" data-planner>
         <h2>Rest and caffeine sketch</h2>
@@ -378,7 +426,8 @@ export function shiftKit(assets) {
           <a class="card link-card" href="/guides/feet-and-back.html"><h3>Feet and back</h3><p>Shoes, loads, and when to see your own clinician.</p></a>
         </div>
       </div>
-    </section>`
+    </section>
+    <section class="wrap section">${productCallout("payTracker")}</section>`
   });
 }
 
@@ -395,8 +444,7 @@ export function studentBay(assets) {
     assets,
     tearoom: true,
     scripts: [assets.checklist],
-    main: `<section class="wrap page-hero"><p class="eyebrow">Placement prep</p><h1>Student Bay</h1><p class="lede">Pack the boring things before the shift invents new paperwork. Ticks stay in this browser. They do not join the roster.</p>
-    ${toolkitCallout()}</section>
+    main: `<section class="wrap page-hero"><p class="eyebrow">Placement prep</p><h1>Student Bay</h1><p class="lede">Pack the boring things before the shift invents new paperwork. Ticks stay in this browser. They do not join the roster.</p></section>
     <section class="wrap section">
       <form id="placement-checklist">
         <p class="progress" id="check-progress" aria-live="polite">0 packed</p>
@@ -429,6 +477,7 @@ export function studentBay(assets) {
           <button class="button" id="check-reset" type="button">Reset ticks</button>
         </div>
       </form>
+      ${toolkitCallout()}
       <div class="grid cards spaced">
         <a class="card link-card" href="/guides/first-clinical-placement.html"><h3>First placement</h3><p>What to organise before the roster starts.</p></a>
         <a class="card link-card" href="/guides/asking-for-help.html"><h3>Asking for help</h3><p>Sentences that work on a busy shift.</p></a>
@@ -945,26 +994,44 @@ export function moderation(assets) {
   });
 }
 
-function shopCard(product, index = 0) {
+function shopCard(product, options = {}) {
+  const eager = Boolean(options.eager);
+  const featured = Boolean(options.featured);
+  const priority = options.fetchPriority ? ` fetchpriority="${esc(options.fetchPriority)}"` : "";
+  const loading = eager ? 'loading="eager"' : 'loading="lazy"';
   const note = product.note ? `<p>${esc(product.note)}</p>` : "";
-  const lazy = index > 1 ? ' loading="lazy" decoding="async"' : "";
-  return `<article class="card shop-card" id="product-${esc(product.id)}">
+  const classes = featured ? "card shop-card shop-featured" : "card shop-card";
+  return `<article class="${classes}" id="product-${esc(product.id)}">
       <picture>
         <source type="image/webp" srcset="/shop/${product.id}-cover.webp">
-        <img src="/shop/${product.id}-cover.png" alt="${esc(product.alt)}" width="${product.width}" height="${product.height}"${lazy}>
+        <img src="/shop/${product.id}-cover.png" alt="${esc(product.alt)}" width="${product.width}" height="${product.height}" ${loading} decoding="async"${priority}>
       </picture>
+      <div class="shop-card-body">
       <h3>${esc(product.name)}</h3>
       <p class="price">${esc(product.priceLabel)}</p>
       <p>${esc(product.description)}</p>
       ${note}
       <a class="button primary" href="${esc(product.url)}" target="_blank" rel="noopener noreferrer">Buy on Gumroad</a>
+      </div>
     </article>`;
 }
 
 export function shop(assets) {
   const groups = shopData.groups;
-  const products = groups.flatMap((group) => group.products);
-  const sections = groups.map((group, groupIndex) => `<section class="shop-group"><h2>${esc(group.title)}</h2><div class="grid shop-grid">${group.products.map((product, i) => shopCard(product, groupIndex === 0 ? i : 99)).join("")}</div></section>`).join("");
+  const products = allShopProducts();
+  const featured = shopProductById("bundle");
+  const featuredHtml = featured ? `<section class="shop-group shop-featured-group" aria-labelledby="shop-featured-heading"><h2 id="shop-featured-heading">The bundle</h2>${shopCard(featured, { eager: true, fetchPriority: "high", featured: true })}</section>` : "";
+  let aboveFold = featured ? 1 : 0;
+  const sections = groups.map((group) => {
+    const items = group.products.filter((product) => product.id !== "bundle");
+    const cards = items.map((product) => {
+      const eager = aboveFold < 3;
+      const card = shopCard(product, { eager });
+      aboveFold += 1;
+      return card;
+    }).join("");
+    return `<section class="shop-group"><h2>${esc(group.title)}</h2><div class="grid shop-grid">${cards}</div></section>`;
+  }).join("");
   return page({
     title: "Shop | Australian templates for nurses, renters and sole traders",
     description: "Printable Australian templates from OnlyScrubs: nursing study sheets, a roster pay estimate tracker, an IQNM registration planner, and life-admin kits for renting, budgeting, moving and sole traders.",
@@ -989,9 +1056,11 @@ export function shop(assets) {
     })),
     main: `<section class="wrap page-hero"><p class="eyebrow">From the OnlyScrubs creator</p><h1>Australian templates we made</h1><p class="lede">Digital downloads for Australian nurses, students, renters and sole traders. Organising tools, not paperwork therapy, though it helps.</p>
       <p class="hero-note">They are general information, not official forms, and not legal, financial, tax or clinical advice. Not third-party ads. Digital downloads delivered via Gumroad. Your rights under the Australian Consumer Law apply.</p></section>
-      <section class="wrap section">${sections}
+      <section class="wrap section">${featuredHtml}${sections}
+      <p class="affiliation shop-note">Independent templates. Not affiliated with or endorsed by any government agency, NMBA or Ahpra. General information only, not legal, financial, tax or clinical advice.</p></section>
+      <section class="wrap section shop-support-section">
       <div class="callout shop-support" data-support-block hidden><p><strong>Not after a template?</strong> You can shout the site a coffee instead. It keeps the guides free and the servers caffeinated. Entirely optional, and it buys you nothing but our gratitude.</p><span class="support-slot" data-support-slot hidden></span></div>
-      <p class="affiliation shop-note">Independent templates. Not affiliated with or endorsed by any government agency, NMBA or Ahpra. General information only, not legal, financial, tax or clinical advice.</p></section>`
+      </section>`
   });
 }
 

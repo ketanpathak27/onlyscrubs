@@ -46,6 +46,17 @@
       "title": "Life admin",
       "products": [
         {
+          "id": "bundle",
+          "name": "Australian Life Admin Bundle - Renter, Budget, Nursing Student & Sole Trader Kits",
+          "price": "49",
+          "priceLabel": "A$49",
+          "url": "https://lofiluffyy.gumroad.com/l/disabv",
+          "description": "Includes all 4 kits: save A$32 vs buying separately (A$81).",
+          "alt": "Cover of the Australian Life Admin Bundle, four template kits.",
+          "width": 960,
+          "height": 540
+        },
+        {
           "id": "renter-kit",
           "name": "Australian Renter's Bond-Back Kit",
           "price": "19",
@@ -73,7 +84,7 @@
           "price": "24",
           "priceLabel": "A$24",
           "url": "https://lofiluffyy.gumroad.com/l/adzqwv",
-          "description": "GST and non-GST invoice templates, income & expense tracker with BAS-prep totals, car logbook and home office log, plus start-up and tax-time checklists. General information only – not tax advice.",
+          "description": "GST and non-GST invoice templates, income & expense tracker with BAS-prep totals, car logbook and home office log, plus start-up and tax-time checklists. General information only \u2013 not tax advice.",
           "alt": "Cover of the Australian Sole Trader Starter Kit, with an invoice and tracker pages.",
           "width": 960,
           "height": 540
@@ -108,17 +119,6 @@
           "url": "https://lofiluffyy.gumroad.com/l/rsjltt",
           "description": "Budget by category, track vendor deposits and payment due dates, manage RSVPs and know your consumer rights before you pay - Excel / Google Sheets plus a printable A4 planner.",
           "alt": "Cover of the Australian Wedding and Event Budget Planner.",
-          "width": 960,
-          "height": 540
-        },
-        {
-          "id": "bundle",
-          "name": "Australian Life Admin Bundle - Renter, Budget, Nursing Student & Sole Trader Kits",
-          "price": "49",
-          "priceLabel": "A$49",
-          "url": "https://lofiluffyy.gumroad.com/l/disabv",
-          "description": "Includes all 4 kits: save A$32 vs buying separately (A$81).",
-          "alt": "Cover of the Australian Life Admin Bundle, four template kits.",
           "width": 960,
           "height": 540
         }

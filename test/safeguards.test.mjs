@@ -273,7 +273,11 @@ test("shop page keeps plain prices and the consumer-law lines", () => {
   const nurses = html.slice(html.indexOf(">For nurses<"), html.indexOf(">Life admin<"));
   const life = html.slice(html.indexOf(">Life admin<"));
   assert.match(nurses, /ozfbx[\s\S]*gnacj[\s\S]*nlvlrt/);
-  assert.match(life, /kaqesn[\s\S]*syfesl[\s\S]*adzqwv[\s\S]*ggwzo[\s\S]*vjweaq[\s\S]*rsjltt[\s\S]*disabv/);
+  assert.match(life, /kaqesn[\s\S]*syfesl[\s\S]*adzqwv[\s\S]*ggwzo[\s\S]*vjweaq[\s\S]*rsjltt/);
+  assert.doesNotMatch(life, /disabv/, "the bundle is featured above the groups, not repeated in Life admin");
+  const featured = html.indexOf("id=\"product-bundle\"");
+  const nursesHead = html.indexOf(">For nurses<");
+  assert.ok(featured >= 0 && featured < nursesHead, "the bundle is featured first, before the shop groups");
   assert.doesNotMatch(html, /gumroad\.com\/js\/gumroad\.js/);
 });
 
