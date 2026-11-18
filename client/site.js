@@ -169,7 +169,7 @@
   };
 
   function showSignedIn(on) {
-    document.querySelectorAll("[data-admin-lock], [data-admin-logout]").forEach(function (el) { el.hidden = !on; });
+    document.querySelectorAll("[data-admin-logout]").forEach(function (el) { el.hidden = !on; });
   }
   fetch("/api/admin/session").then(function (res) { return res.json(); }).then(function (data) {
     showSignedIn(Boolean(data && data.signedIn));

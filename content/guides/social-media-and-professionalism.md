@@ -4,7 +4,6 @@ description: How the NMBA social media guidance and Ahpra's advertising rules ap
 date: 2026-11-17
 updated: 2026-11-17
 tags: professionalism, students
-toolkit: yes
 ---
 
 The group chat feels private right up until it is not. A story, a photo of a screen, a joke that names a ward: any of those can identify a person or a service, and any of them can sit on a server you do not control. This page is general information about professionalism online. It is not clinical advice, and it is not a ruling. The documents that bind you are the NMBA's and Ahpra's.

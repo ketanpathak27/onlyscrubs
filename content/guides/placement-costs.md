@@ -6,6 +6,7 @@ updated: 2026-11-17
 tags: placements, students
 tool: placement
 product: placementKit
+toolkit: yes
 ---
 
 Placement is when the timetable and the bank account have an argument. Rent does not pause because you are on a ward. This page is general information only, for students in Australia. It is not a decision about whether you will be paid, and it is not clinical advice. Figures below were checked on 17 November 2026. The official pages can move the numbers. The calculator uses the figures stored for this site, not a guess typed into the article.
