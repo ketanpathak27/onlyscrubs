@@ -575,6 +575,14 @@ html.nav-locked body {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
 }
+/* Browser default blockquote margins (1em 40px) indented the "Not clinical advice"
+   callout and made it narrower than the guide column. */
+.callout {
+  margin-inline: 0;
+  padding: var(--space-4) var(--space-5);
+}
+.callout > :first-child { margin-top: 0; }
+.callout > :last-child { margin-bottom: 0; }
 .banner {
   padding: var(--space-4) var(--space-5);
   border-left: 8px solid var(--coral-fill);

@@ -166,3 +166,8 @@ test("cross-document view transitions are short, keep the header still, and turn
   assert.match(reduce, /::view-transition-new\(site-main\)/);
   assert.match(css, /html\.vt-enter \.reveal/);
 });
+
+test("guide callouts cancel browser blockquote margins and share padding", () => {
+  assert.match(css, /\.callout\s*\{[^}]*margin-inline:\s*0/);
+  assert.match(css, /\.callout\s*\{[^}]*padding:\s*var\(--space-4\)\s+var\(--space-5\)/);
+});
