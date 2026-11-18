@@ -9,7 +9,7 @@ export const siteConfig = {
    * A Worker var named SUPPORT_URL overrides it. Empty, or anything that is not
    * an http(s) URL, hides the button.
    */
-  supportUrl: "",
+  supportUrl: "https://buymeacoffee.com/onlyscrubs",
   /** Reserved ad slots on guides and gear pages. Override with ADS_ENABLED=true. */
   adsEnabled: false,
   locale: "en-AU",
