@@ -349,7 +349,7 @@ export const GUIDES = [
   }
 ];
 export const SCRIPT_HASHES = [
-  "sha256-o08KDhvOROGgRcFlZwjJoU3E3bwP+Y9eXnqCEjL8gzo=",
+  "sha256-mJOFpMiYMVA6toEmYUSI1X/7CDemGbMcuR2us6HQ89w=",
   "sha256-DZ76L1DlOWNwudjspNR0qrTMETxUvskbU74DbEAJPIk=",
   "sha256-03rnRsqe7GKgo/mRpzOlQNqiVVP2c4QiPKnZpxZgNjI=",
   "sha256-FGKzG5vidY7FmNpVW/6Sfwyb4hXuDGpGVUyhBAHW+vY=",

@@ -28,6 +28,25 @@ const LEGAL_NAV = [
   ["/complaints.html", "Complaints"]
 ];
 
+export function normalizeNavPath(path) {
+  if (!path) return "";
+  let current = String(path).split("?")[0].split("#")[0].trim();
+  if (!current.startsWith("/")) current = "/" + current;
+  if (current.length > 1 && current.endsWith("/")) current = current.slice(0, -1);
+  if (current === "/index.html" || current === "/index") return "/";
+  if (current !== "/" && !/\.[a-z0-9]+$/i.test(current)) current += ".html";
+  return current;
+}
+
+export function navHrefIsCurrent(href, path) {
+  const current = normalizeNavPath(path);
+  const target = normalizeNavPath(href);
+  if (!current || !target) return false;
+  if (current === target) return true;
+  if (target === "/guides.html" && current.startsWith("/guides/")) return true;
+  return false;
+}
+
 export function heroArt() {
   return `<div class="hero-art" role="img" aria-label="Illustration of folded scrubs and a fob watch">
     <svg viewBox="0 0 640 560" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -81,7 +100,8 @@ const NAV_PATHS = {
   chat: '<path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-4 3v-3H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z"/>',
   heart: '<path d="M12 19.5S5 14.2 5 9.6A3.6 3.6 0 0 1 12 8a3.6 3.6 0 0 1 7 1.6c0 4.6-7 9.9-7 9.9z"/>',
   info: '<circle cx="12" cy="12" r="8.5"/><path d="M12 11v6M12 7.5h.01"/>',
-  logout: '<path d="M10 20.5H6.5A2 2 0 0 1 4.5 18.5v-13a2 2 0 0 1 2-2H10"/><path d="M15 16.5 20 12l-5-4.5M20 12H9.5"/>'
+  logout: '<path d="M10 20.5H6.5A2 2 0 0 1 4.5 18.5v-13a2 2 0 0 1 2-2H10"/><path d="M15 16.5 20 12l-5-4.5M20 12H9.5"/>',
+  top: '<path d="M5 14.5 12 7.5l7 7"/><path d="M12 8v10"/>'
 };
 
 function navIcon(name) {
@@ -110,12 +130,13 @@ export function layout(options) {
     const json = JSON.stringify(obj).replace(/</g, "\\u003c");
     return `<script type="application/ld+json">${json}</script>`;
   });
+  const currentPath = path || active || "";
   const nav = NAV.map(([href, label, glyph], index) => {
-    const current = href === active ? ' aria-current="page"' : "";
+    const current = navHrefIsCurrent(href, currentPath) ? ' aria-current="page"' : "";
     return `<a href="${href}"${current} style="--i:${index}">${navIcon(glyph)}<span>${label}</span></a>`;
   }).join("");
   const legal = LEGAL_NAV.map(([href, label]) => {
-    const current = href === active ? ' aria-current="page"' : "";
+    const current = navHrefIsCurrent(href, currentPath) ? ' aria-current="page"' : "";
     return `<a href="${href}"${current}>${label}</a>`;
   }).join("");
   const footerNews = newsletter === "footer"
@@ -176,6 +197,7 @@ export function layout(options) {
         <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav">Menu</button>
       </div>
       <nav class="site-nav" id="site-nav" data-nav aria-label="Primary">
+        <div class="nav-handle" data-nav-handle aria-hidden="true"><span></span></div>
         <div class="nav-primary">${nav}<button class="nav-logout" type="button" data-admin-logout hidden style="--i:${NAV.length}">${navIcon("logout")}<span>Log out</span></button></div>
         <div class="nav-legal" role="group" aria-label="Legal">${legal}</div>
       </nav>
@@ -207,6 +229,7 @@ export function layout(options) {
   </dialog>
   <script src="${assets.site}" defer></script>
   ${scripts.map((src) => `<script src="${src}" defer></script>`).join("\n  ")}
+  <button class="back-to-top" type="button" data-back-to-top aria-label="Back to top" aria-hidden="true" tabindex="-1">${navIcon("top")}<span class="visually-hidden">Back to top</span></button>
 </body>
 </html>`;
 }

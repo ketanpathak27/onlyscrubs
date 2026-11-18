@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import worker, { securityTxt } from "../src/worker.js";
 import { HSTS, applySecurityHeaders } from "../src/lib/http.js";
-import { layout } from "../site/layout.mjs";
+import { readFileSync } from "node:fs";
+import { layout, navHrefIsCurrent, normalizeNavPath } from "../site/layout.mjs";
 import { home } from "../site/pages.mjs";
 
 const assets = { styles: "/assets/styles.css", site: "/assets/site.js" };
@@ -106,4 +107,62 @@ test("mobile nav is a floating panel with icons and a quieter legal group", () =
   assert.doesNotMatch(nav, /https?:\/\/|cdn\.|googleapis|unpkg|jsdelivr/i, "icons are inline, not from a CDN");
   assert.match(nav, /href="\/guides\.html" aria-current="page"/);
   assert.match(html, /class="nav-toggle"/);
+});
+
+
+const css = readFileSync(new URL("../client/styles.css", import.meta.url), "utf8");
+
+function primaryNav(html) {
+  const start = html.indexOf('id="site-nav"');
+  const end = html.indexOf("</nav>", start);
+  return html.slice(start, end);
+}
+
+test("nav marks the current page for .html, extensionless paths, and guide articles", () => {
+  assert.equal(normalizeNavPath("/shop"), "/shop.html");
+  assert.equal(normalizeNavPath("/shop.html"), "/shop.html");
+  assert.equal(normalizeNavPath("/guides/"), "/guides.html");
+  assert.equal(normalizeNavPath("/index.html"), "/");
+  assert.equal(navHrefIsCurrent("/guides.html", "/guides.html"), true);
+  assert.equal(navHrefIsCurrent("/guides.html", "/guides"), true);
+  assert.equal(navHrefIsCurrent("/guides.html", "/guides/isbar-handover.html"), true);
+  assert.equal(navHrefIsCurrent("/guides.html", "/guides/isbar-handover"), true);
+  assert.equal(navHrefIsCurrent("/shop.html", "/guides/isbar-handover.html"), false);
+  assert.equal(navHrefIsCurrent("/privacy.html", "/privacy"), true);
+
+  const article = layout({ title: "T", description: "D", path: "/guides/isbar-handover.html", main: "<h1>Guide</h1>", assets });
+  const articleNav = primaryNav(article);
+  assert.match(articleNav, /href="\/guides\.html" aria-current="page"/);
+  assert.equal((articleNav.match(/aria-current="page"/g) || []).length, 1);
+
+  const ext = layout({ title: "T", description: "D", path: "/shop", main: "<h1>Shop</h1>", assets });
+  assert.match(primaryNav(ext), /href="\/shop\.html" aria-current="page"/);
+
+  const privacy = layout({ title: "T", description: "D", path: "/privacy.html", active: "", main: "<h1>Privacy</h1>", assets });
+  assert.match(primaryNav(privacy), /href="\/privacy\.html" aria-current="page"/);
+
+  const homePage = layout({ title: "T", description: "D", path: "/", active: "/", main: "<h1>Home</h1>", assets });
+  assert.doesNotMatch(primaryNav(homePage), /aria-current="page"/);
+});
+
+test("back-to-top control is present, labelled, and at least 44px", () => {
+  const html = layout({ title: "T", description: "D", path: "/guides.html", active: "/guides.html", main: "<h1>Guides</h1>", assets });
+  assert.match(html, /class="back-to-top"[^>]*data-back-to-top/);
+  assert.match(html, /data-back-to-top[^>]*aria-label="Back to top"/);
+  assert.match(html, /data-back-to-top[\s\S]*?<svg class="nav-icon"/);
+  assert.match(css, /\.back-to-top\s*\{[\s\S]*?width:\s*var\(--tap\)/);
+  assert.match(css, /\.back-to-top\s*\{[\s\S]*?safe-area-inset-bottom/);
+});
+
+test("cross-document view transitions are short, keep the header still, and turn off under reduced motion", () => {
+  assert.match(css, /@view-transition\s*\{\s*navigation:\s*auto;/);
+  assert.match(css, /view-transition-name:\s*site-header/);
+  assert.match(css, /view-transition-name:\s*site-main/);
+  assert.match(css, /os-vt-main-in/);
+  assert.match(css, /--dur-page:\s*280ms/);
+  const reduce = css.slice(css.indexOf("@media (prefers-reduced-motion: reduce)"));
+  assert.match(reduce, /@view-transition\s*\{\s*navigation:\s*none;/);
+  assert.match(reduce, /::view-transition-old\(root\)/);
+  assert.match(reduce, /::view-transition-new\(site-main\)/);
+  assert.match(css, /html\.vt-enter \.reveal/);
 });

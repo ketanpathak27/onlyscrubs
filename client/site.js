@@ -43,7 +43,7 @@
   const navToggle = document.querySelector("[data-nav-toggle]");
   const nav = document.querySelector("[data-nav]");
   const navScrim = document.querySelector("[data-nav-scrim]");
-  const desktopNav = window.matchMedia("(min-width: 1040px)");
+  const desktopNav = window.matchMedia("(min-width: 1024px)");
 
   function navIsDesktop() {
     return desktopNav.matches;
@@ -98,6 +98,7 @@
       navScrim.setAttribute("aria-hidden", willOpen ? "false" : "true");
     }
     lockPage(willOpen);
+    if (willOpen) revealHeader();
     if (willOpen && !already) {
       const first = firstNavItem();
       if (first) first.focus();
@@ -141,7 +142,7 @@
   });
 
   const reveals = document.querySelectorAll(".reveal");
-  if (reduce || !("IntersectionObserver" in window)) {
+  if (reduce || document.documentElement.classList.contains("vt-enter") || !("IntersectionObserver" in window)) {
     reveals.forEach(function (el) { el.classList.add("is-in"); });
   } else {
     const io = new IntersectionObserver(function (entries) {
@@ -466,6 +467,312 @@
       }, 8000);
     }
   }
+
+
+  function isiOS() {
+    const ua = navigator.userAgent || "";
+    return /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  }
+
+  function normalizeNavPath(path) {
+    if (!path) return "";
+    let current = String(path).split("?")[0].split("#")[0].trim();
+    if (!current.startsWith("/")) current = "/" + current;
+    if (current.length > 1 && current.endsWith("/")) current = current.slice(0, -1);
+    if (current === "/index.html" || current === "/index") return "/";
+    if (current !== "/" && !/\.[a-z0-9]+$/i.test(current)) current += ".html";
+    return current;
+  }
+
+  function markCurrentNav() {
+    if (!nav) return;
+    const path = normalizeNavPath(location.pathname);
+    nav.querySelectorAll("a[href]").forEach(function (link) {
+      const href = normalizeNavPath(link.getAttribute("href"));
+      const on = Boolean(href && (href === path || (href === "/guides.html" && path.startsWith("/guides/"))));
+      if (on) link.setAttribute("aria-current", "page");
+      else link.removeAttribute("aria-current");
+    });
+  }
+  markCurrentNav();
+
+  function lightTap() {
+    if (reduce || isiOS()) return;
+    if (typeof navigator.vibrate === "function") navigator.vibrate(8);
+  }
+
+  if (nav) {
+    nav.addEventListener("pointerdown", function (event) {
+      const item = event.target.closest("a, .nav-logout");
+      if (!item || !nav.contains(item)) return;
+      item.classList.add("is-pressed");
+      lightTap();
+    });
+    ["pointerup", "pointercancel", "pointerleave"].forEach(function (type) {
+      nav.addEventListener(type, function (event) {
+        const item = event.target.closest("a, .nav-logout");
+        if (item) item.classList.remove("is-pressed");
+      });
+    });
+  }
+
+  // Swipe up (or a flick) dismisses the floating panel. The handle always
+  // participates; the rest of the panel only does when it cannot scroll, so
+  // an overflowed list still pans normally.
+  if (nav) {
+    const dismissPx = 72;
+    const dismissVel = 0.55;
+    let swipe = null;
+
+    function rubber(dy) {
+      if (dy >= 0) return dy / (1 + dy / 110);
+      return dy;
+    }
+
+    function clearSwipeStyles() {
+      nav.style.transition = "";
+      nav.style.transform = "";
+      nav.style.opacity = "";
+      nav.style.willChange = "";
+    }
+
+    function endSwipe(event) {
+      if (!swipe) return;
+      const dy = rubber(event.clientY - swipe.startY);
+      const dt = Math.max(event.timeStamp - swipe.lastT, 1);
+      const vel = (swipe.lastY - event.clientY) / dt;
+      const shouldClose = swipe.tracking && (dy < -dismissPx || vel > dismissVel);
+      const live = swipe;
+      swipe = null;
+      if (live.pointerId != null) {
+        try { nav.releasePointerCapture(live.pointerId); } catch (error) {}
+      }
+      nav.querySelectorAll(".is-pressed").forEach(function (el) { el.classList.remove("is-pressed"); });
+      if (shouldClose) {
+        const exit = reduce ? 1 : 200;
+        nav.style.willChange = "transform, opacity";
+        nav.style.transition = "transform " + exit + "ms var(--ease-standard), opacity " + exit + "ms var(--ease-standard)";
+        nav.style.transform = "translateY(-30%) scale(0.96)";
+        nav.style.opacity = "0";
+        window.setTimeout(function () {
+          clearSwipeStyles();
+          setNav(false);
+        }, exit + 16);
+      } else if (live.tracking) {
+        const back = reduce ? 1 : 320;
+        nav.style.transition = "transform " + back + "ms var(--ease-sheet), opacity " + back + "ms var(--ease-sheet)";
+        nav.style.transform = "none";
+        nav.style.opacity = "1";
+        const finish = function () {
+          clearSwipeStyles();
+          nav.removeEventListener("transitionend", finish);
+        };
+        nav.addEventListener("transitionend", finish);
+        window.setTimeout(finish, back + 32);
+      } else {
+        clearSwipeStyles();
+      }
+    }
+
+    nav.addEventListener("pointerdown", function (event) {
+      if (!navIsOpen() || navIsDesktop() || event.button) return;
+      const onHandle = Boolean(event.target.closest("[data-nav-handle]"));
+      const scrollable = nav.scrollHeight > nav.clientHeight + 1;
+      if (!onHandle && scrollable && nav.scrollTop > 0) return;
+      swipe = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        lastY: event.clientY,
+        lastT: event.timeStamp,
+        onHandle: onHandle,
+        scrollable: scrollable,
+        tracking: false
+      };
+    });
+
+    nav.addEventListener("pointermove", function (event) {
+      if (!swipe || event.pointerId !== swipe.pointerId) return;
+      const dx = event.clientX - swipe.startX;
+      const dy = event.clientY - swipe.startY;
+      swipe.lastY = event.clientY;
+      swipe.lastT = event.timeStamp;
+      if (!swipe.tracking) {
+        if (Math.abs(dy) < 8 && Math.abs(dx) < 8) return;
+        const vertical = Math.abs(dy) > Math.abs(dx);
+        const canDismiss = swipe.onHandle || !swipe.scrollable;
+        if (!canDismiss || !vertical) {
+          swipe = null;
+          return;
+        }
+        swipe.tracking = true;
+        try { nav.setPointerCapture(event.pointerId); } catch (error) {}
+        nav.style.willChange = "transform, opacity";
+        nav.style.transition = "none";
+        nav.querySelectorAll(".is-pressed").forEach(function (el) { el.classList.remove("is-pressed"); });
+      }
+      if (event.cancelable) event.preventDefault();
+      const y = rubber(dy);
+      const lifted = Math.max(-y, 0);
+      nav.style.transform = "translateY(" + y + "px) scale(" + (1 - Math.min(lifted, 160) / 2000) + ")";
+      nav.style.opacity = String(1 - Math.min(lifted, 180) / 280);
+    }, { passive: false });
+
+    nav.addEventListener("pointerup", endSwipe);
+    nav.addEventListener("pointercancel", endSwipe);
+  }
+
+  const header = document.querySelector(".site-header");
+  const backBtn = document.querySelector("[data-back-to-top]");
+  const footer = document.querySelector(".site-footer");
+  let lastScrollY = Math.max(0, window.scrollY);
+  let headerAway = false;
+  let headerTick = false;
+  let footerInView = false;
+
+  function maxScrollY() {
+    const doc = document.documentElement;
+    return Math.max(0, doc.scrollHeight - doc.clientHeight);
+  }
+
+  function clampedScrollY() {
+    return Math.min(Math.max(window.scrollY, 0), maxScrollY());
+  }
+
+  function setHeaderMoving(on) {
+    if (!header) return;
+    header.classList.toggle("is-moving", on);
+    if (!on) header.style.willChange = "";
+    else header.style.willChange = "transform";
+  }
+
+  function revealHeader() {
+    if (!header || !headerAway) return;
+    headerAway = false;
+    setHeaderMoving(true);
+    header.classList.remove("is-away");
+    header.addEventListener("transitionend", function done(event) {
+      if (event.propertyName && event.propertyName !== "transform") return;
+      setHeaderMoving(false);
+      header.removeEventListener("transitionend", done);
+    });
+  }
+
+  function hideHeader() {
+    if (!header || headerAway || navIsOpen()) return;
+    if (header.contains(document.activeElement)) return;
+    headerAway = true;
+    setHeaderMoving(true);
+    header.classList.add("is-away");
+    header.addEventListener("transitionend", function done(event) {
+      if (event.propertyName && event.propertyName !== "transform") return;
+      setHeaderMoving(false);
+      header.removeEventListener("transitionend", done);
+    });
+  }
+
+  function updateViewportOffset() {
+    const vv = window.visualViewport;
+    const extra = vv ? Math.max(0, window.innerHeight - (vv.height + vv.offsetTop)) : 0;
+    document.documentElement.style.setProperty("--vv-bottom", extra + "px");
+  }
+
+  function pageIsLong() {
+    return document.documentElement.scrollHeight >= window.innerHeight * 2.5;
+  }
+
+  function updateBackToTop(y) {
+    if (!backBtn) return;
+    const show = pageIsLong() && y >= window.innerHeight * 1.5 && !footerInView;
+    const shown = backBtn.classList.contains("is-visible");
+    if (show === shown) return;
+    backBtn.classList.toggle("is-moving", true);
+    backBtn.classList.toggle("is-visible", show);
+    backBtn.setAttribute("aria-hidden", show ? "false" : "true");
+    if (show) backBtn.removeAttribute("tabindex");
+    else backBtn.setAttribute("tabindex", "-1");
+    window.setTimeout(function () { backBtn.classList.remove("is-moving"); }, 400);
+  }
+
+  function onChromeScroll() {
+    const y = clampedScrollY();
+    const raw = window.scrollY;
+    if (raw < 0 || raw > maxScrollY()) {
+      lastScrollY = y;
+      headerTick = false;
+      return;
+    }
+    if (y < 80 || navIsOpen() || (header && header.contains(document.activeElement))) {
+      revealHeader();
+    } else if (y > lastScrollY + 10) {
+      hideHeader();
+    } else if (lastScrollY - y >= 8) {
+      revealHeader();
+    }
+    lastScrollY = y;
+    updateBackToTop(y);
+    headerTick = false;
+  }
+
+  window.addEventListener("scroll", function () {
+    if (headerTick) return;
+    headerTick = true;
+    window.requestAnimationFrame(onChromeScroll);
+  }, { passive: true });
+
+  if (header) {
+    header.addEventListener("focusin", revealHeader);
+  }
+
+  window.addEventListener("pageswap", function () {
+    revealHeader();
+  });
+
+  updateViewportOffset();
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", updateViewportOffset, { passive: true });
+    window.visualViewport.addEventListener("scroll", updateViewportOffset, { passive: true });
+  }
+
+  if (footer && "IntersectionObserver" in window) {
+    const footIo = new IntersectionObserver(function (entries) {
+      footerInView = entries.some(function (entry) { return entry.isIntersecting; });
+      updateBackToTop(clampedScrollY());
+    }, { threshold: 0.08 });
+    const newsletter = footer.querySelector("[data-newsletter]") || footer;
+    footIo.observe(newsletter);
+  }
+
+  if (backBtn) {
+    backBtn.addEventListener("pointerdown", function () { backBtn.classList.add("is-pressed"); });
+    ["pointerup", "pointercancel", "pointerleave"].forEach(function (type) {
+      backBtn.addEventListener(type, function () { backBtn.classList.remove("is-pressed"); });
+    });
+    backBtn.addEventListener("click", function () {
+      const top = { top: 0, left: 0, behavior: reduce ? "auto" : "smooth" };
+      window.scrollTo(top);
+      function focusTarget() {
+        const heading = document.querySelector("main h1");
+        const target = heading || document.querySelector(".skip-link");
+        if (!target) return;
+        if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
+        target.focus({ preventScroll: true });
+      }
+      if (reduce) {
+        focusTarget();
+        return;
+      }
+      let waited = 0;
+      const tick = function () {
+        waited += 1;
+        if (window.scrollY <= 1 || waited > 60) focusTarget();
+        else window.requestAnimationFrame(tick);
+      };
+      window.requestAnimationFrame(tick);
+    });
+  }
+
+  onChromeScroll();
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/sw.js").catch(function () {});
