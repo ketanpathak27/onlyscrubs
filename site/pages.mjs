@@ -2,10 +2,14 @@ import shopData from "../data/shop.json" with { type: "json" };
 import figures from "../data/figures.json" with { type: "json" };
 import { siteConfig } from "../src/config.js";
 import { TAGS } from "../src/lib/moderation.js";
+import { AUTO_HIDE_AFTER, REPORTS_PER_DAY } from "../src/lib/reports.js";
 import { adSlot, heroArt, layout, newsletterForm } from "./layout.mjs";
 import { esc } from "./markdown.mjs";
 
 const SITE = "https://onlyscrubs.org";
+
+/** The one public wording of the report rule. It mirrors decideReport in src/lib/reports.js. */
+export const REPORT_RULE = `An ordinary report does not take an item down on its own: a confession, comment or listing is hidden from the public page, pending moderation, once ${AUTO_HIDE_AFTER} different people have reported it. A report for patient-identifying information, threats or self-harm hides it immediately, pending moderation. The same connection can report an item only once, and each connection can make up to ${REPORTS_PER_DAY} reports a day.`;
 
 function page(options) {
   return layout(options);
@@ -105,7 +109,7 @@ function guideCards(guides) {
 }
 
 export function home(assets, guides) {
-  const featured = guides.slice(0, 3);
+  const featured = guides.slice(0, 4);
   return page({
     title: "OnlyScrubs | Practical stuff for Australian nurses and midwives",
     description: "Free, anonymous guides, scrub swaps, shift tools and moderated confessions for Australian nurses, midwives, students and healthcare workers.",
@@ -141,40 +145,22 @@ export function home(assets, guides) {
       <div class="hero-copy">
         <p class="eyebrow">Nurses, midwives, students</p>
         <h1>The tearoom, minus the patient stories.</h1>
-        <p class="lede">Guides, scrub swaps and harmless confessions for people who live in scrubs. We will joke about rosters, paperwork and cold coffee. We will not joke about patients.</p>
+        <p class="lede">Guides, tools and harmless confessions for people who live in scrubs. We joke about rosters, paperwork and cold coffee. Never about patients.</p>
         <div class="hero-actions">
           <a class="button primary" href="/guides.html">Open the guides</a>
           <a class="button secondary" href="/confessions.html">Enter the tearoom</a>
         </div>
+        <p class="hero-note"><strong>Clean boundary.</strong> Pens, rosters, full moons and the Q word are fair game. Patient stories, workplaces and clinical claims are not. OnlyScrubs is not a clinic and not medical advice.</p>
       </div>
       ${heroArt()}
     </section>
-    <div class="wrap"><p class="banner"><strong>Clean boundary.</strong> Pens, rosters, full moons and the Q word are fair game. Patient stories, workplaces and clinical claims are not. OnlyScrubs is not a clinic and not medical advice.</p></div>
-    <section class="section wrap reveal">
-      <p class="kicker">Start here</p>
-      <h2>Pick a bay before the roster does.</h2>
-      <div class="grid cards">
-        <a class="card link-card" href="/guides.html"><span class="icon-blob">01</span><h3>Guides</h3><p>Registration, placement, nights, handover, pay and how to ask for help. Factual. Still not clinical advice.</p></a>
-        <a class="card link-card" href="/scrub-rack.html"><span class="icon-blob">02</span><h3>Scrub Rack</h3><p>Donate, request or swap clean scrubs. Your email stays off the card, like a pen you actually want back.</p></a>
-        <a class="card link-card" href="/shift-kit.html"><span class="icon-blob">03</span><h3>Shift Kit</h3><p>A rest and caffeine sketch for rosters that think sleep is optional.</p></a>
-        <a class="card link-card" href="/student-bay.html"><span class="icon-blob">04</span><h3>Student Bay</h3><p>A placement checklist that lives in this browser, not in the group chat.</p></a>
-        <a class="card link-card" href="/gear-guide.html"><span class="icon-blob">05</span><h3>Gear</h3><p>Shoes, socks, watches, bags and the eternal pen shortage. No fake reviews.</p></a>
-        <a class="card link-card" href="/shop.html"><span class="icon-blob">06</span><h3>Shop</h3><p>Templates from the person who runs this site. Checkout is on Gumroad.</p></a>
-        <a class="card link-card" href="/wellbeing.html"><span class="icon-blob">07</span><h3>Wellbeing</h3><p>Australian support lines, and a short breathing pause. This one stays serious.</p></a>
-      </div>
-    </section>
-    <section class="section wrap reveal">
-      <p class="kicker">From the guides</p>
-      <h2>Practical. Deliberately not clinical. Mildly caffeinated.</h2>
-      <div class="grid cards">${guideCards(featured)}</div>
-    </section>
-    <section class="section wrap reveal">
+    <section class="section wrap reveal" aria-labelledby="home-community">
       <div class="split">
         <div>
           <p class="kicker">Cheeky, with rails</p>
-          <h2>Confess the pen crime. Not the patient.</h2>
-          <p>Rosters, paperwork, cold coffee and 3am pages are fair game. Patient information, clinical incidents, colleague call-outs, employer names and treatment claims are not.</p>
-          <a class="button primary" href="/submission-rules.html">Read the rules</a>
+          <h2 id="home-community">Confess the pen crime. Not the patient.</h2>
+          <p>Rosters, paperwork, cold coffee and 3am pages are fair game. Patient information, clinical incidents, colleague call-outs, employer names and treatment claims are not. A person reads every post before it goes up.</p>
+          <a class="text-link" href="/submission-rules.html">Read the rules first</a>
         </div>
         <div class="stack">
           <article class="quote"><p>“I brought five pens and left with a spoon, a mystery highlighter and personal growth.”</p><span>Allowed. Harmless and non-identifying.</span></article>
@@ -182,17 +168,70 @@ export function home(assets, guides) {
         </div>
       </div>
     </section>
-    <section class="section wrap" id="newsletter">
+    <section class="section wrap reveal" aria-labelledby="home-guides">
+      <div class="section-head">
+        <div>
+          <p class="kicker">From the guides</p>
+          <h2 id="home-guides">Practical. Deliberately not clinical. Mildly caffeinated.</h2>
+        </div>
+        <a class="text-link" href="/guides.html">All ${guides.length} guides</a>
+      </div>
+      <div class="grid cards">${guideCards(featured)}</div>
+    </section>
+    <section class="section wrap reveal" aria-labelledby="home-tools">
+      <div class="section-head">
+        <div>
+          <p class="kicker">Free tools</p>
+          <h2 id="home-tools">Small tools for rosters that think sleep is optional.</h2>
+        </div>
+      </div>
+      <div class="grid cards three">
+        <a class="card link-card" href="/shift-kit.html"><h3>Shift Kit</h3><p>A rest and caffeine sketch for rosters that think sleep is optional.</p></a>
+        <a class="card link-card" href="/student-bay.html"><h3>Student Bay</h3><p>A placement checklist that lives in this browser, not in the group chat.</p></a>
+        <a class="card link-card" href="/scrub-rack.html"><h3>Scrub Rack</h3><p>Donate, request or swap clean scrubs. Your email stays off the card, like a pen you actually want back.</p></a>
+      </div>
+      <p class="section-foot">Rough shift? The <a href="/wellbeing.html">wellbeing page</a> has Australian support lines and a short breathing pause. That one stays serious.</p>
+    </section>
+    <section class="section wrap reveal" aria-labelledby="home-shop">
+      <div class="section-head">
+        <div>
+          <p class="kicker">From the OnlyScrubs creator</p>
+          <h2 id="home-shop">Templates, because the photocopier is broken again.</h2>
+        </div>
+        <a class="text-link" href="/shop.html">Visit the shop</a>
+      </div>
+      <div class="grid cards three">${shopTeaser()}</div>
+      <p class="section-foot disclosure">Independent templates sold on Gumroad. Not official forms, and not clinical, legal, financial or tax advice.</p>
+    </section>
+    <section class="section wrap" id="newsletter" aria-labelledby="home-newsletter">
       <div class="newsletter-band">
         <div>
           <p class="kicker">Newsletter</p>
-          <h2>Occasional notes. We will not page you at 3am.</h2>
+          <h2 id="home-newsletter">Occasional notes. We will not page you at 3am.</h2>
           <p>Guides and site news from OnlyScrubs, hello@onlyscrubs.org. Each email has an unsubscribe link that removes you straight away.</p>
         </div>
         ${newsletterForm()}
       </div>
     </section>`
   });
+}
+
+const HOME_SHOP_PICKS = ["nursing-toolkit", "nurse-roster-pay", "bundle"];
+
+function shortName(name) {
+  return String(name).split(" - ")[0];
+}
+
+function shopTeaser() {
+  const all = shopData.groups.flatMap((group) => group.products);
+  return HOME_SHOP_PICKS.map((id) => all.find((product) => product.id === id)).filter(Boolean).map((product) => `<a class="card link-card shop-teaser" href="/shop.html#product-${esc(product.id)}">
+        <picture>
+          <source type="image/webp" srcset="/shop/${product.id}-cover.webp">
+          <img src="/shop/${product.id}-cover.png" alt="" width="${product.width}" height="${product.height}" loading="lazy" decoding="async">
+        </picture>
+        <h3>${esc(shortName(product.name))}</h3>
+        <p class="price-inline">${esc(product.priceLabel)}</p>
+      </a>`).join("");
 }
 
 export function guideIndex(assets, guides) {
@@ -204,13 +243,15 @@ export function guideIndex(assets, guides) {
     active: "/guides.html",
     assets,
     tearoom: true,
-    main: `<section class="wrap page-hero"><p class="eyebrow">Read this, not a patient record</p><h1>Guides</h1><p class="lede">Practical notes for study, placement, registration and the parts of the job that are mostly paperwork. Not clinical advice. Each guide says so again, on purpose.</p>${toolkitCallout()}</section>
+    main: `<section class="wrap page-hero"><p class="eyebrow">Read this, not a patient record</p><h1>Guides</h1><p class="lede">Practical notes for study, placement, registration and the parts of the job that are mostly paperwork. Not clinical advice. Each guide says so again, on purpose.</p></section>
       <section class="wrap section">
         <div class="filters" data-guide-filters role="group" aria-label="Filter guides">
           <button class="tag-pill" type="button" data-tag="" aria-pressed="true">All</button>
           ${tagSet.map((tag) => `<button class="tag-pill" type="button" data-tag="${esc(tag)}" aria-pressed="false">${esc(tag)}</button>`).join("")}
         </div>
+        <h2 class="visually-hidden">All guides</h2>
         <div class="grid cards">${guideCards(guides)}</div>
+        ${toolkitCallout()}
       </section>`
   });
 }
@@ -296,7 +337,7 @@ export function scrubRack(assets) {
           <label>Email, kept off the public listing<input name="contactEmail" type="email" required autocomplete="email"></label>
           <label class="check"><input name="confirm" type="checkbox" required><span>I confirm this does not name a workplace, patient, or clinical matter, and that my email is only for OnlyScrubs to pass messages on.</span></label>
           ${postingTerms}
-          <input class="honeypot" name="website" tabindex="-1" autocomplete="off">
+          <input class="honeypot" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" aria-label="Leave this empty">
           <div data-turnstile></div>
           <button class="button primary" type="submit">List it for review</button>
           <p class="form-message" id="listing-message" role="status"></p>
@@ -477,7 +518,7 @@ export function confessions(assets) {
           <fieldset class="tag-picker"><legend>Tags, if they fit</legend>${tags()}</fieldset>
           <label class="check"><input type="checkbox" id="confession-confirm" required><span>I confirm this does not identify a patient, colleague, hospital, employer, date, incident or clinical detail.</span></label>
           ${postingTerms}
-          <input class="honeypot" name="website" tabindex="-1" autocomplete="off">
+          <input class="honeypot" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" aria-label="Leave this empty">
           <div data-turnstile></div>
           <button class="button primary" type="submit">Chart it for review</button>
           <p class="form-message" id="confession-message" role="status"></p>
@@ -549,7 +590,7 @@ export function wellbeing(assets) {
 const rulesFaq = [
   ["Can I post a patient story if I remove the name?", "No. Patient stories are not allowed, even when you think they are de-identified."],
   ["Can I name a colleague or a workplace?", "No. Do not name or describe a colleague, hospital, ward, clinic or employer in a way that identifies them."],
-  ["How do I report a post or a scrub listing?", "Use the Report button on the item, or the complaints page. A report hides that confession or listing from the public page while it is reviewed."]
+  ["How do I report a post or a scrub listing?", "Use the Report button on the item, or the complaints page. " + REPORT_RULE]
 ];
 
 export function rules(assets) {
@@ -577,7 +618,7 @@ export function rules(assets) {
         <li>Bullying, harassment, discrimination, sexual content, hate, or workplace call-outs.</li>
         <li>Testimonials or claims about regulated health services.</li>
       </ul>
-      <p>Upvotes, Same and Hug reactions are for approved posts only. One of each per person. A report hides the confession or listing from the public page and sends it to the moderation queue. The same connection cannot report the same post twice, and there is a daily limit. Read the <a href="/terms.html">Terms</a> before you post. To raise a concern, use the <a href="/complaints.html">complaints page</a>.</p>
+      <p>Upvotes, Same and Hug reactions are for approved posts only. One of each per person. Every report goes to the moderation queue. ${REPORT_RULE} Read the <a href="/terms.html">Terms</a> before you post. To raise a concern, use the <a href="/complaints.html">complaints page</a>.</p>
       <p>If a post looks like you are in crisis, we will show Australian support lines and hold the post. We are not a crisis service. Call 000 if you are in immediate danger.</p>
       ${faqHtml(rulesFaq)}
     </section>`
@@ -592,7 +633,7 @@ export function privacy(assets) {
     active: "",
     assets,
     main: `<section class="wrap page-hero prose"><p class="eyebrow">Australian Privacy Principles</p><h1>Privacy</h1>
-      <p>This page explains how OnlyScrubs handles personal information. It is general information about this website, not legal advice. It was last updated on 17 November 2026.</p>
+      <p>This page explains how OnlyScrubs handles personal information. It is general information about this website, not legal advice. It was last updated on 18 November 2026.</p>
       <h2>Who we are</h2>
       <p>OnlyScrubs is an independent community website at onlyscrubs.org, run from Victoria, Australia, for healthcare workers and students. It is not a hospital, clinic, union, university, regulator, or government agency. For privacy questions, access requests, corrections, or complaints, email <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a>.</p>
       <h2>What we collect</h2>
@@ -621,7 +662,7 @@ export function privacy(assets) {
         <li>Confessions stay pending until moderated. Approved posts move to an archive after a year. Rejected or deleted posts are removed from the public site. An archived post is no longer on the public feed.</li>
         <li>Comments follow the same moderation path and are removed if we delete them.</li>
         <li>Scrub Rack listings and relay messages are kept while the listing is live and while a moderator still needs the message. Ask us and we will delete a listing or a message we can find.</li>
-        <li>A reported confession or listing is hidden from the public page as soon as the report is lodged. We keep the record in the moderation queue until it is restored or deleted.</li>
+        <li>${REPORT_RULE} We keep the record in the moderation queue until it is restored or deleted.</li>
         <li>Newsletter addresses are kept until you unsubscribe or ask us to delete them. Unsubscribe takes effect immediately.</li>
         <li>Rate-limit counters expire with the limit window, from minutes up to about an hour. Vote and reaction markers expire after a year. The admin cookie expires after 12 hours, or sooner if the moderator logs out.</li>
       </ul>
@@ -645,7 +686,7 @@ export function terms(assets) {
     active: "",
     assets,
     main: `<section class="wrap page-hero prose"><p class="eyebrow">The rules of the site</p><h1>Terms of Use</h1>
-      <p>These terms apply when you use onlyscrubs.org. They are the site's house rules. They are general information about how OnlyScrubs operates, not legal advice. If you need advice about your own situation, ask a lawyer. Last updated 17 November 2026.</p>
+      <p>These terms apply when you use onlyscrubs.org. They are the site's house rules. They are general information about how OnlyScrubs operates, not legal advice. If you need advice about your own situation, ask a lawyer. Last updated 18 November 2026.</p>
       <h2>Who may use OnlyScrubs</h2>
       <p>You must be 18 or older. The site is aimed at healthcare workers and students in Australia, including nurses, midwives, and people training for that work. If you are under 18, do not use the site. If you do not agree to these terms, do not post, list, or subscribe.</p>
       <h2>Acceptable use</h2>
@@ -662,7 +703,7 @@ export function terms(assets) {
       <h2>Anonymity has limits</h2>
       <p>Confessions do not ask for your name, but anonymity is not absolute. We store a shortened hash of your connection address to limit spam and repeat votes. Moderators can see the private email on a Scrub Rack listing and on a newsletter signup. A post that describes a real shift too closely can identify you even with the name left off. We may disclose information if the law requires it. Do not post anything you would be unwilling to explain to your employer or your university.</p>
       <h2>Moderation</h2>
-      <p>We may refuse, edit, hide, archive, or delete any content, and we may stop accepting posts, without notice. Reported confessions and listings are hidden from the public page when the report arrives. We aim to resolve a report or a complaint within 7 days. How to raise one is on the <a href="/complaints.html">complaints page</a>. Our moderation decision is about what stays on this website. It is not a finding about you, your workplace, or the law.</p>
+      <p>We may refuse, edit, hide, archive, or delete any content, and we may stop accepting posts, without notice. ${REPORT_RULE} We aim to resolve a report or a complaint within 7 days. How to raise one is on the <a href="/complaints.html">complaints page</a>. Our moderation decision is about what stays on this website. It is not a finding about you, your workplace, or the law.</p>
       <h2>Your content</h2>
       <p>You keep ownership of what you submit. You grant OnlyScrubs a non-exclusive, worldwide, royalty-free licence to host, moderate, display, archive, and remove that content on this site for as long as we operate the relevant page. You confirm you have the right to submit it, and that it does not breach these terms or anyone else's rights. You can ask us to delete a post you can identify. Public copies and archives may already have been seen.</p>
       <h2>Not advice</h2>
@@ -687,9 +728,9 @@ export function complaints(assets) {
     active: "",
     assets,
     main: `<section class="wrap page-hero prose"><p class="eyebrow">Tell us</p><h1>Complaints and takedown</h1>
-      <p>Use this page to report content on OnlyScrubs, including a defamation concern. This is general information about our process, not legal advice, and it is not itself a concerns notice under defamation law. Last updated 17 November 2026.</p>
+      <p>Use this page to report content on OnlyScrubs, including a defamation concern. This is general information about our process, not legal advice, and it is not itself a concerns notice under defamation law. Last updated 18 November 2026.</p>
       <h2>Report a confession or a listing</h2>
-      <p>Open the item and use <strong>Report</strong>. Say what we should look at. The confession or listing is hidden from the public page as soon as the report is lodged, and it appears in the moderation queue. You can also email <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> if the item is already gone, or if the problem is not a single post.</p>
+      <p>Open the item and use <strong>Report</strong>. Choose a category and say what we should look at. The report appears in the moderation queue. ${REPORT_RULE} You can also email <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> if the item is already gone, or if the problem is not a single post.</p>
       <h2>Defamation and other concern notices</h2>
       <p>If you say something on the site is defamatory, or otherwise unlawful, email <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> with the subject "Concern notice". Include:</p>
       <ul>
@@ -702,7 +743,7 @@ export function complaints(assets) {
       </ul>
       <p>If you are unsure whether a formal concerns notice has to follow a set form, get your own advice. We will still treat an email with the details above as a request to review the content.</p>
       <h2>What we do, and when</h2>
-      <p>We hide reported confessions and listings promptly. The Report button does that immediately. If you email us, we hide the item as soon as we have read the email and can find it. We aim to resolve the report within 7 days: leave it hidden, edit it, delete it, or put it back. If you left a contact, we will tell you what we did. Seven days is our target for a decision on the website. It is not a promise about court deadlines.</p>
+      <p>We act on reports promptly. The Report button follows the rule above. If you email us, we hide the item as soon as we have read the email and can find it. We aim to resolve the report within 7 days: leave it hidden, edit it, delete it, or put it back. If you left a contact, we will tell you what we did. Seven days is our target for a decision on the website. It is not a promise about court deadlines.</p>
       <h2>Privacy complaints</h2>
       <p>Privacy complaints, access, and correction are on the <a href="/privacy.html">privacy page</a>. If we cannot resolve a privacy complaint, you can go to the Office of the Australian Information Commissioner at <a href="https://www.oaic.gov.au/" rel="noopener noreferrer">oaic.gov.au</a>.</p>
       <h2>Contact</h2>
@@ -765,7 +806,7 @@ export function admin(assets) {
       <div class="page-hero">
         <p class="eyebrow">Signed in</p>
         <h2>Moderation</h2>
-        <p>Approve, reject or delete pending confessions and listings. A report hides the item from the public page. Approve it again to show it. Newsletter CSV rows include an unsubscribe link. Every email must name OnlyScrubs, hello@onlyscrubs.org, and include that link.</p>
+        <p>Approve, reject or delete pending confessions and listings. ${REPORT_RULE} Approve a hidden item again to show it. Newsletter CSV rows include an unsubscribe link. Every email must name OnlyScrubs, hello@onlyscrubs.org, and include that link.</p>
         <div class="button-row"><button class="button" id="admin-logout" type="button" data-admin-logout>Log out</button></div>
       </div>
       <div class="metrics" id="admin-headlines"></div>
@@ -841,8 +882,10 @@ export function about(assets) {
       <ul>
         <li><a href="/guides.html">Guides</a> of general information, with sources, for students and new clinicians.</li>
         <li>A moderated <a href="/scrub-rack.html">Scrub Rack</a> for clean gear. Emails stay off the public card.</li>
-        <li>Shift tools and a wellbeing page that points to real Australian services.</li>
-        <li>A moderated confessions feed for harmless shift-life humour.</li>
+        <li>Free tools: the <a href="/shift-kit.html">Shift Kit</a> for rest and caffeine timing, and the <a href="/student-bay.html">Student Bay</a> placement checklist, which stays in your browser.</li>
+        <li>A <a href="/gear-guide.html">gear guide</a> for shoes, socks, watches and the eternal pen shortage. No fake reviews.</li>
+        <li>A <a href="/wellbeing.html">wellbeing page</a> that points to real Australian support services.</li>
+        <li>A moderated <a href="/confessions.html">confessions feed</a> for harmless shift-life humour.</li>
         <li>A <a href="/shop.html">shop</a> of the creator's own digital templates. Checkout happens on Gumroad.</li>
         <li>A <a href="/complaints.html">complaints page</a> if something on the site should come down. We aim to resolve those within 7 days.</li>
       </ul>
@@ -893,8 +936,8 @@ export function moderation(assets) {
       </ul>
       <p>Removed or rejected posts do not stay on the public pages. We may delete them. We do not promise to store a copy for you.</p>
       <h2>Reports</h2>
-      <p>Anyone can report a public confession or listing. The item is hidden from the public page when the report is lodged, and a person still reviews it. We aim to resolve reports within 7 days. The full takedown process, including defamation concern notices, is on the <a href="/complaints.html">complaints page</a>.</p>
-      <p>A second report of the same post from the same connection is ignored. There is a daily limit so a pile-on cannot flood the queue. Hiding is not the final decision. A person can put the item back, reject it, or delete it.</p>
+      <p>Anyone can report a public confession, comment or listing, and a person reviews every report. ${REPORT_RULE} We aim to resolve reports within 7 days. The full takedown process, including defamation concern notices, is on the <a href="/complaints.html">complaints page</a>.</p>
+      <p>The daily limit stops a pile-on from flooding the queue or hiding posts it simply dislikes. Hiding is not the final decision. A person can put the item back, reject it, or delete it.</p>
       <h2>How to appeal</h2>
       <p>If your post was rejected, hidden or edited and you think that was wrong, email <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> with the rough time of the post and a short reason. Do not include patient information, a clinical story, or a workplace name in the appeal. A person reads appeals. We aim to reply within 7 days. The reply is an email. It is not a review by AHPRA, a union or an employer.</p>
       <p>This is not the place to complain about a health service. For a notification about a registered practitioner, start with <a href="https://www.ahpra.gov.au/Notifications/mandatorynotifications.aspx" rel="noopener noreferrer">Ahpra's mandatory notifications guidance</a>. For an immediate safety emergency, call 000.</p>
@@ -902,13 +945,13 @@ export function moderation(assets) {
   });
 }
 
-function shopCard(product) {
+function shopCard(product, index = 0) {
   const note = product.note ? `<p>${esc(product.note)}</p>` : "";
-  return `<article class="card shop-card">
+  const lazy = index > 1 ? ' loading="lazy" decoding="async"' : "";
+  return `<article class="card shop-card" id="product-${esc(product.id)}">
       <picture>
-        <source type="image/webp" srcset="/shop/${product.id}-thumb.webp 480w, /shop/${product.id}-cover.webp 960w" sizes="(min-width: 800px) 480px, 100vw">
-        <source type="image/png" srcset="/shop/${product.id}-thumb.png 480w, /shop/${product.id}-cover.png 960w" sizes="(min-width: 800px) 480px, 100vw">
-        <img src="/shop/${product.id}-cover.png" alt="${esc(product.alt)}" width="${product.width}" height="${product.height}">
+        <source type="image/webp" srcset="/shop/${product.id}-cover.webp">
+        <img src="/shop/${product.id}-cover.png" alt="${esc(product.alt)}" width="${product.width}" height="${product.height}"${lazy}>
       </picture>
       <h3>${esc(product.name)}</h3>
       <p class="price">${esc(product.priceLabel)}</p>
@@ -921,7 +964,7 @@ function shopCard(product) {
 export function shop(assets) {
   const groups = shopData.groups;
   const products = groups.flatMap((group) => group.products);
-  const sections = groups.map((group) => `<section class="shop-group"><h2>${esc(group.title)}</h2><div class="grid shop-grid">${group.products.map(shopCard).join("")}</div></section>`).join("");
+  const sections = groups.map((group, groupIndex) => `<section class="shop-group"><h2>${esc(group.title)}</h2><div class="grid shop-grid">${group.products.map((product, i) => shopCard(product, groupIndex === 0 ? i : 99)).join("")}</div></section>`).join("");
   return page({
     title: "Shop | Australian templates for nurses, renters and sole traders",
     description: "Printable Australian templates from OnlyScrubs: nursing study sheets, a roster pay estimate tracker, an IQNM registration planner, and life-admin kits for renting, budgeting, moving and sole traders.",
@@ -944,9 +987,10 @@ export function shop(assets) {
         availability: "https://schema.org/InStock"
       }
     })),
-    main: `<section class="wrap page-hero"><p class="eyebrow">From the OnlyScrubs creator</p><h1>Australian templates we made</h1><p class="lede">Digital downloads for Australian nurses, students, renters and sole traders. They are organising tools and general information, sold on Gumroad. They are not official forms, and they are not legal, financial, tax or clinical advice. Not third-party ads.</p>
-      <p>Digital downloads delivered via Gumroad. Your rights under the Australian Consumer Law apply.</p></section>
+    main: `<section class="wrap page-hero"><p class="eyebrow">From the OnlyScrubs creator</p><h1>Australian templates we made</h1><p class="lede">Digital downloads for Australian nurses, students, renters and sole traders. Organising tools, not paperwork therapy, though it helps.</p>
+      <p class="hero-note">They are general information, not official forms, and not legal, financial, tax or clinical advice. Not third-party ads. Digital downloads delivered via Gumroad. Your rights under the Australian Consumer Law apply.</p></section>
       <section class="wrap section">${sections}
+      <div class="callout shop-support" data-support-block hidden><p><strong>Not after a template?</strong> You can shout the site a coffee instead. It keeps the guides free and the servers caffeinated. Entirely optional, and it buys you nothing but our gratitude.</p><span class="support-slot" data-support-slot hidden></span></div>
       <p class="affiliation shop-note">Independent templates. Not affiliated with or endorsed by any government agency, NMBA or Ahpra. General information only, not legal, financial, tax or clinical advice.</p></section>`
   });
 }

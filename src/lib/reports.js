@@ -1,9 +1,17 @@
-/** Distinct-reporter limits. High-severity categories hide a post immediately. */
+/**
+ * The one report rule, shared by the live handler and the policy pages.
+ * - An ordinary report is recorded, and the item stays up until AUTO_HIDE_AFTER
+ *   distinct reporters have reported it. Then it is hidden pending moderation.
+ * - A report in a HIGH_SEVERITY category (patient-identifying information,
+ *   threats, self-harm) hides the item immediately, pending moderation.
+ * - The same connection cannot report the same item twice, and each connection
+ *   has REPORTS_PER_DAY reports per day.
+ */
 
 export const REPORTS_PER_DAY = 8;
 export const AUTO_HIDE_AFTER = 3;
-export const REPORT_CATEGORIES = ["other", "spam", "harassment", "patient-info", "threats"];
-export const HIGH_SEVERITY = new Set(["patient-info", "threats"]);
+export const REPORT_CATEGORIES = ["other", "spam", "harassment", "patient-info", "threats", "self-harm"];
+export const HIGH_SEVERITY = new Set(["patient-info", "threats", "self-harm"]);
 
 export function normaliseCategory(value) {
   const category = String(value || "").trim().toLowerCase();

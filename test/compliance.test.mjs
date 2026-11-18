@@ -149,16 +149,32 @@ test("a listing report hides it and shows in the admin reported queue", async ()
 
   const report = await apiReport(request("https://onlyscrubs.org/api/report", {
     method: "POST",
-    body: { id, kind: "listing", reason: "Names a workplace" }
+    ip: "203.0.113.21",
+    body: { id, kind: "listing", category: "other", reason: "Names a workplace" }
   }), box);
-  assert.equal((await report.json()).hidden, true);
+  assert.equal((await report.json()).hidden, false);
+  const stillUp = await (await apiListings(request("https://onlyscrubs.org/api/listings"), box)).json();
+  assert.equal(stillUp.listings.some((item) => item.id === id), true, "one ordinary report leaves the listing up");
+
+  const queued = await (await apiAdmin(request("https://onlyscrubs.org/api/admin?kind=listing&status=reported", { token: SECRET }), box)).json();
+  assert.equal(queued.items[0].id, id);
+  assert.equal(queued.items[0].reportsCount, 1);
+  assert.equal(queued.items[0].hiddenAt, undefined);
+
+  for (const ip of ["203.0.113.22", "203.0.113.23"]) {
+    await apiReport(request("https://onlyscrubs.org/api/report", {
+      method: "POST",
+      ip,
+      body: { id, kind: "listing", category: "spam", reason: "Still names a workplace" }
+    }), box);
+  }
   const hidden = await (await apiListings(request("https://onlyscrubs.org/api/listings"), box)).json();
   assert.equal(hidden.listings.some((item) => item.id === id), false);
 
   const flagged = await apiAdmin(request("https://onlyscrubs.org/api/admin?kind=listing&status=reported", { token: SECRET }), box);
   const flaggedBody = await flagged.json();
   assert.equal(flaggedBody.items[0].id, id);
-  assert.equal(flaggedBody.items[0].reportsCount, 1);
+  assert.equal(flaggedBody.items[0].reportsCount, 3);
   assert.ok(flaggedBody.items[0].hiddenAt);
 
   const restored = await apiAdmin(request("https://onlyscrubs.org/api/admin", {
@@ -171,7 +187,7 @@ test("a listing report hides it and shows in the admin reported queue", async ()
   assert.equal(back.listings.some((item) => item.id === id), true);
 });
 
-test("a confession report hides the post from the public feed", async () => {
+test("a patient-information report hides the post from the public feed", async () => {
   const box = env();
   const text = "I brought six black pens and still had to borrow a highlighter from the tea room.";
   const created = await apiConfessions(request("https://onlyscrubs.org/api/confessions", {
@@ -189,7 +205,7 @@ test("a confession report hides the post from the public feed", async () => {
   await apiReport(request("https://onlyscrubs.org/api/report", {
     method: "POST",
     ip: "203.0.113.11",
-    body: { id, reason: "Identifies someone" }
+    body: { id, category: "patient-info", reason: "Identifies someone" }
   }), box);
   const pub = await (await apiConfessions(request("https://onlyscrubs.org/api/confessions"), box)).json();
   assert.equal(pub.confessions.some((item) => item.id === id), false);

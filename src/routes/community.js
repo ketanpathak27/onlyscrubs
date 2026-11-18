@@ -259,12 +259,14 @@ export async function apiReport(request, env) {
   item.lastReportCategory = decision.category;
   item.lastReportReason = clean(parsed.body.reason).slice(0, 220) || "Community report";
   item.reportedAt = now;
-  item.hiddenAt = item.hiddenAt || now;
-  item.hiddenReason = decision.high
-    ? "Hidden immediately: " + decision.category
-    : "Hidden after a community report";
+  if (decision.hide && !item.hiddenAt) {
+    item.hiddenAt = now;
+    item.hiddenReason = decision.high
+      ? "Hidden immediately: " + decision.category
+      : "Hidden after " + decision.reportsCount + " community reports";
+  }
   await kv.put(item._key, JSON.stringify(strip(item)));
-  return json({ ok: true, hidden: true });
+  return json({ ok: true, hidden: Boolean(item.hiddenAt) });
 }
 
 export async function apiNewsletter(request, env) {

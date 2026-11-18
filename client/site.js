@@ -22,7 +22,15 @@
   }
   apply(current(), false);
   toggle?.addEventListener("click", function () {
-    apply(current() === "dark" ? "light" : "dark", true);
+    const next = current() === "dark" ? "light" : "dark";
+    root.classList.add("theme-anim");
+    window.setTimeout(function () { root.classList.remove("theme-anim"); }, 400);
+    // Cross-fade the whole page instead of snapping colours (Safari 18+, Chrome). Falls back to an instant swap.
+    if (!reduce && typeof document.startViewTransition === "function") {
+      document.startViewTransition(function () { apply(next, true); });
+    } else {
+      apply(next, true);
+    }
   });
   if (!localStorage.getItem("onlyscrubs-theme")) {
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function (event) {
@@ -34,16 +42,25 @@
 
   const navToggle = document.querySelector("[data-nav-toggle]");
   const nav = document.querySelector("[data-nav]");
-  navToggle?.addEventListener("click", function () {
-    const open = nav.classList.toggle("is-open");
+  function setNav(open) {
+    if (!nav || !navToggle) return;
+    nav.classList.toggle("is-open", open);
     navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+  navToggle?.addEventListener("click", function () {
+    setNav(!nav.classList.contains("is-open"));
   });
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && nav?.classList.contains("is-open")) {
-      nav.classList.remove("is-open");
-      navToggle.setAttribute("aria-expanded", "false");
+      setNav(false);
       navToggle.focus();
     }
+  });
+  // Close the menu when a link is chosen or the page behind it is tapped.
+  document.addEventListener("click", function (event) {
+    if (!nav?.classList.contains("is-open")) return;
+    if (event.target.closest("[data-nav-toggle]")) return;
+    if (event.target.closest("[data-nav] a") || !event.target.closest("[data-nav]")) setNav(false);
   });
 
   const reveals = document.querySelectorAll(".reveal");
@@ -57,7 +74,7 @@
           io.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.12 });
+    }, { threshold: 0.08, rootMargin: "0px 0px -6% 0px" });
     reveals.forEach(function (el) { io.observe(el); });
   }
 
@@ -93,14 +110,20 @@
   }
   loadConfig().then(function (cfg) {
     const href = usableSupportUrl(cfg.supportUrl);
-    document.querySelectorAll("[data-support-link]").forEach(function (link) {
-      if (href) {
-        link.href = href;
-        link.hidden = false;
-      } else {
-        link.removeAttribute("href");
-        link.hidden = true;
+    document.querySelectorAll("[data-support-block]").forEach(function (block) { block.hidden = !href; });
+    document.querySelectorAll("[data-support-slot]").forEach(function (slot) {
+      slot.textContent = "";
+      if (!href) {
+        slot.hidden = true;
+        return;
       }
+      const link = document.createElement("a");
+      link.className = "button secondary compact";
+      link.href = href;
+      link.rel = "noopener noreferrer";
+      link.textContent = "Buy the next round of coffee";
+      slot.appendChild(link);
+      slot.hidden = false;
     });
     if (cfg.adsEnabled) {
       document.querySelectorAll("[data-ad-slot]").forEach(function (slot) { slot.hidden = false; });
@@ -181,7 +204,10 @@
         const tags = (card.dataset.tags || "").split(",");
         card.hidden = Boolean(active) && tags.indexOf(active) === -1;
       });
+      if (cards[0] && drawn) cards[0].parentElement.classList.add("is-filtered");
+      drawn = true;
     }
+    let drawn = false;
     guideFilters.addEventListener("click", function (event) {
       const button = event.target.closest("[data-tag]");
       if (!button) return;
@@ -274,12 +300,32 @@
     }
     openInstallSheet();
   });
+  // Close with a short exit animation so the sheet never just vanishes.
+  function closeSheet(sheet) {
+    if (!sheet) return;
+    if (!sheet.close) { sheet.hidden = true; return; }
+    if (!sheet.open || sheet.classList.contains("is-closing")) return;
+    if (reduce) { sheet.close(); return; }
+    sheet.classList.add("is-closing");
+    let done = false;
+    function finish() {
+      if (done) return;
+      done = true;
+      sheet.classList.remove("is-closing");
+      sheet.close();
+    }
+    sheet.addEventListener("animationend", finish, { once: true });
+    window.setTimeout(finish, 320);
+  }
   installSheet?.querySelector("[data-install-close]")?.addEventListener("click", function () {
-    if (installSheet.close) installSheet.close();
-    else installSheet.hidden = true;
+    closeSheet(installSheet);
   });
   installSheet?.addEventListener("click", function (event) {
-    if (event.target === installSheet && installSheet.close) installSheet.close();
+    if (event.target === installSheet) closeSheet(installSheet);
+  });
+  installSheet?.addEventListener("cancel", function (event) {
+    event.preventDefault();
+    closeSheet(installSheet);
   });
   document.addEventListener("click", async function (event) {
     const button = event.target.closest("[data-admin-logout]");
@@ -333,8 +379,13 @@
     if (!reduce) {
       let index = 0;
       window.setInterval(function () {
+        if (document.hidden) return;
         index = (index + 1) % lines.length;
-        tearoom.textContent = lines[index];
+        tearoom.classList.add("is-swapping");
+        window.setTimeout(function () {
+          tearoom.textContent = lines[index];
+          tearoom.classList.remove("is-swapping");
+        }, 220);
       }, 8000);
     }
   }

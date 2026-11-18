@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync, readdirSync } from "node:fs";
 import { parseGuide } from "../site/markdown.mjs";
-import { shop } from "../site/pages.mjs";
+import { complaints, moderation, privacy, REPORT_RULE, rules, shop, terms } from "../site/pages.mjs";
 import { buildDigest } from "../src/lib/digest.js";
 import { AUTO_HIDE_AFTER, decideReport, REPORTS_PER_DAY } from "../src/lib/reports.js";
 import { screenText } from "../src/lib/screen.js";
@@ -69,6 +69,25 @@ test("report decisions ignore duplicates, cap the day, and hide at the threshold
   assert.equal(early.high, true);
   assert.equal(decideReport({ duplicate: false, usedToday: 0, distinctCount: 0, category: "threats" }).high, true);
   assert.equal(decideReport({ duplicate: false, usedToday: 0, distinctCount: 0, category: "nope" }).category, "other");
+  const first = decideReport({ duplicate: false, usedToday: 0, distinctCount: 0, category: "spam" });
+  assert.equal(first.hide, false);
+  const second = decideReport({ duplicate: false, usedToday: 0, distinctCount: 1, category: "harassment" });
+  assert.equal(second.hide, false);
+  const harm = decideReport({ duplicate: false, usedToday: 0, distinctCount: 0, category: "self-harm" });
+  assert.equal(harm.hide, true);
+  assert.equal(harm.high, true);
+});
+
+test("policy pages state the same report rule the code enforces", () => {
+  assert.match(REPORT_RULE, new RegExp(AUTO_HIDE_AFTER + " different people"));
+  assert.match(REPORT_RULE, /patient-identifying information, threats or self-harm hides it immediately/);
+  assert.match(REPORT_RULE, new RegExp("up to " + REPORTS_PER_DAY + " reports a day"));
+  const assets = { styles: "/s.css", site: "/s.js" };
+  for (const render of [privacy, terms, moderation, complaints, rules]) {
+    const html = render(assets);
+    assert.ok(html.includes(REPORT_RULE), render.name + " should state the report rule");
+    assert.doesNotMatch(html, /hidden from the public page (as soon as|when) the report/i, render.name + " still has the old wording");
+  }
 });
 
 test("flagged confessions are stored pending and not published", async () => {
@@ -120,10 +139,16 @@ test("three distinct reports hide a post and a duplicate does not count", async 
   };
   await kv.put("confession:2026-11-17T00:00:00.000Z:post-1", JSON.stringify(record));
   const first = await apiReport(request("/api/report", { method: "POST", ip: "203.0.113.1", body: { id: "post-1", category: "spam", reason: "noise" } }), env);
-  assert.equal((await first.json()).ok, true);
+  const firstBody = await first.json();
+  assert.equal(firstBody.ok, true);
+  assert.equal(firstBody.hidden, false);
+  const afterFirst = JSON.parse(await kv.get("confession:2026-11-17T00:00:00.000Z:post-1"));
+  assert.equal(afterFirst.hiddenAt, undefined, "one ordinary report leaves the post up");
+  assert.equal(afterFirst.reportsCount, 1);
   const again = await apiReport(request("/api/report", { method: "POST", ip: "203.0.113.1", body: { id: "post-1", category: "spam", reason: "noise" } }), env);
   assert.equal((await again.json()).duplicate, true);
-  await apiReport(request("/api/report", { method: "POST", ip: "203.0.113.2", body: { id: "post-1", category: "other", reason: "again" } }), env);
+  const second = await apiReport(request("/api/report", { method: "POST", ip: "203.0.113.2", body: { id: "post-1", category: "other", reason: "again" } }), env);
+  assert.equal((await second.json()).hidden, false);
   const third = await apiReport(request("/api/report", { method: "POST", ip: "203.0.113.3", body: { id: "post-1", category: "harassment", reason: "third" } }), env);
   assert.equal((await third.json()).hidden, true);
   const stored = JSON.parse(await kv.get("confession:2026-11-17T00:00:00.000Z:post-1"));
@@ -250,4 +275,25 @@ test("shop page keeps plain prices and the consumer-law lines", () => {
   assert.match(nurses, /ozfbx[\s\S]*gnacj[\s\S]*nlvlrt/);
   assert.match(life, /kaqesn[\s\S]*syfesl[\s\S]*adzqwv[\s\S]*ggwzo[\s\S]*vjweaq[\s\S]*rsjltt[\s\S]*disabv/);
   assert.doesNotMatch(html, /gumroad\.com\/js\/gumroad\.js/);
+});
+
+test("a self-harm report hides immediately", async () => {
+  const kv = memoryKv();
+  const env = { CONFESSIONS_KV: kv };
+  await kv.put("confession:2026-11-17T00:00:00.000Z:post-3", JSON.stringify({
+    id: "post-3",
+    text: "Night four and the vending machine has started judging me.",
+    status: "approved",
+    createdAt: new Date().toISOString(),
+    reportsCount: 0
+  }));
+  const res = await apiReport(request("/api/report", {
+    method: "POST",
+    ip: "203.0.113.10",
+    body: { id: "post-3", category: "self-harm", reason: "worried about the poster" }
+  }), env);
+  assert.equal((await res.json()).hidden, true);
+  const stored = JSON.parse(await kv.get("confession:2026-11-17T00:00:00.000Z:post-3"));
+  assert.ok(stored.hiddenAt);
+  assert.match(stored.hiddenReason, /self-harm/);
 });

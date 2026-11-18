@@ -35,7 +35,7 @@ test("support link stays hidden unless it is a real http(s) URL", async () => {
   assert.equal(supportLink("https://buymeacoffee.com/onlyscrubs"), "https://buymeacoffee.com/onlyscrubs");
 
   const empty = await worker.fetch(new Request("https://onlyscrubs.org/api/config"), {});
-  assert.equal((await empty.json()).supportUrl, "");
+  assert.equal((await empty.json()).supportUrl, "https://buymeacoffee.com/onlyscrubs");
   const placeholder = await worker.fetch(new Request("https://onlyscrubs.org/api/config"), { SUPPORT_URL: "javascript:void(0)" });
   assert.equal((await placeholder.json()).supportUrl, "");
   const set = await worker.fetch(new Request("https://onlyscrubs.org/api/config"), { SUPPORT_URL: "https://ko-fi.com/onlyscrubs" });

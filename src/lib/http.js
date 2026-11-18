@@ -1,5 +1,8 @@
 import { readCookie, SESSION_COOKIE, verifySession } from "./session.js";
 
+/** One year, all subdomains. Deliberately no preload: that is hard to undo. */
+export const HSTS = "max-age=31536000; includeSubDomains";
+
 export function json(data, status = 200, extra = {}) {
   const headers = new Headers({
     "content-type": "application/json; charset=utf-8",
@@ -8,7 +11,7 @@ export function json(data, status = 200, extra = {}) {
     "x-frame-options": "DENY",
     "referrer-policy": "strict-origin-when-cross-origin",
     "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
-    "strict-transport-security": "max-age=15552000; includeSubDomains"
+    "strict-transport-security": HSTS
   });
   if (extra.retryAfter) headers.set("retry-after", String(extra.retryAfter));
   return new Response(JSON.stringify(data), { status, headers });
@@ -140,7 +143,7 @@ export function applySecurityHeaders(response, pathname, scriptHashes) {
   headers.set("x-frame-options", "DENY");
   headers.set("referrer-policy", "strict-origin-when-cross-origin");
   headers.set("permissions-policy", "camera=(), microphone=(), geolocation=(), payment=(), usb=()");
-  headers.set("strict-transport-security", "max-age=15552000; includeSubDomains");
+  headers.set("strict-transport-security", HSTS);
   headers.set("cache-control", cacheControlFor(pathname));
   if (pathname.startsWith("/admin") || pathname === "/unsubscribe") headers.set("x-robots-tag", "noindex, nofollow");
   if (pathname === "/unsubscribe") headers.set("referrer-policy", "no-referrer");

@@ -8,4 +8,9 @@
   } catch (error) {
     document.documentElement.dataset.theme = "light";
   }
+  try {
+    if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      document.documentElement.classList.add("motion-ok");
+    }
+  } catch (error) {}
 })();

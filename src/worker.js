@@ -1,6 +1,6 @@
 import { CANONICAL, SCRIPT_HASHES } from "./generated/meta.js";
 import { siteConfig, supportLink } from "./config.js";
-import { applySecurityHeaders, json } from "./lib/http.js";
+import { applySecurityHeaders, HSTS, json } from "./lib/http.js";
 import { turnstileSiteKey } from "./lib/turnstile.js";
 import { apiComments, apiConfessions, apiNewsletter, apiRate, apiReact, apiReport, apiUnsubscribe } from "./routes/community.js";
 import { apiListings, apiMessages } from "./routes/rack.js";
@@ -20,7 +20,7 @@ function redirect(location, status = 301) {
     headers: {
       location,
       "cache-control": "public, max-age=3600",
-      "strict-transport-security": "max-age=15552000; includeSubDomains",
+      "strict-transport-security": HSTS,
       "x-content-type-options": "nosniff",
       "referrer-policy": "strict-origin-when-cross-origin"
     }
@@ -34,6 +34,32 @@ function indexNowKeyFile() {
       "content-type": "text/plain; charset=utf-8",
       "cache-control": "public, max-age=3600",
       "x-content-type-options": "nosniff"
+    }
+  });
+}
+
+/** RFC 9116 security.txt. Expires rolls forward so the file never goes stale. */
+export function securityTxt(now = new Date()) {
+  const expires = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
+  expires.setUTCHours(0, 0, 0, 0);
+  return [
+    `Contact: mailto:${siteConfig.contactEmail}`,
+    `Expires: ${expires.toISOString().replace(".000Z", "Z")}`,
+    "Preferred-Languages: en",
+    `Canonical: ${siteConfig.siteUrl}/.well-known/security.txt`,
+    `Policy: ${siteConfig.siteUrl}/complaints.html`,
+    ""
+  ].join("\n");
+}
+
+function securityTxtFile() {
+  return new Response(securityTxt(), {
+    status: 200,
+    headers: {
+      "content-type": "text/plain; charset=utf-8",
+      "cache-control": "public, max-age=86400",
+      "x-content-type-options": "nosniff",
+      "strict-transport-security": HSTS
     }
   });
 }
@@ -108,6 +134,8 @@ export default {
     }
 
     if (path === `/${siteConfig.indexNowKey}.txt`) return indexNowKeyFile();
+    if (path === "/.well-known/security.txt") return securityTxtFile();
+    if (path === "/security.txt") return redirect(`https://${SITE_HOST}/.well-known/security.txt`);
 
     if (CANONICAL[path]) {
       return redirect(CANONICAL[path] + url.search);

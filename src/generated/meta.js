@@ -349,7 +349,7 @@ export const GUIDES = [
   }
 ];
 export const SCRIPT_HASHES = [
-  "sha256-gcjtwTPQOZXLIrMoiaKsNnlt9MiwBNoONUs7FnTTr4E=",
+  "sha256-o08KDhvOROGgRcFlZwjJoU3E3bwP+Y9eXnqCEjL8gzo=",
   "sha256-DZ76L1DlOWNwudjspNR0qrTMETxUvskbU74DbEAJPIk=",
   "sha256-03rnRsqe7GKgo/mRpzOlQNqiVVP2c4QiPKnZpxZgNjI=",
   "sha256-FGKzG5vidY7FmNpVW/6Sfwyb4hXuDGpGVUyhBAHW+vY=",
@@ -381,7 +381,7 @@ export const SCRIPT_HASHES = [
   "sha256-vimc0cjpzGb4jkY9sz5RHtn190mQ6kWgbYNpjW6konQ=",
   "sha256-wQk8mEAWqYA0r2n2QkKuatylTcFdf8N9nFtGoNOT0MY=",
   "sha256-VEFahPjlfjonpzC7puGSvHGvc89sej9NCdW/1l6N2HE=",
-  "sha256-lg7Dbab44hlpIpTiQTngBgsbexKPkdFFYx2dFa+qVqg=",
+  "sha256-Kh+P/FzgEfqGJnZFnSTkf02ESLHTyU+SR4LjzUFWMYM=",
   "sha256-Pdv9VAKMkNX00smSl1OWH6RbmWi+u/bT0g6Mxr66PXM=",
   "sha256-Sl0jETEZiCgGmwJEB72mHwEbY1rbaFNy07Fs4kVja+w=",
   "sha256-0hTF3kDVm0lHuM3bPlfVYvt+XlK7UHrgh7py4km4iWE=",
