@@ -10,16 +10,42 @@ const themeBoot = fs.readFileSync(
 ).trim();
 
 const NAV = [
-  ["/guides.html", "Guides"],
-  ["/scrub-rack.html", "Scrub Rack"],
-  ["/shift-kit.html", "Shift Kit"],
-  ["/student-bay.html", "Student Bay"],
-  ["/gear-guide.html", "Gear"],
-  ["/shop.html", "Shop"],
-  ["/confessions.html", "Confessions"],
-  ["/wellbeing.html", "Wellbeing"],
-  ["/about.html", "About"]
+  ["/guides.html", "Guides", "book"],
+  ["/scrub-rack.html", "Scrub Rack", "shirt"],
+  ["/shift-kit.html", "Shift Kit", "briefcase"],
+  ["/student-bay.html", "Student Bay", "cap"],
+  ["/gear-guide.html", "Gear", "stethoscope"],
+  ["/shop.html", "Shop", "bag"],
+  ["/confessions.html", "Confessions", "chat"],
+  ["/wellbeing.html", "Wellbeing", "heart"],
+  ["/about.html", "About", "info"]
 ];
+
+const LEGAL_NAV = [
+  ["/privacy.html", "Privacy"],
+  ["/terms.html", "Terms"],
+  ["/disclaimer.html", "Disclaimer"],
+  ["/complaints.html", "Complaints"]
+];
+
+export function normalizeNavPath(path) {
+  if (!path) return "";
+  let current = String(path).split("?")[0].split("#")[0].trim();
+  if (!current.startsWith("/")) current = "/" + current;
+  if (current.length > 1 && current.endsWith("/")) current = current.slice(0, -1);
+  if (current === "/index.html" || current === "/index") return "/";
+  if (current !== "/" && !/\.[a-z0-9]+$/i.test(current)) current += ".html";
+  return current;
+}
+
+export function navHrefIsCurrent(href, path) {
+  const current = normalizeNavPath(path);
+  const target = normalizeNavPath(href);
+  if (!current || !target) return false;
+  if (current === target) return true;
+  if (target === "/guides.html" && current.startsWith("/guides/")) return true;
+  return false;
+}
 
 export function heroArt() {
   return `<div class="hero-art" role="img" aria-label="Illustration of folded scrubs and a fob watch">
@@ -64,6 +90,25 @@ function icon(name) {
   return `<svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M15 3a8 8 0 1 0 6 13 7 7 0 1 1-6-13z"/></svg>`;
 }
 
+const NAV_PATHS = {
+  book: '<path d="M5 19.5A2 2 0 0 1 7 17.5h13"/><path d="M7 3.5h13v17H7A2 2 0 0 1 5 18.5v-13a2 2 0 0 1 2-2z"/><path d="M9.5 8h7M9.5 12h7"/>',
+  shirt: '<path d="M9 4.5 12 6l3-1.5 3.5 3L16 9.5V20H8V9.5L5.5 7.5 9 4.5z"/><path d="M9 4.5c.6 1.4 1.7 2 3 2s2.4-.6 3-2"/>',
+  briefcase: '<rect x="3.5" y="7" width="17" height="13" rx="2"/><path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7"/><path d="M3.5 12h17"/>',
+  cap: '<path d="M3 10 12 5l9 5-9 5-9-5z"/><path d="M7 12.2v4.2c0 .7 2.2 2.1 5 2.1s5-1.4 5-2.1v-4.2"/><path d="M21 10v5.5"/>',
+  stethoscope: '<path d="M4.5 3v7.5a3.5 3.5 0 0 0 7 0V3"/><path d="M4.5 3H2.8M11.5 3h1.7"/><path d="M11.5 10.5c.2 4 3 6.5 5.2 6.5"/><circle cx="19" cy="17" r="3"/>',
+  bag: '<path d="M6.5 8h11l1.2 12.5H5.3L6.5 8z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>',
+  chat: '<path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-4 3v-3H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z"/>',
+  heart: '<path d="M12 19.5S5 14.2 5 9.6A3.6 3.6 0 0 1 12 8a3.6 3.6 0 0 1 7 1.6c0 4.6-7 9.9-7 9.9z"/>',
+  info: '<circle cx="12" cy="12" r="8.5"/><path d="M12 11v6M12 7.5h.01"/>',
+  logout: '<path d="M10 20.5H6.5A2 2 0 0 1 4.5 18.5v-13a2 2 0 0 1 2-2H10"/><path d="M15 16.5 20 12l-5-4.5M20 12H9.5"/>',
+  top: '<path d="M5 14.5 12 7.5l7 7"/><path d="M12 8v10"/>'
+};
+
+function navIcon(name) {
+  const paths = NAV_PATHS[name];
+  return `<svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+}
+
 export function layout(options) {
   const {
     title,
@@ -85,8 +130,13 @@ export function layout(options) {
     const json = JSON.stringify(obj).replace(/</g, "\\u003c");
     return `<script type="application/ld+json">${json}</script>`;
   });
-  const nav = NAV.map(([href, label]) => {
-    const current = href === active ? ' aria-current="page"' : "";
+  const currentPath = path || active || "";
+  const nav = NAV.map(([href, label, glyph], index) => {
+    const current = navHrefIsCurrent(href, currentPath) ? ' aria-current="page"' : "";
+    return `<a href="${href}"${current} style="--i:${index}">${navIcon(glyph)}<span>${label}</span></a>`;
+  }).join("");
+  const legal = LEGAL_NAV.map(([href, label]) => {
+    const current = navHrefIsCurrent(href, currentPath) ? ' aria-current="page"' : "";
     return `<a href="${href}"${current}>${label}</a>`;
   }).join("");
   const footerNews = newsletter === "footer"
@@ -138,15 +188,21 @@ export function layout(options) {
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
-    <a class="brand" href="/"><span class="brand-mark">OS</span><span>OnlyScrubs</span></a>
-    <div class="header-tools">
-      <button class="nav-logout header-logout" type="button" data-admin-logout hidden>Log out</button>
-      <a class="icon-button nav-lock" href="/admin.html" data-admin-lock hidden aria-label="Admin"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></a>
-      <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch colour theme">${icon("sun")}${icon("moon")}</button>
-      <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav">Menu</button>
+    <div class="header-bar">
+      <a class="brand" href="/"><span class="brand-mark">OS</span><span>OnlyScrubs</span></a>
+      <div class="header-tools">
+        <button class="nav-logout header-logout" type="button" data-admin-logout hidden>Log out</button>
+        <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch colour theme">${icon("sun")}${icon("moon")}</button>
+        <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav">Menu</button>
+      </div>
+      <nav class="site-nav" id="site-nav" data-nav aria-label="Primary">
+        <div class="nav-handle" data-nav-handle aria-hidden="true"><span></span></div>
+        <div class="nav-primary">${nav}<button class="nav-logout" type="button" data-admin-logout hidden style="--i:${NAV.length}">${navIcon("logout")}<span>Log out</span></button></div>
+        <div class="nav-legal" role="group" aria-label="Legal">${legal}</div>
+      </nav>
     </div>
-    <nav class="site-nav" id="site-nav" data-nav aria-label="Primary">${nav}<button class="nav-logout" type="button" data-admin-logout hidden>Log out</button></nav>
     ${tearoomBlock}
+    <div class="nav-scrim" data-nav-scrim aria-hidden="true"></div>
   </header>
   <main id="main">${main}</main>
   <footer class="site-footer">
@@ -158,7 +214,7 @@ export function layout(options) {
         <div class="footer-col"><p class="footer-head">Legal</p><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/disclaimer.html">Disclaimer</a><a href="/complaints.html">Complaints</a></div>
       </nav>
       <p class="affiliation">OnlyScrubs is not affiliated with AHPRA, the Nursing and Midwifery Board of Australia (NMBA), any union, health service or employer.</p>
-      <p class="fine">General information only. Not a clinic and not medical advice. <a href="/terms.html">Terms</a> · <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a> <a class="admin-entry" href="/admin.html">Admin</a></p>
+      <p class="fine">General information only. Not a clinic and not medical advice. <a href="/terms.html">Terms</a> · <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a></p>
       <div class="button-row no-print">${support}<button class="button compact" type="button" data-install>Install app</button></div>
     </div>
   </footer>
@@ -172,6 +228,7 @@ export function layout(options) {
   </dialog>
   <script src="${assets.site}" defer></script>
   ${scripts.map((src) => `<script src="${src}" defer></script>`).join("\n  ")}
+  <button class="back-to-top" type="button" data-back-to-top aria-label="Back to top" aria-hidden="true" tabindex="-1">${navIcon("top")}<span class="visually-hidden">Back to top</span></button>
 </body>
 </html>`;
 }

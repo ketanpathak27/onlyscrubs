@@ -4,7 +4,6 @@ description: General notes on fatigue, sleep and getting home after late or nigh
 date: 2026-11-17
 updated: 2026-11-17
 tags: nights, wellbeing
-toolkit: yes
 ---
 
 Night shift asks you to be awake while the suburb is asleep, and then to sleep while the bins are collected. Fatigue is what accumulates when that bargain is unfair, the roster is tight, or you are new and running on nerves. This page is general information. It is not clinical advice, not a diagnosis, and not a reason to take a medicine because a stranger online takes one.

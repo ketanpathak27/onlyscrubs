@@ -4,7 +4,6 @@ description: An overview of raising safety concerns at work or on placement in A
 date: 2026-11-17
 updated: 2026-11-17
 tags: safety, grads
-toolkit: yes
 ---
 
 Speaking up is part of safe practice. It is also awkward, especially when you are new and the person you need to question has been there for years. This page is an overview of the paths that exist in Australia. It is not legal advice, not clinical advice, and not a script for a particular emergency. If someone is in immediate danger, call 000, and use the internal emergency number as well.
