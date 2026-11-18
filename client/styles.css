@@ -854,3 +854,6 @@ fieldset.group legend { font-family: var(--font-display); padding: 0 6px; }
   white-space: nowrap;
   border: 0;
 }
+
+.shop-support{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;margin-top:32px}
+.shop-support p{margin:0;flex:1 1 320px}

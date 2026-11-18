@@ -110,6 +110,7 @@
   }
   loadConfig().then(function (cfg) {
     const href = usableSupportUrl(cfg.supportUrl);
+    document.querySelectorAll("[data-support-block]").forEach(function (block) { block.hidden = !href; });
     document.querySelectorAll("[data-support-slot]").forEach(function (slot) {
       slot.textContent = "";
       if (!href) {

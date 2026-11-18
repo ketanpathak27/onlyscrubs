@@ -990,6 +990,7 @@ export function shop(assets) {
     main: `<section class="wrap page-hero"><p class="eyebrow">From the OnlyScrubs creator</p><h1>Australian templates we made</h1><p class="lede">Digital downloads for Australian nurses, students, renters and sole traders. Organising tools, not paperwork therapy, though it helps.</p>
       <p class="hero-note">They are general information, not official forms, and not legal, financial, tax or clinical advice. Not third-party ads. Digital downloads delivered via Gumroad. Your rights under the Australian Consumer Law apply.</p></section>
       <section class="wrap section">${sections}
+      <div class="callout shop-support" data-support-block hidden><p><strong>Not after a template?</strong> You can shout the site a coffee instead. It keeps the guides free and the servers caffeinated. Entirely optional, and it buys you nothing but our gratitude.</p><span class="support-slot" data-support-slot hidden></span></div>
       <p class="affiliation shop-note">Independent templates. Not affiliated with or endorsed by any government agency, NMBA or Ahpra. General information only, not legal, financial, tax or clinical advice.</p></section>`
   });
 }
