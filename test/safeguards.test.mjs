@@ -250,7 +250,7 @@ test("shop page keeps plain prices and the consumer-law lines", () => {
   assert.match(html, /A\$49/);
   assert.match(html, /For nurses/);
   assert.match(html, /Life admin/);
-  assert.match(html, /Includes all 4 kits: save A\$32 vs buying separately \(A\$81\)\./);
+  assert.match(html, /Includes all 4 kits: save A\$32 before GST \(A\$35\.20 incl\. GST\) vs buying the four kits separately\./);
   assert.match(html, /Pay estimates only\. You enter your own award or enterprise agreement rates\. No award rates are stated on this page\./);
   assert.match(html, /Not migration advice\./);
   assert.match(html, /Log your shifts, enter your own award or agreement rates and estimate each pay/);
@@ -266,8 +266,13 @@ test("shop page keeps plain prices and the consumer-law lines", () => {
   assert.match(html, /rel="noopener noreferrer"/);
   assert.match(html, /target="_blank"/);
   assert.match(html, /Digital downloads delivered via Gumroad\. Your rights under the Australian Consumer Law apply\./);
+  assert.match(html, /Prices for Australian buyers include 10% GST, which Gumroad collects at checkout\. Outside Australia, tax depends on your country\./);
   assert.match(html, /Independent templates\. Not affiliated with or endorsed by any government agency, NMBA or Ahpra\./);
-  assert.match(html, /"price":"19"/);
+  assert.match(html, /"price":"20.90"/);
+  assert.match(html, /"price":"53.90"/);
+  assert.match(html, /"price":"18.70"/);
+  assert.match(html, /"price":"26.40"/);
+  assert.match(html, /"price":"16.50"/);
   assert.match(html, /"priceCurrency":"AUD"/);
   assert.doesNotMatch(html, /best seller|was\/now|<s>|line-through|NMBA approved|ATO approved/i);
   const nurses = html.slice(html.indexOf(">For nurses<"), html.indexOf(">Life admin<"));

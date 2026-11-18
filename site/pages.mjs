@@ -93,6 +93,56 @@ function money(value) {
   return "A$" + Number(value).toFixed(2).replace(/\.00$/, "");
 }
 
+/** GST-inclusive shop price. Gumroad adds 10% GST at checkout. */
+export function gstPrice(base) {
+  const baseCents = Math.round(Number(base) * 100);
+  const totalCents = Math.round(baseCents * 1.1);
+  const gstCents = totalCents - baseCents;
+  const baseLabel = money(baseCents / 100);
+  const totalLabel = money(totalCents / 100);
+  const gstLabel = money(gstCents / 100);
+  return {
+    baseCents,
+    totalCents,
+    gstCents,
+    baseLabel,
+    totalLabel,
+    gstLabel,
+    totalText: `${totalLabel} incl. GST`,
+    breakdownText: `(${baseLabel} + ${gstLabel} GST, added by Gumroad at checkout)`,
+    schemaPrice: (totalCents / 100).toFixed(2)
+  };
+}
+
+export const BUNDLE_KIT_IDS = ["renter-kit", "budget-planner", "nursing-toolkit", "sole-trader-kit"];
+
+export function bundleSavingLine() {
+  const kits = BUNDLE_KIT_IDS.map((id) => {
+    const product = shopProductById(id);
+    if (!product) throw new Error("Missing bundle kit " + id);
+    return product;
+  });
+  const bundle = shopProductById("bundle");
+  const kitSumCents = kits.reduce((sum, product) => sum + Math.round(Number(product.price) * 100), 0);
+  const bundleCents = Math.round(Number(bundle.price) * 100);
+  const saveCents = kitSumCents - bundleCents;
+  if (saveCents !== 3200) {
+    throw new Error("Bundle saving does not add up: kits " + (kitSumCents / 100) + " minus bundle " + (bundleCents / 100) + " is " + (saveCents / 100) + ", not 32");
+  }
+  const save = gstPrice(saveCents / 100);
+  return `Includes all 4 kits: save ${save.baseLabel} before GST (${save.totalLabel} incl. GST) vs buying the four kits separately.`;
+}
+
+function productDescription(product) {
+  return product.id === "bundle" ? bundleSavingLine() : product.description;
+}
+
+function shopPriceHtml(product, kind = "card") {
+  const gst = gstPrice(product.price);
+  const totalClass = kind === "teaser" ? "price-inline" : "price";
+  return `<p class="${totalClass}">${esc(gst.totalText)}</p><p class="price-gst">${esc(gst.breakdownText)}</p>`;
+}
+
 function toolBlock(guide) {
   if (guide.tool === "cpd") {
     return `<section class="panel" data-cpd-tally data-target="${figures.cpd.minimumHours}">
@@ -280,7 +330,7 @@ function shopTeaser() {
           <img src="/shop/${product.id}-cover.png" alt="" width="${product.width}" height="${product.height}" loading="lazy" decoding="async">
         </picture>
         <h3>${esc(shortName(product.name))}</h3>
-        <p class="price-inline">${esc(product.priceLabel)}</p>
+        ${shopPriceHtml(product, "teaser")}
         <p class="button-row"><a class="button primary" href="${esc(product.url)}" target="_blank" rel="noopener noreferrer">View on Gumroad</a></p>
       </article>`).join("");
 }
@@ -1008,8 +1058,8 @@ function shopCard(product, options = {}) {
       </picture>
       <div class="shop-card-body">
       <h3>${esc(featured ? shortName(product.name) : product.name)}</h3>
-      <p class="price">${esc(product.priceLabel)}</p>
-      <p>${esc(product.description)}</p>
+      ${shopPriceHtml(product)}
+      <p>${esc(productDescription(product))}</p>
       ${note}
       <a class="button primary" href="${esc(product.url)}" target="_blank" rel="noopener noreferrer">Buy on Gumroad</a>
       </div>
@@ -1043,19 +1093,20 @@ export function shop(assets) {
       "@context": "https://schema.org",
       "@type": "Product",
       name: product.name,
-      description: product.description,
+      description: productDescription(product),
       image: `${SITE}/shop/${product.id}-cover.webp`,
       brand: { "@type": "Brand", "name": "OnlyScrubs" },
       offers: {
         "@type": "Offer",
         priceCurrency: "AUD",
-        price: product.price,
+        price: gstPrice(product.price).schemaPrice,
         url: product.url,
         availability: "https://schema.org/InStock"
       }
     })),
     main: `<section class="wrap page-hero"><p class="eyebrow">From the OnlyScrubs creator</p><h1>Australian templates we made</h1><p class="lede">Digital downloads for Australian nurses, students, renters and sole traders. Organising tools, not paperwork therapy, though it helps.</p>
-      <p class="hero-note">They are general information, not official forms, and not legal, financial, tax or clinical advice. Not third-party ads. Digital downloads delivered via Gumroad. Your rights under the Australian Consumer Law apply.</p></section>
+      <p class="hero-note">They are general information, not official forms, and not legal, financial, tax or clinical advice. Not third-party ads. Digital downloads delivered via Gumroad. Your rights under the Australian Consumer Law apply.</p>
+      <p class="hero-note">Prices for Australian buyers include 10% GST, which Gumroad collects at checkout. Outside Australia, tax depends on your country.</p></section>
       <section class="wrap section">${featuredHtml}${sections}
       <p class="affiliation shop-note">Independent templates. Not affiliated with or endorsed by any government agency, NMBA or Ahpra. General information only, not legal, financial, tax or clinical advice.</p></section>
       <section class="wrap section shop-support-section">

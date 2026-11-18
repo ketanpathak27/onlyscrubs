@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
-import { admin, confessions, guideArticle, home, shop } from "../site/pages.mjs";
+import shopData from "../data/shop.json" with { type: "json" };
+import { admin, confessions, guideArticle, gstPrice, home, productCallout, shop } from "../site/pages.mjs";
 import { parseGuide } from "../site/markdown.mjs";
 import { layout } from "../site/layout.mjs";
 
@@ -42,7 +43,7 @@ test("the Life Admin Bundle is featured first on the shop, with honest savings w
   assert.ok(bundle >= 0, "bundle card is present");
   assert.ok(bundle < nurses && bundle < toolkit && bundle < renter, "bundle is featured before the shop groups");
   assert.equal((html.match(/id="product-bundle"/g) || []).length, 1, "the bundle is not repeated in its group");
-  assert.match(html, /Includes all 4 kits: save A\$32 vs buying separately \(A\$81\)\./);
+  assert.match(html, /Includes all 4 kits: save A\$32 before GST \(A\$35\.20 incl\. GST\) vs buying the four kits separately\./);
   assert.match(html, /id="shop-featured-heading">The bundle</);
   const bundleBlock = html.slice(html.indexOf('id="product-bundle"'), html.indexOf('id="product-nursing-toolkit"'));
   assert.match(bundleBlock, /<h3>Australian Life Admin Bundle<\/h3>/, "featured card uses the shorter display title");
@@ -148,4 +149,50 @@ test("shop callout cards have their own inner padding so they stay clear of PR 1
   const css = readFileSync(new URL("../client/styles.css", import.meta.url), "utf8");
   assert.match(css, /\.shop-callout\s*\{[\s\S]*?padding:\s*var\(--card-pad\)/);
   assert.match(css, /\.shop-callout\s*\{[\s\S]*?margin-inline:\s*0/);
+});
+
+test("gstPrice is base times 1.1 rounded to cents", () => {
+  const cases = [
+    [19, "A$20.90 incl. GST", "(A$19 + A$1.90 GST, added by Gumroad at checkout)", "20.90"],
+    [24, "A$26.40 incl. GST", "(A$24 + A$2.40 GST, added by Gumroad at checkout)", "26.40"],
+    [49, "A$53.90 incl. GST", "(A$49 + A$4.90 GST, added by Gumroad at checkout)", "53.90"],
+    [17, "A$18.70 incl. GST", "(A$17 + A$1.70 GST, added by Gumroad at checkout)", "18.70"],
+    [15, "A$16.50 incl. GST", "(A$15 + A$1.50 GST, added by Gumroad at checkout)", "16.50"],
+    [12, "A$13.20 incl. GST", "(A$12 + A$1.20 GST, added by Gumroad at checkout)", "13.20"]
+  ];
+  for (const [base, total, breakdown, schema] of cases) {
+    const gst = gstPrice(base);
+    assert.equal(gst.totalText, total);
+    assert.equal(gst.breakdownText, breakdown);
+    assert.equal(gst.schemaPrice, schema);
+  }
+});
+
+test("every displayed shop price leads with an incl. GST total", () => {
+  const shopHtml = shop(assets);
+  const homeHtml = home(assets, guides);
+  const products = shopData.groups.flatMap((group) => group.products);
+  for (const product of products) {
+    const gst = gstPrice(product.price);
+    const start = shopHtml.indexOf(`id="product-${product.id}"`);
+    assert.ok(start >= 0, `${product.id} is on the shop page`);
+    const rest = shopHtml.slice(start + 1);
+    const endRel = rest.search(/id="product-|<\/section>/);
+    const block = endRel >= 0 ? shopHtml.slice(start, start + 1 + endRel) : shopHtml.slice(start);
+    assert.ok(block.includes(gst.totalText), `${product.id} shows ${gst.totalText}`);
+    assert.ok(block.includes(gst.breakdownText), `${product.id} shows the GST breakdown`);
+    assert.ok(block.indexOf(gst.totalText) < block.indexOf(gst.breakdownText), `${product.id} leads with the GST-inclusive total`);
+    assert.ok(shopHtml.includes(`"price":"${gst.schemaPrice}"`), `schema price for ${product.id} is ${gst.schemaPrice}`);
+  }
+  assert.match(shopHtml, /Prices for Australian buyers include 10% GST, which Gumroad collects at checkout/);
+  const homePicks = ["nursing-toolkit", "nurse-roster-pay", "bundle"];
+  for (const id of homePicks) {
+    const product = products.find((item) => item.id === id);
+    const gst = gstPrice(product.price);
+    assert.ok(homeHtml.includes(gst.totalText), `homepage shows ${gst.totalText} for ${id}`);
+    assert.ok(homeHtml.includes(gst.breakdownText), `homepage shows the GST breakdown for ${id}`);
+  }
+  assert.doesNotMatch(productCallout("payTracker"), /A\$\d|incl\. GST/);
+  assert.doesNotMatch(productCallout("iqnmPlanner"), /A\$\d|incl\. GST/);
+  assert.doesNotMatch(rendered("first-clinical-placement.md"), /A\$\d|incl\. GST/);
 });
