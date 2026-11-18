@@ -512,6 +512,14 @@ html.nav-locked body {
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+.hero-plain {
+  margin: 0 0 12px;
+  max-width: var(--measure);
+  color: var(--ink);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
 .hero-actions, .button-row { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-5); }
 .hero-art {
   background: var(--mist);

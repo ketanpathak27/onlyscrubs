@@ -173,14 +173,14 @@ export function layout(options) {
   <meta property="og:site_name" content="OnlyScrubs">
   <meta property="og:locale" content="en_AU">
   <meta property="og:image" content="https://onlyscrubs.org/og.png">
-  <meta property="og:image:alt" content="OnlyScrubs, practical notes for Australian healthcare workers">
+  <meta property="og:image:alt" content="OnlyScrubs, education and support for Australian healthcare workers">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${esc(fullTitle)}">
   <meta name="twitter:description" content="${esc(description)}">
   <meta name="twitter:image" content="https://onlyscrubs.org/og.png">
-  <meta name="twitter:image:alt" content="OnlyScrubs, practical notes for Australian healthcare workers">
+  <meta name="twitter:image:alt" content="OnlyScrubs, education and support for Australian healthcare workers">
   <link rel="preload" href="/assets/fonts/source-sans-3-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="${assets.styles}">
   ${jsonScripts.join("\n  ")}
@@ -209,7 +209,7 @@ export function layout(options) {
     ${footerNews}
     <div>
       <nav class="footer-nav" aria-label="Footer">
-        <div class="footer-col"><p class="footer-head">Explore</p><a href="/guides.html">Guides</a><a href="/shop.html">Shop</a><a href="/wellbeing.html">Wellbeing</a><a href="/about.html">About</a></div>
+        <div class="footer-col"><p class="footer-head">Explore</p><a href="/guides.html">Guides</a><a href="/shop.html">Shop</a><a href="/wellbeing.html">Wellbeing</a><a href="/about.html">About</a><a href="mailto:hello@onlyscrubs.org">Contact</a></div>
         <div class="footer-col"><p class="footer-head">Community</p><a href="/submit.html">Submit</a><a href="/submission-rules.html">Rules</a><a href="/moderation.html">How we moderate</a><a href="/advertise.html">Advertise</a></div>
         <div class="footer-col"><p class="footer-head">Legal</p><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/disclaimer.html">Disclaimer</a><a href="/complaints.html">Complaints</a></div>
       </nav>
