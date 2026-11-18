@@ -237,7 +237,7 @@ fs.writeFileSync(path.join(publicDir, "sw.js"), sw);
 const manifest = {
   name: "OnlyScrubs",
   short_name: "OnlyScrubs",
-  description: "Practical, anonymous resources for Australian nurses, midwives and students.",
+  description: pages.HOME_DESCRIPTION,
   start_url: "/",
   scope: "/",
   display: "standalone",

@@ -8,6 +8,41 @@ import { esc } from "./markdown.mjs";
 
 const SITE = "https://onlyscrubs.org";
 
+export const HOME_TITLE = "Education and support for Australian healthcare workers";
+export const HOME_DESCRIPTION = "Education and support for Australian healthcare workers — nurses, midwives, doctors and students. Free guides on CPD, AHPRA and NMBA renewal, placements, graduate programs and tax.";
+export const GUIDE_DESCRIPTION_FALLBACK = "A free education guide for Australian healthcare workers, covering practical topics such as CPD, registration, placements and shift life. Not clinical advice.";
+
+export const KNOWS_ABOUT = [
+  "Healthcare education",
+  "Continuing professional development for nurses and midwives",
+  "AHPRA registration",
+  "NMBA registration renewal",
+  "Clinical placements",
+  "Graduate nursing and midwifery programs",
+  "Tax for nurses and midwives"
+];
+
+export function siteOrganization() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "OnlyScrubs",
+    url: `${SITE}/`,
+    email: "hello@onlyscrubs.org",
+    logo: `${SITE}/icons/icon-512.png`,
+    areaServed: { "@type": "Country", name: "Australia" },
+    description: HOME_DESCRIPTION,
+    knowsAbout: KNOWS_ABOUT
+  };
+}
+
+export function guideMetaDescription(guide) {
+  const text = String(guide?.description || "").trim();
+  if (text) return text;
+  const title = String(guide?.title || "Guide").trim();
+  return `${title}. ${GUIDE_DESCRIPTION_FALLBACK}`;
+}
+
 /** The one public wording of the report rule. It mirrors decideReport in src/lib/reports.js. */
 export const REPORT_RULE = `An ordinary report does not take an item down on its own: a confession, comment or listing is hidden from the public page, pending moderation, once ${AUTO_HIDE_AFTER} different people have reported it. A report for patient-identifying information, threats or self-harm hides it immediately, pending moderation. The same connection can report an item only once, and each connection can make up to ${REPORTS_PER_DAY} reports a day.`;
 
@@ -215,28 +250,19 @@ function guideCards(guides) {
 export function home(assets, guides) {
   const featured = guides.slice(0, 4);
   return page({
-    title: "OnlyScrubs | Practical stuff for Australian nurses and midwives",
-    description: "Free, anonymous guides, scrub swaps, shift tools and moderated confessions for Australian nurses, midwives, students and healthcare workers.",
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
     path: "/",
     active: "/",
     assets,
     tearoom: true,
     newsletter: "band",
-    jsonLd: [{
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      name: "OnlyScrubs",
-      url: `${SITE}/`,
-      email: "hello@onlyscrubs.org",
-      logo: `${SITE}/icons/icon-512.png`,
-      areaServed: { "@type": "Country", name: "Australia" },
-      description: "Anonymous practical resources for Australian nurses, midwives, students and healthcare workers."
-    }, {
+    jsonLd: [siteOrganization(), {
       "@context": "https://schema.org",
       "@type": "WebSite",
       name: "OnlyScrubs",
       url: `${SITE}/`,
-      description: "Practical, anonymous resources for Australian nurses, midwives, students and healthcare workers.",
+      description: HOME_DESCRIPTION,
       inLanguage: "en-AU",
       publisher: { "@type": "Organization", name: "OnlyScrubs", url: `${SITE}/`, email: "hello@onlyscrubs.org" },
       potentialAction: {
@@ -247,9 +273,10 @@ export function home(assets, guides) {
     }],
     main: `<section class="wrap hero">
       <div class="hero-copy">
-        <p class="eyebrow">Nurses, midwives, students</p>
+        <p class="eyebrow">Nurses, midwives, doctors and students</p>
+        <p class="hero-plain">Education and support for Australian healthcare workers.</p>
         <h1>The tearoom, minus the patient stories.</h1>
-        <p class="lede">Guides, tools and harmless confessions for people who live in scrubs. We joke about rosters, paperwork and cold coffee. Never about patients.</p>
+        <p class="lede">Free guides on CPD, AHPRA and NMBA renewal, placements, graduate programs and tax, plus tools for shift life. We joke about rosters, paperwork and cold coffee. Never about patients.</p>
         <div class="hero-actions">
           <a class="button primary" href="/guides.html">Open the guides</a>
           <a class="button secondary" href="/confessions.html">Enter the tearoom</a>
@@ -257,20 +284,6 @@ export function home(assets, guides) {
         <p class="hero-note"><strong>Clean boundary.</strong> Pens, rosters, full moons and the Q word are fair game. Patient stories, workplaces and clinical claims are not. OnlyScrubs is not a clinic and not medical advice.</p>
       </div>
       ${heroArt()}
-    </section>
-    <section class="section wrap reveal" aria-labelledby="home-community">
-      <div class="split">
-        <div>
-          <p class="kicker">Cheeky, with rails</p>
-          <h2 id="home-community">Confess the pen crime. Not the patient.</h2>
-          <p>Rosters, paperwork, cold coffee and 3am pages are fair game. Patient information, clinical incidents, colleague call-outs, employer names and treatment claims are not. A person reads every post before it goes up.</p>
-          <a class="text-link" href="/submission-rules.html">Read the rules first</a>
-        </div>
-        <div class="stack">
-          <article class="quote"><p>“I brought five pens and left with a spoon, a mystery highlighter and personal growth.”</p><span>Allowed. Harmless and non-identifying.</span></article>
-          <article class="quote bad"><p>“A patient at my hospital…”</p><span>Not allowed. No patients, locations, dates or clinical detail.</span></article>
-        </div>
-      </div>
     </section>
     <section class="section wrap reveal" aria-labelledby="home-guides">
       <div class="section-head">
@@ -295,6 +308,20 @@ export function home(assets, guides) {
         <a class="card link-card" href="/scrub-rack.html"><h3>Scrub Rack</h3><p>Donate, request or swap clean scrubs. Your email stays off the card, like a pen you actually want back.</p></a>
       </div>
       <p class="section-foot">Rough shift? The <a href="/wellbeing.html">wellbeing page</a> has Australian support lines and a short breathing pause. That one stays serious.</p>
+    </section>
+    <section class="section wrap reveal" aria-labelledby="home-community">
+      <div class="split">
+        <div>
+          <p class="kicker">Cheeky, with rails</p>
+          <h2 id="home-community">Confess the pen crime. Not the patient.</h2>
+          <p>Rosters, paperwork, cold coffee and 3am pages are fair game. Patient information, clinical incidents, colleague call-outs, employer names and treatment claims are not. A person reads every post before it goes up.</p>
+          <a class="text-link" href="/submission-rules.html">Read the rules first</a>
+        </div>
+        <div class="stack">
+          <article class="quote"><p>“I brought five pens and left with a spoon, a mystery highlighter and personal growth.”</p><span>Allowed. Harmless and non-identifying.</span></article>
+          <article class="quote bad"><p>“A patient at my hospital…”</p><span>Not allowed. No patients, locations, dates or clinical detail.</span></article>
+        </div>
+      </div>
     </section>
     <section class="section wrap reveal" aria-labelledby="home-shop">
       <div class="section-head">
@@ -339,7 +366,7 @@ export function guideIndex(assets, guides) {
   const tagSet = [...new Set(guides.flatMap((guide) => guide.tags))];
   return page({
     title: "Guides",
-    description: "Practical Australian guides for nursing and midwifery students and new clinicians: placement, nights, ISBAR, study, money and asking for help.",
+    description: "Education and support guides for Australian healthcare workers: CPD, AHPRA and NMBA renewal, placements, graduate programs, tax and more. Free, practical and not clinical advice.",
     path: "/guides.html",
     active: "/guides.html",
     assets,
@@ -359,9 +386,10 @@ export function guideIndex(assets, guides) {
 
 export function guideArticle(assets, guide, related) {
   const url = `${SITE}${guide.path}`;
+  const description = guideMetaDescription(guide);
   return page({
     title: guide.title,
-    description: guide.description,
+    description,
     path: guide.path,
     active: "/guides.html",
     assets,
@@ -371,7 +399,7 @@ export function guideArticle(assets, guide, related) {
       "@context": "https://schema.org",
       "@type": "Article",
       headline: guide.title,
-      description: guide.description,
+      description,
       datePublished: guide.date,
       dateModified: guide.updated || guide.date,
       inLanguage: "en-AU",
@@ -951,7 +979,7 @@ const AFFILIATION = "OnlyScrubs is not affiliated with AHPRA, the Nursing and Mi
 export function about(assets) {
   return page({
     title: "About",
-    description: "OnlyScrubs is an independent Australian project for nurses, midwives, students and healthcare workers. It is not a regulator, a union, a health service or an employer.",
+    description: "OnlyScrubs is an independent project made by an Australian healthcare worker, offering education and support for nurses, midwives, doctors and students. It is not a registered business and does not have an ABN.",
     path: "/about.html",
     active: "/about.html",
     assets,
@@ -960,21 +988,14 @@ export function about(assets) {
       "@type": "AboutPage",
       name: "About OnlyScrubs",
       url: `${SITE}/about.html`,
-      description: "Who runs OnlyScrubs, why it exists, and what it is not.",
+      description: "OnlyScrubs is an independent project made by an Australian healthcare worker, offering education and support for healthcare workers and students.",
       inLanguage: "en-AU",
-      mainEntity: {
-        "@type": "Organization",
-        name: "OnlyScrubs",
-        url: `${SITE}/`,
-        email: "hello@onlyscrubs.org",
-        areaServed: "AU",
-        description: AFFILIATION
-      }
+      mainEntity: siteOrganization()
     }],
     main: `<section class="wrap page-hero prose"><p class="eyebrow">Who we are</p><h1>About OnlyScrubs</h1>
       <p class="affiliation">${AFFILIATION}</p>
       <h2>Who runs it</h2>
-      <p>OnlyScrubs is an independent Australian project. It is not a company holding itself out as a health service, and it is not run by a hospital, a university, a union or a regulator. One person keeps the site, reads the queue, and can be reached at <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a>.</p>
+      <p>OnlyScrubs is an independent project made by an Australian healthcare worker. It is not a registered business, and it does not have an ABN. It is not a company holding itself out as a health service, and it is not run by a hospital, a university, a union or a regulator. One person keeps the site, reads the queue, and can be reached at <a href="mailto:hello@onlyscrubs.org">hello@onlyscrubs.org</a>.</p>
       <h2>Why it exists</h2>
       <p>Official information for nurses, midwives and students is scattered across boards, awards, state health pages and university handbooks. Shift life is also lonely, and the group chats that fill the gap are a poor place for anything that could identify a patient or a workplace. This site is a small, free, anonymous corner for practical notes, scrub swaps, shift tools and harmless humour, with a person between a post and the public page.</p>
       <h2>What it is</h2>
