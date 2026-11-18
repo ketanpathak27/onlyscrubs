@@ -42,25 +42,102 @@
 
   const navToggle = document.querySelector("[data-nav-toggle]");
   const nav = document.querySelector("[data-nav]");
-  function setNav(open) {
-    if (!nav || !navToggle) return;
-    nav.classList.toggle("is-open", open);
-    navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  const navScrim = document.querySelector("[data-nav-scrim]");
+  const desktopNav = window.matchMedia("(min-width: 1040px)");
+
+  function navIsDesktop() {
+    return desktopNav.matches;
   }
-  navToggle?.addEventListener("click", function () {
-    setNav(!nav.classList.contains("is-open"));
-  });
-  document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape" && nav?.classList.contains("is-open")) {
-      setNav(false);
+
+  function navIsOpen() {
+    return Boolean(nav && nav.classList.contains("is-open"));
+  }
+
+  function firstNavItem() {
+    return nav && nav.querySelector(".nav-primary a, .nav-primary button:not([hidden])");
+  }
+
+  function navFocusables() {
+    if (!nav) return [];
+    const items = [];
+    if (navToggle) items.push(navToggle);
+    nav.querySelectorAll("a, button").forEach(function (el) {
+      if (el.hidden) return;
+      items.push(el);
+    });
+    return items;
+  }
+
+  function lockPage(lock) {
+    const root = document.documentElement;
+    if (lock) {
+      if (root.classList.contains("nav-locked")) return;
+      const gap = window.innerWidth - root.clientWidth;
+      root.style.setProperty("--nav-scrollbar-comp", (gap > 0 ? gap : 0) + "px");
+      root.dataset.navScrollY = String(window.scrollY);
+      root.classList.add("nav-locked");
+      document.body.style.top = "-" + window.scrollY + "px";
+    } else if (root.classList.contains("nav-locked")) {
+      const y = Number(root.dataset.navScrollY || 0);
+      root.classList.remove("nav-locked");
+      document.body.style.top = "";
+      root.style.removeProperty("--nav-scrollbar-comp");
+      delete root.dataset.navScrollY;
+      window.scrollTo(0, y);
+    }
+  }
+
+  function setNav(open, opts) {
+    if (!nav || !navToggle) return;
+    const willOpen = Boolean(open) && !navIsDesktop();
+    const already = navIsOpen();
+    nav.classList.toggle("is-open", willOpen);
+    navToggle.setAttribute("aria-expanded", willOpen ? "true" : "false");
+    if (navScrim) {
+      navScrim.classList.toggle("is-open", willOpen);
+      navScrim.setAttribute("aria-hidden", willOpen ? "false" : "true");
+    }
+    lockPage(willOpen);
+    if (willOpen && !already) {
+      const first = firstNavItem();
+      if (first) first.focus();
+    } else if (!willOpen && already && opts && opts.focusToggle) {
       navToggle.focus();
     }
+  }
+
+  navToggle?.addEventListener("click", function () {
+    setNav(!navIsOpen());
   });
-  // Close the menu when a link is chosen or the page behind it is tapped.
+  document.addEventListener("keydown", function (event) {
+    if (!navIsOpen() || navIsDesktop()) return;
+    if (event.key === "Escape") {
+      setNav(false, { focusToggle: true });
+      return;
+    }
+    if (event.key !== "Tab") return;
+    const items = navFocusables();
+    if (!items.length) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+  // Close the menu when a link is chosen, the scrim is tapped, or the page behind it is tapped.
   document.addEventListener("click", function (event) {
-    if (!nav?.classList.contains("is-open")) return;
+    if (!navIsOpen()) return;
     if (event.target.closest("[data-nav-toggle]")) return;
-    if (event.target.closest("[data-nav] a") || !event.target.closest("[data-nav]")) setNav(false);
+    if (event.target.closest("[data-nav] a") || event.target.closest("[data-nav-scrim]") || !event.target.closest("[data-nav]")) {
+      setNav(false);
+    }
+  });
+  desktopNav.addEventListener("change", function () {
+    if (desktopNav.matches) setNav(false);
   });
 
   const reveals = document.querySelectorAll(".reveal");

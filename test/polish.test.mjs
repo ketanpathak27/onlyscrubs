@@ -75,3 +75,35 @@ test("homepage is a calm hero plus at most four focused sections, then the newsl
   const guideLinks = main.match(/href="\/guides\/g\d\.html"/g) || [];
   assert.ok(guideLinks.length >= 3 && guideLinks.length <= 4, "3 or 4 featured guides");
 });
+
+test("mobile nav is a floating panel with icons and a quieter legal group", () => {
+  const html = layout({ title: "T", description: "D", path: "/guides.html", active: "/guides.html", main: "<p>x</p>", assets });
+  const navStart = html.indexOf('id="site-nav"');
+  const navEnd = html.indexOf("</nav>", navStart);
+  assert.ok(navStart > 0 && navEnd > navStart, "primary nav is present");
+  const nav = html.slice(navStart, navEnd);
+
+  assert.match(html, /data-nav-toggle[^>]*aria-expanded="false"/);
+  assert.match(html, /aria-controls="site-nav"/);
+  assert.match(html, /class="header-bar"/);
+  assert.match(html, /class="nav-scrim"[^>]*data-nav-scrim/);
+  assert.match(nav, /class="nav-primary"/);
+  assert.match(nav, /class="nav-legal"[^>]*aria-label="Legal"/);
+
+  const labels = ["Guides", "Scrub Rack", "Shift Kit", "Student Bay", "Gear", "Shop", "Confessions", "Wellbeing", "About"];
+  for (const label of labels) {
+    const item = nav.match(new RegExp(`<a href="[^"]+"[^>]*>[\\s\\S]*?${label}<\\/span>`));
+    assert.ok(item, label + " is in the primary nav");
+    assert.match(item[0], /class="nav-icon"[^>]*aria-hidden="true"/, label + " has a hidden icon");
+    assert.match(item[0], /<svg /);
+  }
+
+  assert.match(nav, /href="\/privacy\.html"/);
+  assert.match(nav, /href="\/terms\.html"/);
+  assert.match(nav, /href="\/disclaimer\.html"/);
+  assert.match(nav, /href="\/complaints\.html"/);
+  assert.doesNotMatch(nav, /<img /);
+  assert.doesNotMatch(nav, /https?:\/\/|cdn\.|googleapis|unpkg|jsdelivr/i, "icons are inline, not from a CDN");
+  assert.match(nav, /href="\/guides\.html" aria-current="page"/);
+  assert.match(html, /class="nav-toggle"/);
+});
